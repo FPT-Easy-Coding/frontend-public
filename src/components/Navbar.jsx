@@ -24,12 +24,12 @@ const Navbar = () => {
         <ThemeSwap />
         <NavLink
           to="/login"
-          className={({ isActive }) => (isActive ? "btn btn-ghost btn-active btn-md rounded-btn" : "btn btn-ghost btn-md rounded-btn")} 
+          className={({ isActive }) => (isActive ? "hidden" : "btn btn-primary btn-md rounded-3xl")} 
         >
           Login
         </NavLink>
-        <NavLink to="/signup" className="btn btn-primary btn-md rounded-btn">Sign up</NavLink>
-        <div className="dropdown dropdown-end">
+        <NavLink to="/signup" className={({ isActive }) => (isActive ? "hidden" : "btn btn-secondary btn-md rounded-3xl")}>Sign up</NavLink>
+        {/* <div className="dropdown dropdown-end">
           <div
             tabIndex={0}
             role="button"
@@ -59,7 +59,7 @@ const Navbar = () => {
               <a>Logout</a>
             </li>
           </ul>
-        </div>
+        </div> */}
       </div>
     </div>
   );

@@ -21,7 +21,7 @@ const ThemeSwap = () => {
   return (
     <>
       {/* Toggle switch */}
-      <label className="cursor-pointer grid place-items-center">
+      <label className="cursor-pointer grid place-items-center mr-2">
         <input
           type="checkbox"
           value="synthwave"
