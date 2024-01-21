@@ -1,4 +1,4 @@
-import { Form, NavLink, useRouteLoaderData} from "react-router-dom";
+import { Form, NavLink, useRouteLoaderData } from "react-router-dom";
 import logo from "../assets/logo.svg";
 import ThemeSwap from "./ThemeSwap";
 import { useEffect } from "react";
@@ -60,11 +60,11 @@ const userBtn = (data) => {
           <li>
             <a>Settings</a>
           </li>
-          <li>
-            <Form action="/logout" method="post">
+          <Form action="/logout" method="post">
+            <li>
               <button type="submit">Logout</button>
-            </Form>
-          </li>
+            </li>
+          </Form>
         </ul>
       </div>
     </>
