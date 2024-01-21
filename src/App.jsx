@@ -1,22 +1,50 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Homepage from "./pages/Homepage";
-import Signup from "./pages/Signup";
-import Login from "./pages/Login";
 import Root from "./pages/Root";
-import { action as signupAction } from "./pages/Signup";
+import Signup, {
+  action as signupAction,
+} from "./pages/authentication/Register/Signup";
 import { ToastContainer } from "react-toastify";
-import { action as loginAction } from "./pages/Login";
 
 import "react-toastify/dist/ReactToastify.css";
 
+import Homepage from "./pages/Homepage";
+import Login, {
+  action as loginAction,
+} from "./pages/authentication/Login/Login";
+import ForgotPassword from "./pages/authentication/ForgotPassword/ForgotPassword";
+import ResetPassword from "./pages/authentication/ForgotPassword/ResetPassword";
+import ProfilePage from "./pages/account/user/ProfilePage";
+import logout from "./utils/loader/auth/logout";
+import { getAuthCredentials } from "./utils/loader/auth/auth";
 const router = createBrowserRouter([
   {
     path: "/",
+    loader: getAuthCredentials,
+    id: "root-loader",
     element: <Root />,
     children: [
       { index: true, element: <Homepage /> },
       { path: "signup", element: <Signup />, action: signupAction },
       { path: "login", element: <Login />, action: loginAction },
+      {
+        path: "forgotten",
+        children: [
+          {
+            index: true,
+            element: <ForgotPassword />,
+          },
+          {
+            path: "reset-password",
+            element: <ResetPassword />,
+          },
+        ],
+      },
+      { path: "home", element: <Homepage /> },
+      {
+        path: "user",
+        children: [{path: "profile", element: <ProfilePage /> }],
+      },
+      { path: "logout", action: logout },
     ],
   },
 ]);

@@ -1,5 +1,3 @@
-
-import Footer from "../components/Footer";
 import cover from "../assets/homepage-cover.jpg";
 
 const Homepage = () => {
@@ -31,7 +29,6 @@ const Homepage = () => {
           </div>
         </div>
       </div>
-      <Footer />
     </div>
   );
 };

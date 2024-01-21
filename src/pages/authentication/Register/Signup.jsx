@@ -1,5 +1,5 @@
 
-import SignupForm from "../components/SignupForm";
+import SignupForm from "../../../components/authentication/Register/SignupForm";
 import axios from "axios";
 
 function Signup() {

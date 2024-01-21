@@ -6,8 +6,6 @@ import {
   useNavigation
 } from "react-router-dom";
 import { toast } from "react-toastify";
-// import { useRef } from "react";
-// import Modal from "./Modal";
 function SignupForm() {
   const data = useActionData();
   console.log(data);
@@ -29,6 +27,7 @@ function SignupForm() {
       });
     }
   }, [data]);
+  const spinningBtn = <span className="loading loading-spinner"></span>;
   return (
     <>
       <div className="flex justify-center items-center pb-10">
@@ -183,11 +182,11 @@ function SignupForm() {
               </div>
               <div className="form-control mt-5">
                 <button
-                  className="btn btn-primary btn-outline"
+                  className="btn btn-primary"
                   // onClick={handleSubmit}
                   disabled={isSubmitting && true}
                 >
-                  Signup
+                  {isSubmitting ? spinningBtn : "Register"}
                 </button>
               </div>
             </Form>
