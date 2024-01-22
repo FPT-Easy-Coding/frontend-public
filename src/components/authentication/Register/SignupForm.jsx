@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   Form,
   Link,
@@ -34,7 +34,7 @@ function SignupForm() {
         <div className="card w-full max-w-[35rem] shadow-2xl bg-base-100">
           <div className="card-body">
             <div className="flex justify-center items-center pb-3">
-              <div className="card-title">Sign up your QuizToast</div>
+              <div className="card-title">Register your QuizToast</div>
             </div>
             <Form method="post">
               <div className="form-control">
@@ -49,7 +49,7 @@ function SignupForm() {
                   name="email"
                 />
               </div>
-              {/* <div className="form-control">
+              <div className="form-control">
                 <label className="label">
                   <span className="label-text">Phone number</span>
                 </label>
@@ -59,7 +59,7 @@ function SignupForm() {
                   className="input input-bordered"
                   id="new-phonenum"
                 />
-              </div> */}
+              </div>
               <div className="flex items-center gap-3">
                 <div className="form-control basis-1/2">
                   <label className="label">
@@ -86,8 +86,8 @@ function SignupForm() {
                   />
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                {/* <div className="form-control basis-3/5">
+              <div className="">
+                <div className="form-control">
                   <label className="label">
                     <span className="label-text">Username</span>
                   </label>
@@ -98,7 +98,7 @@ function SignupForm() {
                     id="new-uname"
 
                   />
-                </div> */}
+                </div>
                 {/* <div className="form-control basis-2/5">
                   <label className="label">
                     <span className="label-text">Date of birth</span>

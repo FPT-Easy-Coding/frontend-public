@@ -2,12 +2,19 @@
 import { useEffect, useState, useRef } from "react";
 import { Form, Link, useActionData, useNavigation } from "react-router-dom";
 import { toast } from "react-toastify";
+import { isValidEmail } from "../../../utils/check/checkInputField";
 function LoginForm() {
   const data = useActionData();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
   const [isError, setIsError] = useState(false);
   const errorCond = useRef();
+
+  const [inputValues, setInputValues] = useState({
+    email: "",
+    password: "",
+  });
+
   useEffect(() => {
     if (data?.errorCondition) {
       switch (data?.errorCondition) {
@@ -22,15 +29,23 @@ function LoginForm() {
       }
       setIsError(true);
     } else {
-      if (data?.error){
-        toast.error(data.message)
+      if (data?.error) {
+        toast.error(data.message);
       }
       setIsError(false);
     }
   }, [data]);
-  function handleChange() {
-    setIsError(false);
+  function handleChange(identifier, value) {
+    setInputValues((prev) => ({ ...prev, [identifier]: value }));
+
+    if (isValidEmail(value)) {
+      setIsError(false);
+      console.log(isError);
+    } else {
+      setIsError(true);
+    }
   }
+
   const spinningBtn = <span className="loading loading-spinner"></span>;
   return (
     <>
@@ -57,7 +72,7 @@ function LoginForm() {
                   className={`input input-bordered ${
                     isError ? "input-error" : ""
                   }`}
-                  onChange={handleChange}
+                  onChange={(e) => handleChange("email", e.target.value)}
                   required
                 />
               </div>
@@ -72,7 +87,7 @@ function LoginForm() {
                     isError ? "input-error" : ""
                   }`}
                   name="password"
-                  onChange={handleChange}
+                  onChange={(e) => handleChange("password", e.target.value)}
                   required
                 />
                 <label className="label">
