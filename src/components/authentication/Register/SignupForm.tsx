@@ -1,10 +1,5 @@
-import { useEffect, useState } from "react";
-import {
-  Form,
-  Link,
-  useActionData,
-  useNavigation
-} from "react-router-dom";
+import { useEffect } from "react";
+import { Form, Link, useActionData, useNavigation } from "react-router-dom";
 import { toast } from "react-toastify";
 function SignupForm() {
   const data = useActionData();
@@ -13,17 +8,17 @@ function SignupForm() {
   const isSubmitting = navigation.state === "submitting";
 
   useEffect(() => {
-    if (data?.error === true) {
-      toast.error(data?.message, {
+    if ((data as { error?: boolean })?.error === true) {
+      toast.error((data as { message?: string })?.message, {
         onClose: () => {
           window.open("/", "_self");
-        }
+        },
       });
     } else {
-      toast.success(data?.message, {
+      toast.success((data as { message?: string })?.message, {
         onClose: () => {
           window.open("/login", "_self");
-        }
+        },
       });
     }
   }, [data]);
@@ -96,7 +91,6 @@ function SignupForm() {
                     placeholder="username"
                     className="input input-bordered"
                     id="new-uname"
-
                   />
                 </div>
                 {/* <div className="form-control basis-2/5">
@@ -199,7 +193,6 @@ function SignupForm() {
                 <a
                   href="https://accounts.google.com/o/oauth2/auth?scope=profile email&redirect_uri=http://localhost:8080/eCommerceProject/register-google&response_type=code&client_id=432080739851-i90lscb3v0n6lrv551n210tise0a6drf.apps.googleusercontent.com&approval_prompt=force"
                   className="btn btn-primary btn-outline btn-disabled"
-                  disabled=""
                 >
                   <img
                     //   src="./asset/images/Login/icons8-google.svg"

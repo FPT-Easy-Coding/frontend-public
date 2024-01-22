@@ -4,11 +4,11 @@ import { Form, Link, useActionData, useNavigation } from "react-router-dom";
 import { toast } from "react-toastify";
 import { isValidEmail } from "../../../utils/check/checkInputField";
 function LoginForm() {
-  const data = useActionData();
+  const actionData = useActionData();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
   const [isError, setIsError] = useState(false);
-  const errorCond = useRef();
+  const errorConditionRef = useRef<any>();
 
   const [inputValues, setInputValues] = useState({
     email: "",
@@ -16,31 +16,33 @@ function LoginForm() {
   });
 
   useEffect(() => {
-    if (data?.errorCondition) {
-      switch (data?.errorCondition) {
+    const errorCondition = (actionData as { errorCondition?: string })?.errorCondition;
+    if (errorCondition) {
+      switch (errorCondition) {
         case "wc":
         case "ec":
         case "pc":
-          toast.error(data.message);
-          errorCond.current = data.errorCondition;
+          toast.error((actionData as { message: string }).message);
+          errorConditionRef.current = errorCondition || undefined;
           break;
         default:
           toast.error("You should check again the credentials you entered.");
       }
       setIsError(true);
     } else {
-      if (data?.error) {
-        toast.error(data.message);
+      if ((actionData as { error?: boolean })?.error) {
+        const { message } = actionData as { message: string };
+        toast.error(message);
       }
       setIsError(false);
     }
-  }, [data]);
-  function handleChange(identifier, value) {
+  }, [actionData]);
+
+  function handleChange(identifier: string, value: string) {
     setInputValues((prev) => ({ ...prev, [identifier]: value }));
 
     if (isValidEmail(value)) {
       setIsError(false);
-      console.log(isError);
     } else {
       setIsError(true);
     }
@@ -69,9 +71,7 @@ function LoginForm() {
                   type="email"
                   placeholder="email"
                   name="email"
-                  className={`input input-bordered ${
-                    isError ? "input-error" : ""
-                  }`}
+                  className={`input input-bordered ${isError ? "input-error" : ""}`}
                   onChange={(e) => handleChange("email", e.target.value)}
                   required
                 />
@@ -83,27 +83,19 @@ function LoginForm() {
                 <input
                   type="password"
                   placeholder="password"
-                  className={`input input-bordered ${
-                    isError ? "input-error" : ""
-                  }`}
+                  className={`input input-bordered ${isError ? "input-error" : ""}`}
                   name="password"
                   onChange={(e) => handleChange("password", e.target.value)}
                   required
                 />
                 <label className="label">
-                  <Link
-                    to="/forgotten"
-                    className="label-text-alt link link-hover"
-                  >
+                  <Link to="/forgotten" className="label-text-alt link link-hover">
                     Forgot password?
                   </Link>
                 </label>
               </div>
               <div className="form-control mt-6">
-                <button
-                  className="btn btn-primary"
-                  disabled={isSubmitting && true}
-                >
+                <button className="btn btn-primary" disabled={isSubmitting && true}>
                   {isSubmitting ? spinningBtn : "Login"}
                 </button>
               </div>

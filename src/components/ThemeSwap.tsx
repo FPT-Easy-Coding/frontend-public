@@ -6,7 +6,7 @@ import { useState } from "react";
 const ThemeSwap = () => {
   // Retrieve the initial theme value from local storage
   const [isDark, setIsDark] = useState(
-    JSON.parse(localStorage.getItem("isDark"))
+    JSON.parse(localStorage.getItem("isDark") || "false")
   );
 
   // Update the local storage and apply the selected theme

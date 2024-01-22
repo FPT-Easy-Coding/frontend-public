@@ -6,7 +6,7 @@ function Signup() {
   return <SignupForm />;
 }
 
-export async function action({ request }) {
+export async function action({ request }: { request: any }) {
   const data = await request.formData();
   const payload = {
     firstname: data.get("firstname"),

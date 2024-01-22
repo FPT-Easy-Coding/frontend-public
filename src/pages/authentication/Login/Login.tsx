@@ -6,7 +6,7 @@ function Login() {
   return <LoginForm />;
 }
 export default Login;
-export async function action({ request }) {
+export async function action({ request }: { request: any }) {
   try {
     const data = await request.formData();
     const { email, password } = Object.fromEntries(data);
