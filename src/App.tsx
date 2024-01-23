@@ -16,6 +16,13 @@ import ResetPassword from "./pages/authentication/ForgotPassword/ResetPassword";
 import ProfilePage from "./pages/account/user/ProfilePage";
 import logout from "./utils/loader/auth/logout";
 import { getAuthCredentials } from "./utils/loader/auth/auth";
+
+
+import "@fontsource/roboto/300.css";
+import "@fontsource/roboto/400.css";
+import "@fontsource/roboto/500.css";
+import "@fontsource/roboto/700.css";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -42,7 +49,7 @@ const router = createBrowserRouter([
       { path: "home", element: <Homepage /> },
       {
         path: "user",
-        children: [{path: "profile", element: <ProfilePage /> }],
+        children: [{ path: "profile", element: <ProfilePage /> }],
       },
       { path: "logout", action: logout },
     ],
