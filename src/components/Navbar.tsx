@@ -4,6 +4,7 @@ import ThemeSwap from "./ThemeSwap";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
 
+
 const guestBtn = () => {
   return (
     <>
@@ -27,7 +28,7 @@ const guestBtn = () => {
   );
 };
 
-const userBtn = (data) => {
+const userBtn: React.FC<{ data: any; firstName: string; lastName: string }> = (data) => {
   return (
     <>
       <div className="dropdown dropdown-end">
@@ -74,8 +75,8 @@ const userBtn = (data) => {
 const Navbar = () => {
   const data = useRouteLoaderData("root-loader");
   useEffect(() => {
-    if (data?.error) {
-      toast.error(data?.message);
+    if ((data as { error?: boolean })?.error) {
+      toast.error((data as { message: string })?.message);
     }
   }, [data]);
   return (
@@ -86,8 +87,8 @@ const Navbar = () => {
           <NavLink to="/" className="btn btn-ghost btn-sm rounded-btn">
             Home
           </NavLink>
-          <NavLink className="btn btn-ghost btn-sm rounded-btn">About</NavLink>
-          <NavLink className="btn btn-ghost btn-sm rounded-btn">
+          <NavLink to="/about" className="btn btn-ghost btn-sm rounded-btn">About</NavLink>
+          <NavLink to="/contact" className="btn btn-ghost btn-sm rounded-btn">
             Contact
           </NavLink>
         </div>
@@ -101,7 +102,7 @@ const Navbar = () => {
       </div>
       <div className="flex-none gap-2">
         <ThemeSwap />
-        {data ? userBtn(data) : guestBtn()}
+        {data ? userBtn((data as { data : any; firstName: string; lastName: string })) : guestBtn()}
       </div>
     </div>
   );
