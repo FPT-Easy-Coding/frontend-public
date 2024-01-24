@@ -1,7 +1,9 @@
+import { TextField } from "@mui/material";
 function Profile() {
   return (
-    <div>Profile</div>
-    // print out json data
+    <>
+      <TextField id="outlined-basic" label="Outlined" variant="outlined" />
+    </>
   );
 }
 
