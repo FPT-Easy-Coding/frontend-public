@@ -3,7 +3,6 @@ import { useEffect, useState, useRef } from "react";
 import { Form, Link, useActionData, useNavigation } from "react-router-dom";
 import { toast } from "react-toastify";
 import { isValidEmail } from "../../../utils/check/checkInputField";
-import { flushSync } from "react-dom";
 function LoginForm() {
   const actionData = useActionData();
   const navigation = useNavigation();

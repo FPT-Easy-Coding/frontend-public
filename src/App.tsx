@@ -49,7 +49,7 @@ const router = createBrowserRouter([
       { path: "home", element: <Homepage /> },
       {
         path: "user",
-        children: [{ path: "profile", element: <ProfilePage /> }],
+        children: [{ index: true, path: "profile", element: <ProfilePage /> }],
       },
       { path: "logout", action: logout },
     ],
