@@ -1,28 +1,19 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Root from "./pages/Root";
-import Signup, {
-  action as signupAction,
-} from "./pages/authentication/Register/Signup";
 import { ToastContainer } from "react-toastify";
 
 import "react-toastify/dist/ReactToastify.css";
 
 import Homepage from "./pages/Homepage";
-import Login, {
-  action as loginAction,
-} from "./pages/authentication/Login/Login";
+import AuthPage, {
+  action as authAction,
+} from "./pages/authentication/authpage/AuthPage";
 import ForgotPassword from "./pages/authentication/ForgotPassword/ForgotPassword";
 import ResetPassword from "./pages/authentication/ForgotPassword/ResetPassword";
 import ProfilePage from "./pages/account/user/ProfilePage";
 import logout from "./utils/loader/auth/logout";
 import { getAuthCredentials } from "./utils/loader/auth/auth";
-
-
-import "@fontsource/roboto/300.css";
-import "@fontsource/roboto/400.css";
-import "@fontsource/roboto/500.css";
-import "@fontsource/roboto/700.css";
-
+import "@mantine/core/styles.css";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -31,8 +22,7 @@ const router = createBrowserRouter([
     element: <Root />,
     children: [
       { index: true, element: <Homepage /> },
-      { path: "signup", element: <Signup />, action: signupAction },
-      { path: "login", element: <Login />, action: loginAction },
+      { path: "auth", element: <AuthPage />, action: authAction },
       {
         path: "forgotten",
         children: [

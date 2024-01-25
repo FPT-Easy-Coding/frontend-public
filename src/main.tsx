@@ -1,11 +1,11 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App.js'
-import './index.css'
+import ReactDOM from "react-dom/client";
+import App from "./App.tsx";
+import "@mantine/core/styles.css";
+import "./index.css";
+import { MantineProvider } from "@mantine/core";
 
-
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
+ReactDOM.createRoot(document.getElementById("root")!).render(
+  <MantineProvider defaultColorScheme="light" >
     <App />
-  </React.StrictMode>,
-)
+  </MantineProvider>
+);

@@ -1,13 +1,12 @@
 import { Outlet, useSubmit, useRouteLoaderData } from "react-router-dom";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+import Navbar from "../components/navbar/Navbar";
 import { useEffect } from "react";
 
 function Root() {
   const data = useRouteLoaderData("root-loader");
   const submit = useSubmit();
   useEffect(() => {
-    if (!(data) || data?.error) {
+    if (!(data) || (data as { error?: string }).error) {
       submit(null, { action: "/logout", method: "post" });
       return;
     }
@@ -18,7 +17,6 @@ function Root() {
       <main>
         <Outlet />
       </main>
-      <Footer />
     </>
   );
 }
