@@ -5,12 +5,12 @@ import { useEffect } from "react";
 function Root() {
   const data = useRouteLoaderData("root-loader");
   const submit = useSubmit();
-  useEffect(() => {
-    if (!(data) || (data as { error?: string }).error) {
-      submit(null, { action: "/logout", method: "post" });
-      return;
-    }
-  }, [data, submit]);
+  // useEffect(() => {
+  //   if (!(data) || (data as { error?: string }).error) {
+  //     submit(null, { action: "/logout", method: "post" });
+  //     return;
+  //   }
+  // }, [data, submit]);
   return (
     <>
       <Navbar />

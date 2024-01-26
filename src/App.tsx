@@ -4,7 +4,7 @@ import { ToastContainer } from "react-toastify";
 
 import "react-toastify/dist/ReactToastify.css";
 
-import Homepage from "./pages/Homepage";
+import Homepage from "./pages/guest/Homepage";
 import AuthPage, {
   action as authAction,
 } from "./pages/authentication/authpage/AuthPage";

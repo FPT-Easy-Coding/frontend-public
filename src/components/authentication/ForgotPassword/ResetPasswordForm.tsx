@@ -1,3 +1,4 @@
+import { Button, Stack, TextInput } from "@mantine/core";
 import { Form } from "react-router-dom";
 function ResetPasswordForm() {
   return (
@@ -7,34 +8,37 @@ function ResetPasswordForm() {
           <h1 className="text-4xl font-extrabold mb-2">
             Time to reset your password : )
           </h1>
-          <h2 className="text-xl italic">
+          <h2 className="font-thin text-base italic">
             ... don&apos;t forget it, as it&apos;s important!
           </h2>
           <div className="font-light mt-10"></div>
           <Form>
-            <label className="form-control w-full my-6">
-              <div className="label">
-                <span className="label-text">new password</span>
-              </div>
-              <input
-                type="password"
-                placeholder="Type here"
-                className="input input-bordered w-full"
+            <Stack gap={"md"}>
+              <TextInput
+                radius="md"
+                size="md"
+                label="new password"
+                withAsterisk
+                placeholder="type new password"
               />
-            </label>
 
-            <label className="form-control w-full my-6">
-              <div className="label">
-                <span className="label-text">confirm new password</span>
-              </div>
-              <input
-                type="password"
-                placeholder="Type here"
-                className="input input-bordered w-full"
+              <TextInput
+                size="md"
+                radius="md"
+                label="confirm new password"
+                withAsterisk
+                placeholder="confirm your new password"
               />
-            </label>
 
-            <button className="btn btn-primary">Send</button>
+              <Button
+                variant="filled"
+                radius="md"
+                type="submit"
+                fullWidth
+              >
+                Button
+              </Button>
+            </Stack>
           </Form>
         </div>
       </div>

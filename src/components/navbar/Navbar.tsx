@@ -12,21 +12,70 @@ import {
   IconMessageCircle,
   IconLibraryPlus,
   IconSquarePlus,
+  IconSettings,
+  IconSearch,
+  IconArrowsLeftRight,
+  IconTrash,
+  IconUserCircle,
+  IconPremiumRights,
+  IconLogout,
 } from "@tabler/icons-react";
 
 const navBtn = "text-sm";
 
 const userBtn = (data: any, submit: any) => {
   return (
-    <Form method="post" action="/logout">
-      <Avatar
-        component="button"
-        variant="filled"
-        radius="xl"
-        color="grape"
-        className="cursor-pointer"
-      />
-    </Form>
+    <>
+      <Menu shadow="md" width={200}>
+        <Menu.Target>
+          <Avatar
+            component="button"
+            variant="filled"
+            radius="xl"
+            color="grape"
+            className="cursor-pointer"
+          />
+        </Menu.Target>
+
+        <Menu.Dropdown>
+          <Menu.Label>Menu</Menu.Label>
+          <Menu.Item
+            leftSection={
+              <IconUserCircle style={{ width: rem(14), height: rem(14) }} />
+            }
+          >
+            Profile
+          </Menu.Item>
+
+          <Menu.Item
+            leftSection={
+              <IconSettings style={{ width: rem(14), height: rem(14) }} />
+            }
+          >
+            Settings
+          </Menu.Item>
+
+          <Menu.Item
+            leftSection={
+              <IconPremiumRights style={{ width: rem(14), height: rem(14) }} />
+            }
+          >
+            Upgrade to Premium
+          </Menu.Item>
+
+          <Menu.Divider />
+            <Menu.Item
+              color="red"
+              leftSection={
+                <IconLogout style={{ width: rem(14), height: rem(14) }} />
+              }
+              onClick={() => submit(null, { method: "post", action: "/logout" })}
+            >
+              Logout
+            </Menu.Item>
+        </Menu.Dropdown>
+      </Menu>
+    </>
   );
 };
 

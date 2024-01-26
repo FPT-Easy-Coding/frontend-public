@@ -1,4 +1,4 @@
-import HeroContent from "../components/hero/HeroContent";
+import HeroContent from "../../components/hero/HeroContent";
 
 
 
