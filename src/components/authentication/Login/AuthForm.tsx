@@ -183,7 +183,6 @@ export default function AuthForm(props: PaperProps) {
               )}
 
               <TextInput
-                required
                 label="Email"
                 placeholder="youremail@domain"
                 radius="md"
@@ -192,7 +191,6 @@ export default function AuthForm(props: PaperProps) {
               />
 
               <PasswordInput
-                required
                 label="Password"
                 placeholder="Your password"
                 radius="md"

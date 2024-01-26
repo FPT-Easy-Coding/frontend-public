@@ -1,6 +1,7 @@
 import { Outlet, useSubmit, useRouteLoaderData } from "react-router-dom";
 import Navbar from "../components/navbar/Navbar";
 import { useEffect } from "react";
+import Footer from "../components/footer/Footer";
 
 function Root() {
   const data = useRouteLoaderData("root-loader");
@@ -17,6 +18,7 @@ function Root() {
       <main>
         <Outlet />
       </main>
+      <Footer />
     </>
   );
 }
