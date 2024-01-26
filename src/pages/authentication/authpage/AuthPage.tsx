@@ -1,6 +1,7 @@
 import axios from "axios";
 import AuthForm from "../../../components/authentication/Login/AuthForm";
-import { json, redirect } from "react-router-dom";
+import { redirect } from "react-router-dom";
+import { assignLoginPayload, assignRegisterPayload } from "../../../utils/loader/auth/auth";
 
 function AuthPage() {
   return <AuthForm />;
@@ -12,54 +13,60 @@ export async function action({ request }: { request: any }) {
     const mode = searchParams.get("mode") || "login";
     const data = await request.formData();
     const formField = Object.fromEntries(data);
-    const payload: any = {};
+    let payload: any = {};
     let api: string = "authenticate";
+
     if (mode !== "login" && mode !== "register") {
-      throw json({ message: "Unsupported mode" }, { status: 422 });
+      throw new Error("Unsupported mode");
     }
 
     if (mode === "login") {
-      payload.email = formField.email;
-      payload.password = formField.password;
-    }
-
-    if (mode === "register") {
-      payload.firstname = formField.firstname;
-      payload.lastname = formField.lastname;
-      payload.email = formField.email;
-      payload.password = formField.password;
-      payload.telephone = formField.telephone;
-      payload.username = formField.username;
-      payload.mfaEnabled = false;
+      payload = assignLoginPayload(formField);
+    } else if (mode === "register") {
+      payload = assignRegisterPayload(formField);
       api = "register";
     }
-    console.log(payload);
 
-    const fetchedData = await axios
-      .post("http://localhost:8080/api/v1/auth/" + api, payload)
-      .then((res) => res.data)
-      .catch((err) => err.response.data);
+    const apiUrl = `http://localhost:8080/api/v1/auth/${api}`;
+    const fetchedData = await axios.post(apiUrl, payload).then((res) => res.data).catch((err) => err.response.data);
 
-    if (fetchedData?.error) {
+    let errorFieldExtracted: string[] | null = [];
+
+    if (mode === "register" && fetchedData?.error) {
+      fetchedData.data.forEach((e: any) => {
+        if (e.fieldName) {
+          errorFieldExtracted!.push(e.fieldName);
+        }
+      });
       return {
         error: true,
         message: fetchedData.data[0]?.errorMessage || "Something went wrong",
-        errorField: fetchedData.data?.errorField || null,
+        errorField: errorFieldExtracted
       };
     }
 
-    console.log(fetchedData);
+    if (mode === "login" && fetchedData?.error) {
+      fetchedData.data[0]?.fieldName?.forEach((e: any) => {
+        if (e) {
+          errorFieldExtracted!.push(e);
+        }
+      });
+      return {
+        error: true,
+        message: fetchedData.data[0]?.errorMessage || "Something went wrong",
+        errorField: errorFieldExtracted
+      };
+    }
 
     sessionStorage.setItem("RT", fetchedData.refreshToken);
     localStorage.setItem("AT", fetchedData.accessToken);
     localStorage.setItem("uid", fetchedData.userId);
 
-
     return redirect("/home");
   } catch (error) {
     return {
       error: true,
-      message: "Something went wrong with us, be patience!",
+      message: "Something went wrong with us, be patient!",
     };
   }
 }

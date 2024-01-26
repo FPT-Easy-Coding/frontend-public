@@ -1,5 +1,5 @@
 import { upperFirst } from "@mantine/hooks";
-import { useForm } from "@mantine/form";
+import { isEmail, matches, matchesField, useForm } from "@mantine/form";
 import {
   TextInput,
   PasswordInput,
@@ -40,6 +40,27 @@ export default function AuthForm(props: PaperProps) {
   const isLogin = searchParams.get("mode") === "login";
   const isSubmitting = navigation.state === "submitting";
 
+  let validationLogin = () => {
+    return {
+      email: isEmail("Please enter a valid email"),
+      password: matches(
+        /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,32}$/,
+        "Invalid password"
+      ),
+    }
+  };
+
+  let validationRegister = () => {
+    return {
+      email: isEmail("Please enter a valid email"),
+      password: matches(
+        /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,32}$/,
+        "Invalid password"
+      ),
+      confirmPassword: matchesField("password", "Passwords are not the same"),
+    }
+  }
+
   const form = useForm({
     initialValues: {
       username: "",
@@ -53,20 +74,36 @@ export default function AuthForm(props: PaperProps) {
       terms: true,
     },
 
-    validate: {
-      email: (val) => (/^\S+@\S+$/.test(val) ? null : "Invalid email"),
-      password: (val) =>
-        val.length <= 6
-          ? "Password should include at least 6 characters"
-          : null,
-    },
+    validate: isLogin ? validationLogin() : validationRegister(),
   });
 
+  const assignRegisterPayload = (formFieldData: any) => {
+    return {
+      firstname: formFieldData.firstname,
+      lastname: formFieldData.lastname,
+      email: formFieldData.email,
+      password: formFieldData.password,
+      telephone: formFieldData.telephone,
+      username: formFieldData.username,
+    };
+  };
+
+  const assignLoginPayload = (formFieldData: any) => {
+    return {
+      email: formFieldData.email,
+      password: formFieldData.password,
+    };
+  };
+
   useEffect(() => {
-    if (data && data?.error) {
-      form.setFieldError('email', data.message);
-      form.setFieldError('password', data.message);
-      toast.error(data.message);
+    if (data?.error) {
+      if (Array.isArray(data.errorField)) {
+        data.errorField.forEach((e: any) => {
+          // form.setFieldError(e, data?.message);
+          toast.error(data?.message);
+        });
+      }
+      toast.error(data?.message);
     }
   }, [data]);
 
@@ -91,14 +128,23 @@ export default function AuthForm(props: PaperProps) {
             my="lg"
           />
 
-          <Form method="post" onSubmit={form.onSubmit(() => {
-            submit(form.values, { method: "post" });
-          })}>
+          <Form
+            method="post"
+            onSubmit={form.onSubmit(() => {
+              submit(
+                isLogin
+                  ? assignLoginPayload(form.values)
+                  : assignRegisterPayload(form.values),
+                { method: "post" }
+              );
+            })}
+          >
             <Stack>
               {!isLogin && (
                 <>
                   <Group grow>
                     <TextInput
+                      required
                       label="Firstname"
                       placeholder="Your first name"
                       radius="md"
@@ -106,6 +152,7 @@ export default function AuthForm(props: PaperProps) {
                       {...form.getInputProps("firstname")}
                     />
                     <TextInput
+                      required
                       label="Lastname"
                       placeholder="Your last name"
                       radius="md"
@@ -116,6 +163,7 @@ export default function AuthForm(props: PaperProps) {
 
                   <Group grow>
                     <TextInput
+                      required
                       label="Username"
                       placeholder="Your username"
                       radius="md"
@@ -123,16 +171,12 @@ export default function AuthForm(props: PaperProps) {
                       {...form.getInputProps("username")}
                     />
                     <TextInput
+                      required
                       label="Phone number"
                       placeholder="Your phone number"
-                      onChange={(event) =>
-                        form.setFieldValue(
-                          "telephone",
-                          event.currentTarget.value
-                        )
-                      }
                       radius="md"
                       name="telephone"
+                      {...form.getInputProps("telephone")}
                     />
                   </Group>
                 </>
@@ -154,6 +198,11 @@ export default function AuthForm(props: PaperProps) {
                 radius="md"
                 name="password"
                 {...form.getInputProps("password")}
+                description={
+                  !isLogin
+                    ? "from 8 to 32 characters, at least 1 number, 1 symbol, 1 uppercase letter and 1 lowercase letter"
+                    : null
+                }
               />
               {!isLogin && (
                 <PasswordInput
@@ -179,6 +228,7 @@ export default function AuthForm(props: PaperProps) {
               <Link
                 to={`?mode=${isLogin ? "register" : "login"}`}
                 className="text-blue-600 text-sm"
+                onClick={() => form.reset()}
               >
                 {!isLogin
                   ? "Already have an account? Login"

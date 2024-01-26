@@ -17,3 +17,22 @@ export function getAuthToken() {
 export function getAuthUserId() {
   return localStorage.getItem("uid");
 }
+
+export function assignLoginPayload(formFieldData: any) {
+  return {
+    email: formFieldData.email,
+    password: formFieldData.password,
+  };
+}
+
+export function assignRegisterPayload(formFieldData: any) {
+  return {
+    firstname: formFieldData.firstname,
+    lastname: formFieldData.lastname,
+    email: formFieldData.email,
+    password: formFieldData.password,
+    telephone: formFieldData.telephone,
+    username: formFieldData.username,
+    mfaEnabled: false,
+  };
+}
