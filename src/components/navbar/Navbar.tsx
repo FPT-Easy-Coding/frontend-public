@@ -34,14 +34,14 @@ const userBtn = (data: any, submit: any) => {
     <>
       <Menu shadow="md" width={200}>
         <Menu.Target>
-          <Group component="button" className="cursor-pointer border-none">
+          <Group className="cursor-pointer border-none">
             <Avatar
               variant="filled"
               radius="xl"
               color="grape"
               className="cursor-pointer"
             />
-            <Text>{data.firstName + " " + data.lastName || "User"}</Text>
+            <Text className="text-sm font-semibold" >{data.firstName + " " + data.lastName || "User"}</Text>
           </Group>
         </Menu.Target>
 

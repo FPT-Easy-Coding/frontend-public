@@ -1,6 +1,6 @@
 import { Title } from "@mantine/core";
-import Carousel from "../../components/carousel/Carousel";
-import HeroContent from "../../components/hero/HeroContent";
+import Carousel from "../../../components/carousel/Carousel";
+import HeroContent from "../../../components/hero/HeroContent";
 
 const Homepage = () => {
   return (
