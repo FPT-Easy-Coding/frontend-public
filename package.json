@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource-variable/open-sans": "^5.0.23",
     "@mantine/carousel": "^7.4.2",
     "@mantine/charts": "^7.4.2",
     "@mantine/code-highlight": "^7.4.2",
@@ -23,6 +24,8 @@
     "@mantine/nprogress": "^7.4.2",
     "@mantine/spotlight": "^7.4.2",
     "@mantine/tiptap": "^7.4.2",
+    "@mantinex/dev-icons": "^1.0.2",
+    "@mantinex/mantine-logo": "^1.0.1",
     "@tabler/icons-react": "^2.46.0",
     "@tiptap/extension-link": "^2.1.16",
     "@tiptap/react": "^2.1.16",
@@ -37,6 +40,7 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.21.1",
     "react-toastify": "^10.0.3",
+    "react-toggle-dark-mode": "^1.1.1",
     "recharts": "^2.10.4",
     "sort-by": "^0.0.2",
     "theme-change": "^2.5.0",
@@ -50,7 +54,6 @@
     "@vitejs/plugin-react": "^4.2.1",
     "@vitejs/plugin-react-swc": "^3.5.0",
     "autoprefixer": "^10.4.16",
-    "daisyui": "^4.6.0",
     "eslint": "^8.55.0",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",

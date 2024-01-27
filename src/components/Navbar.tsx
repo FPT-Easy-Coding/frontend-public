@@ -1,6 +1,5 @@
 import { Form, NavLink, useRouteLoaderData } from "react-router-dom";
-import logo from "../assets/logo.svg";
-import ThemeSwap from "./ThemeSwap";
+import logo from "../../src/assets/logo.svg";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
 

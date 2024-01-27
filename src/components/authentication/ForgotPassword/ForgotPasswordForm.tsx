@@ -1,6 +1,18 @@
-import { Form } from "react-router-dom";
+import { Button, Stack, TextInput } from "@mantine/core";
+import { isEmail, useForm } from "@mantine/form";
+import { Form, useSubmit } from "react-router-dom";
 
 function ForgotPasswordForm() {
+  const submit = useSubmit();
+  const form = useForm({
+    initialValues: {
+      email: "",
+    },
+
+    validate: {
+      email: isEmail("Please enter a valid email"),
+    },
+  });
   return (
     <div className="max-w-screen h-screen">
       <div className="w-9/12 h-screen mx-auto flex items-center justify-center">
@@ -16,19 +28,28 @@ function ForgotPasswordForm() {
             log in and reset your password. If you signed up with your
             parent&apos;s email, we&apos;ll send them a link.
           </div>
-          <Form>
-            <label className="form-control w-full my-6">
-              <div className="label">
-                <span className="label-text">Enter your account email</span>
-              </div>
-              <input
-                type="password"
-                placeholder="Type here"
-                className="input input-bordered w-full"
-              />
-            </label>
-            <button className="btn btn-primary">Send link</button>
-          </Form>
+          <div className="mt-10">
+            <Form
+              method="post"
+              onSubmit={form.onSubmit(() => {
+                submit(form.values, { method: "post" });
+              })}
+            >
+              <Stack>
+                <TextInput
+                  size="md"
+                  radius="md"
+                  label="enter your email"
+                  placeholder="type here"
+                  {...form.getInputProps("email")}
+                />
+
+                <Button variant="filled" radius="md" type="submit" fullWidth>
+                  Button
+                </Button>
+              </Stack>
+            </Form>
+          </div>
         </div>
       </div>
     </div>
