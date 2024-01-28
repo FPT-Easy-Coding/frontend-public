@@ -12,7 +12,11 @@ import ForgotPassword from "./pages/authentication/ForgotPassword/ForgotPassword
 import ResetPassword from "./pages/authentication/ForgotPassword/ResetPassword";
 import ProfilePage from "./pages/account/user/ProfilePage";
 import logout from "./utils/loader/auth/logout";
-import { getAuthCredentials } from "./utils/loader/auth/auth";
+import {
+  checkAuth,
+  getAuthCredentials,
+  preventAuth,
+} from "./utils/loader/auth/auth";
 import "@mantine/core/styles.css";
 import UserDashboard from "./pages/guest/after_login/UserDashboard";
 const router = createBrowserRouter([
@@ -23,7 +27,7 @@ const router = createBrowserRouter([
     element: <Root />,
     children: [
       { index: true, element: <Homepage /> },
-      { path: "auth", element: <AuthPage />, action: authAction },
+      { path: "auth", element: <AuthPage />, action: authAction, loader: preventAuth },
       {
         path: "forgotten",
         children: [
@@ -37,7 +41,7 @@ const router = createBrowserRouter([
           },
         ],
       },
-      { path: "home", element: <UserDashboard /> },
+      { path: "home", element: <UserDashboard />, loader: checkAuth },
       {
         path: "user",
         children: [{ index: true, path: "profile", element: <ProfilePage /> }],

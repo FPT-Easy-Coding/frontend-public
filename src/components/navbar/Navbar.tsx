@@ -41,7 +41,9 @@ const userBtn = (data: any, submit: any) => {
               color="grape"
               className="cursor-pointer"
             />
-            <Text className="text-sm font-semibold" >{data.firstName + " " + data.lastName || "User"}</Text>
+            <Text className="text-sm font-semibold">
+              {data ? data.firstname + " " + data.lastname : "Guest"}
+            </Text>
           </Group>
         </Menu.Target>
 
@@ -87,57 +89,68 @@ const userBtn = (data: any, submit: any) => {
   );
 };
 
+const guestBtn = (mode: string) => {
+  return (
+    <>
+      <NavLink to="/auth?mode=login">
+        <Button
+          variant={mode === "register" ? "filled" : "light"}
+          color="indigo"
+          radius="md"
+          fz="sm"
+          className={mode === "login" ? "hidden" : ""}
+        >
+          Login
+        </Button>
+      </NavLink>
+
+      <NavLink to="/auth?mode=register">
+        <Button
+          variant="filled"
+          color="indigo"
+          radius="md"
+          fz="sm"
+          className={mode === "register" ? "hidden" : ""}
+        >
+          Signup
+        </Button>
+      </NavLink>
+    </>
+  );
+};
+
+interface LoaderData {
+  error?: boolean;
+  firstname?: string | null;
+  lastname?: string | null;
+  email?: string | null;
+}
+
 function Navbar() {
   const mode = useSearchParams()[0].get("mode");
-  const data = useLoaderData();
+  const data: LoaderData = useLoaderData() as LoaderData;
+  console.log(data);
   const submit = useSubmit();
   const { colorScheme, setColorScheme } = useMantineColorScheme({
-    keepTransitions: true
+    keepTransitions: true,
   });
   const computedColorScheme = useComputedColorScheme("light");
   const toggleColorScheme = () => {
     setColorScheme(computedColorScheme === "dark" ? "light" : "dark");
   };
-  const guestBtn = () => {
-    return (
-      <>
-        <NavLink to="/auth?mode=login">
-          <Button
-            variant={mode === "register" ? "filled" : "light"}
-            color="indigo"
-            radius="md"
-            fz="sm"
-            className={mode === "login" ? "hidden" : ""}
-          >
-            Login
-          </Button>
-        </NavLink>
-
-        <NavLink to="/auth?mode=register">
-          <Button
-            variant="filled"
-            color="indigo"
-            radius="md"
-            fz="sm"
-            className={mode === "register" ? "hidden" : ""}
-          >
-            Signup
-          </Button>
-        </NavLink>
-      </>
-    );
-  };
+  const btnState = data?.error || !data ? guestBtn(mode as string) : userBtn(data, submit);
+  const whichHomepage = data?.error || !data ? "/" : "/home";
 
   return (
     <>
       <header className="w-full h-16 flex items-center justify-between sticky top-0 z-20 shadow-sm bg-[--mantine-color-body]">
         <div className="flex items-center w-full">
-          <NavLink to="/" className="w-32 mx-5">
+          <NavLink to={whichHomepage} className="w-32 mx-5">
             <img src={logo} alt="hehelogo" />
           </NavLink>
 
           <div className="ml-5 flex items-center">
-            <NavLink to="/" className="no-underline">
+            <NavLink to={whichHomepage} className="no-underline">
               {({ isActive }) => (
                 <Button
                   autoContrast
@@ -210,9 +223,7 @@ function Navbar() {
                 </Menu.Item>
               </Menu.Dropdown>
             </Menu>
-            <Group>
-              {data ? userBtn(data, submit) : guestBtn() || null}
-            </Group>
+            <Group>{btnState}</Group>
           </Group>
         </div>
       </header>

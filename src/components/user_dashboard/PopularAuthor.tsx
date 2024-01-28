@@ -1,15 +1,19 @@
 import { Carousel } from "@mantine/carousel";
 import {
   Card,
-  Text,
   Badge,
   Group,
   Stack,
   Avatar,
   Flex,
+  Title,
 } from "@mantine/core";
 import classes from "./Carousel.module.css";
+import '@tabler/icons-react';
+import { IconLibrary, IconSchool } from "@tabler/icons-react";
 
+const quizSetsIcon = <IconLibrary size={18} />
+const classIcon = <IconSchool size={18} />
 function PopularAuthor() {
   return (
     <>
@@ -35,141 +39,28 @@ function PopularAuthor() {
             >
               <Flex className="flex-col px-5 h-full" justify="space-between">
                 <Card.Section>
-                  <Stack className="gap-2">
-                    <Text fw={500}>DU MA SWP</Text>
-                    <Badge color="indigo">30 question</Badge>
+                  <Avatar
+                    variant="filled"
+                    radius="xl"
+                    size="xl"
+                    color="violet"
+                  />
+                </Card.Section>
+                <Card.Section>
+                  <Stack gap={6}>
+                    <Group gap={8}>
+                      <Title order={3}>Thaycaoduc</Title>
+                      <Badge color="orange">Teacher</Badge>
+                    </Group>
+                    <Group gap={"xs"}>
+                      <Badge color="blue" autoContrast leftSection={quizSetsIcon}>
+                        911 quiz sets
+                      </Badge>
+                      <Badge color="blue" autoContrast leftSection={classIcon}>
+                        1 class
+                      </Badge>
+                    </Group>
                   </Stack>
-                </Card.Section>
-                <Card.Section>
-                  <Group gap={"xs"}>
-                    <Avatar variant="filled" radius="xl" size="sm" />
-                    <Text size="sm">Thaycaoduc</Text>
-                  </Group>
-                </Card.Section>
-              </Flex>
-            </Card>
-          </Carousel.Slide>
-          <Carousel.Slide>
-            <Card
-              shadow="sm"
-              padding="lg"
-              radius="md"
-              withBorder
-              component="a"
-              className="h-full"
-            >
-              <Flex className="flex-col px-5 h-full" justify="space-between">
-                <Card.Section>
-                  <Stack className="gap-2">
-                    <Text fw={500}>Norway Fjord Adventures</Text>
-                    <Badge color="indigo">On Sale</Badge>
-                  </Stack>
-                </Card.Section>
-                <Card.Section>
-                  <Group gap={"xs"}>
-                    <Avatar variant="filled" radius="xl" size="sm" />
-                    <Text size="sm">Jane Doe</Text>
-                  </Group>
-                </Card.Section>
-              </Flex>
-            </Card>
-          </Carousel.Slide>
-          <Carousel.Slide>
-            <Card
-              shadow="sm"
-              padding="lg"
-              radius="md"
-              withBorder
-              component="a"
-              className="h-full"
-            >
-              <Flex className="flex-col px-5 h-full" justify="space-between">
-                <Card.Section>
-                  <Stack className="gap-2">
-                    <Text fw={500}>Norway Fjord Adventures</Text>
-                    <Badge color="indigo">On Sale</Badge>
-                  </Stack>
-                </Card.Section>
-                <Card.Section>
-                  <Group gap={"xs"}>
-                    <Avatar variant="filled" radius="xl" size="sm" />
-                    <Text size="sm">Jane Doe</Text>
-                  </Group>
-                </Card.Section>
-              </Flex>
-            </Card>
-          </Carousel.Slide>
-          <Carousel.Slide>
-            <Card
-              shadow="sm"
-              padding="lg"
-              radius="md"
-              withBorder
-              component="a"
-              className="h-full"
-            >
-              <Flex className="flex-col px-5 h-full" justify="space-between">
-                <Card.Section>
-                  <Stack className="gap-2">
-                    <Text fw={500}>Norway Fjord Adventures</Text>
-                    <Badge color="indigo">On Sale</Badge>
-                  </Stack>
-                </Card.Section>
-                <Card.Section>
-                  <Group gap={"xs"}>
-                    <Avatar variant="filled" radius="xl" size="sm" />
-                    <Text size="sm">Jane Doe</Text>
-                  </Group>
-                </Card.Section>
-              </Flex>
-            </Card>
-          </Carousel.Slide>
-          <Carousel.Slide>
-            <Card
-              shadow="sm"
-              padding="lg"
-              radius="md"
-              withBorder
-              component="a"
-              className="h-full"
-            >
-              <Flex className="flex-col px-5 h-full" justify="space-between">
-                <Card.Section>
-                  <Stack className="gap-2">
-                    <Text fw={500}>Norway Fjord Adventures</Text>
-                    <Badge color="indigo">On Sale</Badge>
-                  </Stack>
-                </Card.Section>
-                <Card.Section>
-                  <Group gap={"xs"}>
-                    <Avatar variant="filled" radius="xl" size="sm" />
-                    <Text size="sm">Jane Doe</Text>
-                  </Group>
-                </Card.Section>
-              </Flex>
-            </Card>
-          </Carousel.Slide>
-          <Carousel.Slide>
-            <Card
-              shadow="sm"
-              padding="lg"
-              radius="md"
-              withBorder
-              component="a"
-              className="h-full"
-            >
-              <Flex className="flex-col px-5 h-full" justify="space-between">
-                <Card.Section>
-                  <Stack className="gap-2">
-                    <Text fw={500}>Norway Fjord Adventures</Text>
-                    <Badge color="indigo">On Sale</Badge>
-                  </Stack>
-                </Card.Section>
-                <Card.Section>
-                  <Group gap={"xs"}>
-                    <Avatar variant="filled" radius="xl" size="sm" />
-                    <Text size="sm">Jane Doe</Text>
-                  </Group>
                 </Card.Section>
               </Flex>
             </Card>

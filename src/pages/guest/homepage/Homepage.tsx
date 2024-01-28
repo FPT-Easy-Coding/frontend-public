@@ -1,8 +1,15 @@
 import { Title } from "@mantine/core";
-import Carousel from "../../../components/carousel/Carousel";
+import Carousel from "../../../components/carousel/HomeCarousel";
 import HeroContent from "../../../components/hero/HeroContent";
+import { useEffect } from "react";
+import { getAuthCredentials } from "../../../utils/loader/auth/auth";
 
 const Homepage = () => {
+  useEffect(() => {
+    if(getAuthCredentials()){
+      window.location.href = "/home";
+    }
+  },[]);
   return (
     <div className="overflow-x-hidden">
       <HeroContent />

@@ -1,7 +1,8 @@
 import { redirect } from "react-router-dom";
 
 export default function logout() {
-  localStorage.clear();
+  localStorage.removeItem("AT");
+  localStorage.removeItem("uid");
   sessionStorage.clear();
   return redirect("/");
 }

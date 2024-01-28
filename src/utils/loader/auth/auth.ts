@@ -1,3 +1,4 @@
+import { redirect } from "react-router-dom";
 import { getUser } from "../user/user";
 
 export function getAuthCredentials() {
@@ -8,6 +9,30 @@ export function getAuthCredentials() {
     return null;
   }
   return getUser(userId);
+}
+
+export async function checkAuth() {
+  const authCredentials = await getAuthCredentials();
+  if (authCredentials === null || authCredentials?.error === true) {
+    return redirect("/auth?mode=login");
+  }
+  return null;
+}
+
+export async function preventAuth() {
+  if (isLoggedIn()) {
+    return redirect("/home");
+  }
+  return null;
+}
+
+export function isLoggedIn() {
+  const authToken = getAuthToken();
+  const userId = getAuthUserId();
+  if (!authToken || !userId) {
+    return false;
+  }
+  return true;
 }
 
 export function getAuthToken() {
