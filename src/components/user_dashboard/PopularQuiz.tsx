@@ -36,7 +36,7 @@ function PopularQuiz() {
               <Flex className="flex-col px-5 h-full" justify="space-between">
                 <Card.Section>
                   <Stack className="gap-2">
-                    <Text fw={500}>DU MA SWP</Text>
+                    <Text fw={500}>ahihi</Text>
                     <Badge color="indigo">30 question</Badge>
                   </Stack>
                 </Card.Section>

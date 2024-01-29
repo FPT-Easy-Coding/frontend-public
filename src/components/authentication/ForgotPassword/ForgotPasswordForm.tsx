@@ -45,7 +45,7 @@ function ForgotPasswordForm() {
                 />
 
                 <Button variant="filled" radius="md" type="submit" fullWidth>
-                  Button
+                  Send email
                 </Button>
               </Stack>
             </Form>

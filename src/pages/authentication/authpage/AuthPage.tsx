@@ -1,7 +1,10 @@
 import axios from "axios";
 import AuthForm from "../../../components/authentication/Login/AuthForm";
 import { redirect } from "react-router-dom";
-import { assignLoginPayload, assignRegisterPayload } from "../../../utils/loader/auth/auth";
+import {
+  assignLoginPayload,
+  assignRegisterPayload,
+} from "../../../utils/loader/auth/auth";
 
 function AuthPage() {
   return <AuthForm />;
@@ -24,11 +27,15 @@ export async function action({ request }: { request: any }) {
       payload = assignLoginPayload(formField);
     } else if (mode === "register") {
       payload = assignRegisterPayload(formField);
+      console.log(payload);
       api = "register";
     }
 
     const apiUrl = `http://localhost:8080/api/v1/auth/${api}`;
-    const fetchedData = await axios.post(apiUrl, payload).then((res) => res.data).catch((err) => err.response.data);
+    const fetchedData = await axios
+      .post(apiUrl, payload)
+      .then((res) => res.data)
+      .catch((err) => err.response.data);
 
     let errorFieldExtracted: string[] | null = [];
 
@@ -41,7 +48,7 @@ export async function action({ request }: { request: any }) {
       return {
         error: true,
         message: fetchedData.data[0]?.errorMessage || "Something went wrong",
-        errorField: errorFieldExtracted
+        errorField: errorFieldExtracted,
       };
     }
 
@@ -54,13 +61,15 @@ export async function action({ request }: { request: any }) {
       return {
         error: true,
         message: fetchedData.data[0]?.errorMessage || "Something went wrong",
-        errorField: errorFieldExtracted
+        errorField: errorFieldExtracted,
       };
     }
 
-    sessionStorage.setItem("RT", fetchedData.refreshToken);
-    localStorage.setItem("AT", fetchedData.accessToken);
-    localStorage.setItem("uid", fetchedData.userId);
+    if (mode === "login") {
+      sessionStorage.setItem("RT", fetchedData.refreshToken);
+      localStorage.setItem("AT", fetchedData.accessToken);
+      localStorage.setItem("uid", fetchedData.userId);
+    }
 
     return redirect("/home");
   } catch (error) {

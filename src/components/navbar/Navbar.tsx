@@ -42,7 +42,7 @@ const userBtn = (data: any, submit: any) => {
               className="cursor-pointer"
             />
             <Text className="text-sm font-semibold">
-              {data ? data.firstname + " " + data.lastname : "Guest"}
+              {data ? data.firstName + " " + data.lastName : "Guest"}
             </Text>
           </Group>
         </Menu.Target>

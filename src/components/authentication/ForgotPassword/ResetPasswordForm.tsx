@@ -36,7 +36,7 @@ function ResetPasswordForm() {
                 type="submit"
                 fullWidth
               >
-                Button
+                Confirm
               </Button>
             </Stack>
           </Form>

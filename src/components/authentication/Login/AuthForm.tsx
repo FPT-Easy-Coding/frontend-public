@@ -47,7 +47,7 @@ export default function AuthForm(props: PaperProps) {
         /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,32}$/,
         "Invalid password"
       ),
-    }
+    };
   };
 
   let validationRegister = () => {
@@ -58,8 +58,8 @@ export default function AuthForm(props: PaperProps) {
         "Invalid password"
       ),
       confirmPassword: matchesField("password", "Passwords are not the same"),
-    }
-  }
+    };
+  };
 
   const form = useForm({
     initialValues: {
@@ -99,7 +99,7 @@ export default function AuthForm(props: PaperProps) {
     if (data?.error) {
       if (Array.isArray(data.errorField)) {
         data.errorField.forEach((e: any) => {
-          // form.setFieldError(e, data?.message);
+          form.setFieldError(e, data?.message);
           toast.error(data?.message);
         });
       }
@@ -223,15 +223,20 @@ export default function AuthForm(props: PaperProps) {
             </Stack>
 
             <Group justify="space-between" mt="xl">
-              <Link
-                to={`?mode=${isLogin ? "register" : "login"}`}
-                className="text-blue-600 text-sm"
-                onClick={() => form.reset()}
-              >
-                {!isLogin
-                  ? "Already have an account? Login"
-                  : "Don't have an account? Register"}
-              </Link>
+              <Stack>
+                <Link
+                  to={`?mode=${isLogin ? "register" : "login"}`}
+                  className="text-blue-600 text-sm"
+                  onClick={() => form.reset()}
+                >
+                  {!isLogin
+                    ? "Already have an account? Login"
+                    : "Don't have an account? Register"}
+                </Link>
+                <Link to="/forgotten" className="text-blue-600 text-sm" onClick={() => form.reset()}>
+                  Forgot your password?
+                </Link>
+              </Stack>
               <Button type="submit" radius="xl" loading={isSubmitting}>
                 {upperFirst(isLogin ? "Login" : "Register")}
               </Button>
