@@ -18,7 +18,7 @@ import {
   preventAuth,
 } from "./utils/loader/auth/auth";
 import "@mantine/core/styles.css";
-import UserDashboard from "./pages/guest/after_login/UserDashboard";
+import UserDashboard from "./pages/after_login/UserDashboard";
 const router = createBrowserRouter([
   {
     path: "/",

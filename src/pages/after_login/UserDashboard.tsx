@@ -1,7 +1,7 @@
 import { Container, Stack, Title } from "@mantine/core";
-import RecentQuiz from "../../../components/user_dashboard/RecentQuiz";
-import PopularQuiz from "../../../components/user_dashboard/PopularQuiz";
-import PopularAuthor from "../../../components/user_dashboard/PopularAuthor";
+import RecentQuiz from "../../components/user_dashboard/RecentQuiz";
+import PopularQuiz from "../../components/user_dashboard/PopularQuiz";
+import PopularAuthor from "../../components/user_dashboard/PopularAuthor";
 
 function UserDashboard() {
   return (

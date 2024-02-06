@@ -16,6 +16,7 @@ export async function action({ request }: { request: any }) {
     const mode = searchParams.get("mode") || "login";
     const data = await request.formData();
     const formField = Object.fromEntries(data);
+    console.log(formField);
     let payload: any = {};
     let api: string = "authenticate";
 
