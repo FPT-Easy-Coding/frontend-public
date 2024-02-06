@@ -19,12 +19,14 @@ import {
 } from "./utils/loader/auth/auth";
 import "@mantine/core/styles.css";
 import UserDashboard from "./pages/after_login/UserDashboard";
+import { ErrorPage } from "./pages/errorpage/ErrorPage";
 const router = createBrowserRouter([
   {
     path: "/",
     loader: getAuthCredentials,
     id: "root-loader",
     element: <Root />,
+    errorElement: <ErrorPage />,
     children: [
       { index: true, element: <Homepage /> },
       { path: "auth", element: <AuthPage />, action: authAction, loader: preventAuth },

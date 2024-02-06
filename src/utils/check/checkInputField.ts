@@ -6,11 +6,3 @@ export function isValidEmail(value: string) {
     const re = /[^\s@]+@[^\s@]+\.[^\s@]+/;
     return re.test(value);
 }
-
-// export const isValidPassword = (value) => {
-
-// }
-
-// export const isConfirmPasswordMatch = (value) => {
-
-// }
