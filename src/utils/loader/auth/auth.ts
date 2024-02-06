@@ -52,12 +52,13 @@ export function assignLoginPayload(formFieldData: any) {
 
 export function assignRegisterPayload(formFieldData: any) {
   return {
-    firstname: formFieldData.firstname,
-    lastname: formFieldData.lastname,
+    firstName: formFieldData.firstname,
+    lastName: formFieldData.lastname,
     email: formFieldData.email,
     password: formFieldData.password,
     telephone: formFieldData.telephone,
-    username: formFieldData.username,
+    userName: formFieldData.username,
+    role: "USER",
     mfaEnabled: false,
   };
 }
