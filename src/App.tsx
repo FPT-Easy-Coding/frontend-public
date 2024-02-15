@@ -20,6 +20,7 @@ import {
 import "@mantine/core/styles.css";
 import UserDashboard from "./pages/after_login/UserDashboard";
 import { ErrorPage } from "./pages/errorpage/ErrorPage";
+import QuizSetDetails from "./pages/quiz/quizsets/SetDetails";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -47,6 +48,9 @@ const router = createBrowserRouter([
       {
         path: "user",
         children: [{ index: true, path: "profile", element: <ProfilePage /> }],
+      },
+      {
+        path: "sets/:setId", element: <QuizSetDetails />
       },
       { path: "logout", action: logout },
     ],

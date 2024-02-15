@@ -12,7 +12,7 @@ function Root() {
   return (
     <>
       <Navbar />
-      <main>
+      <main className="mt-10">
         <Outlet />
       </main>
       <Footer />
