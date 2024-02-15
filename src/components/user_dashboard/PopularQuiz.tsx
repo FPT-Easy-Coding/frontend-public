@@ -24,7 +24,7 @@ interface Quiz {
 
 function PopularQuiz() {
 
-  const [listQuiz, setListQuiz] = useState<Quiz[]>([]);
+  const [listPopularQuiz, setListPopularQuiz] = useState<Quiz[]>([]);
 
   useEffect(() => {
     axios.get('http://localhost:8080/api/v1/quiz/get-all-quiz')
@@ -37,7 +37,7 @@ function PopularQuiz() {
           const diffB = Math.abs(currentTime - timeB);
           return diffA - diffB;
         }) : [];
-        setListQuiz(sortedList);
+        setListPopularQuiz(sortedList);
       })
   }, []);
 
@@ -64,7 +64,7 @@ function PopularQuiz() {
         classNames={classes}
 
       >
-        {listQuiz.map((quiz, index) => (
+        {listPopularQuiz.map((quiz, index) => (
           <Carousel.Slide key={index}>
             <Card
               shadow="sm"

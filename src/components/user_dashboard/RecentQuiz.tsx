@@ -23,7 +23,7 @@ function RecentQuiz() {
     // Add other properties as needed
   }
 
-  const [listQuiz, setListQuiz] = useState<Quiz[]>([]);
+  const [listRecentQuiz, setListRecentQuiz] = useState<Quiz[]>([]);
 
   useEffect(() => {
     axios.get('http://localhost:8080/api/v1/quiz/get-all-quiz')
@@ -36,7 +36,7 @@ function RecentQuiz() {
           const diffB = Math.abs(currentTime - timeB);
           return diffA - diffB;
         }) : [];
-        setListQuiz(sortedList);
+        setListRecentQuiz(sortedList);
       })
   }, []);
 
@@ -62,7 +62,7 @@ function RecentQuiz() {
           dragFree
           classNames={classes}
         >
-          {listQuiz.map((quiz, index) => (
+          {listRecentQuiz.map((quiz, index) => (
             <Carousel.Slide key={index}>
               <Card
                 shadow="sm"
