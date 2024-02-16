@@ -1,9 +1,22 @@
 import { Button, Stack, TextInput } from "@mantine/core";
 import { isEmail, useForm } from "@mantine/form";
-import { Form, useSubmit } from "react-router-dom";
+import { Dispatch, SetStateAction } from "react";
+import {
+  Form,
+  useActionData,
+  useNavigation,
+  useSubmit,
+} from "react-router-dom";
 
-function ForgotPasswordForm() {
+function ForgotPasswordForm({
+  setForgotEmail,
+}: {
+  setForgotEmail: Dispatch<SetStateAction<string>>;
+}) {
   const submit = useSubmit();
+  const actionData = useActionData() as { hasEmail: boolean };
+  const navigation = useNavigation();
+  const isSubmitting = navigation.state === "submitting";
   const form = useForm({
     initialValues: {
       email: "",
@@ -13,6 +26,11 @@ function ForgotPasswordForm() {
       email: isEmail("Please enter a valid email"),
     },
   });
+
+  if (actionData?.hasEmail) {
+    setForgotEmail(form.values.email);
+  }
+
   return (
     <div className="max-w-screen h-screen">
       <div className="w-9/12 h-screen mx-auto flex items-center justify-center">
@@ -44,7 +62,13 @@ function ForgotPasswordForm() {
                   {...form.getInputProps("email")}
                 />
 
-                <Button variant="filled" radius="md" type="submit" fullWidth>
+                <Button
+                  variant="filled"
+                  radius="md"
+                  type="submit"
+                  fullWidth
+                  loading={isSubmitting}
+                >
                   Send email
                 </Button>
               </Stack>
