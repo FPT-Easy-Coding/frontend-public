@@ -129,7 +129,6 @@ interface LoaderData {
 function Navbar() {
   const mode = useSearchParams()[0].get("mode");
   const data: LoaderData = useLoaderData() as LoaderData;
-  console.log(data);
   const submit = useSubmit();
   const { colorScheme, setColorScheme } = useMantineColorScheme({
     keepTransitions: true,

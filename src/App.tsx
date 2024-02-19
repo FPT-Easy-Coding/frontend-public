@@ -20,7 +20,9 @@ import {
 import "@mantine/core/styles.css";
 import UserDashboard from "./pages/after_login/UserDashboard";
 import { ErrorPage } from "./pages/errorpage/ErrorPage";
-import QuizSetDetails from "./pages/quiz/quizsets/SetDetails";
+import SetDetails from "./pages/quiz/set/SetDetails";
+import { loader as SetLoader } from "./pages/quiz/set/SetDetails";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -30,7 +32,12 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       { index: true, element: <Homepage /> },
-      { path: "auth", element: <AuthPage />, action: authAction, loader: preventAuth },
+      {
+        path: "auth",
+        element: <AuthPage />,
+        action: authAction,
+        loader: preventAuth,
+      },
       {
         path: "forgotten",
         children: [
@@ -50,7 +57,12 @@ const router = createBrowserRouter([
         children: [{ index: true, path: "profile", element: <ProfilePage /> }],
       },
       {
-        path: "sets/:setId", element: <QuizSetDetails />
+        path: "quiz/set/:id",
+        loader: checkAuth,
+        children: [
+          { index: true, element: <SetDetails />, loader: SetLoader },
+          // { path: "learn", element: <QuizSetDetails /> },
+        ],
       },
       { path: "logout", action: logout },
     ],
