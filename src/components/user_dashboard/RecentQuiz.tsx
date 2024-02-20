@@ -8,9 +8,51 @@ import {
   Avatar,
   Flex,
 } from "@mantine/core";
+import axios from "axios";
+import { useEffect, useState } from "react";
 import classes from "./Carousel.module.css";
 
 function RecentQuiz() {
+  interface Quiz {
+    quizId: string;
+    quizName: string;
+    numberOfQuestions: number;
+    userName: string;
+    view: number;
+    timeRecentViewQuiz: string; // Change the type to string
+    // Add other properties as needed
+  }
+
+  const [recentQuiz, setrecentQuiz] = useState<Quiz[]>([]);
+
+  useEffect(() => {
+    axios.get('http://localhost:8080/api/v1/quiz/get-all-quiz')
+      .then(res => {
+        const sortedList = res && res.data ? res.data.sort((a: { timeRecentViewQuiz: string | number | Date; }, b: { timeRecentViewQuiz: string | number | Date; }) => {
+          const timeA = new Date(a.timeRecentViewQuiz).getTime();
+          const timeB = new Date(b.timeRecentViewQuiz).getTime();
+          return timeB - timeA; // Sort in descending order for most recent views first
+        }) : [];
+        setrecentQuiz(sortedList);
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+        // Handle error gracefully, e.g., display an error message to the user
+      });
+  }, []);
+
+
+
+
+  const handleClickUpdateTime = async (quizId: any) => {
+    await axios.put(`http://localhost:8080/api/v1/quiz/update-time-quiz/${quizId}`);
+    alert("Update successful!");
+  };
+
+  const handleClickIncreaseView = async (quizId: any) => {
+    alert("me");
+    await axios.put(`http://localhost:8080/api/v1/quiz/increase-view/${quizId}`);
+  };
   return (
     <>
       <div>
@@ -24,31 +66,46 @@ function RecentQuiz() {
           dragFree
           classNames={classes}
         >
-          <Carousel.Slide>
-            <Card
-              shadow="sm"
-              padding="lg"
-              radius="md"
-              withBorder
-              component="a"
-              className="h-full"
-            >
-              <Flex className="flex-col px-5 h-full" justify="space-between">
-                <Card.Section>
-                  <Stack className="gap-2">
-                    <Text fw={500}>ahihi</Text>
-                    <Badge color="indigo">30 question</Badge>
-                  </Stack>
-                </Card.Section>
-                <Card.Section>
-                  <Group gap={"xs"}>
-                    <Avatar variant="filled" radius="xl" size="sm" />
-                    <Text size="sm">Thaycaoduc</Text>
-                  </Group>
-                </Card.Section>
-              </Flex>
-            </Card>
-          </Carousel.Slide>
+          {recentQuiz.map((quiz, index) => (
+            <Carousel.Slide key={index}>
+              <Card
+                shadow="sm"
+                padding="lg"
+                radius="md"
+                withBorder
+                component="a"
+                className="h-full"
+              >
+                <Flex
+                  className="flex-col px-5 h-full"
+                  justify="space-between"
+                  onClick={() => {
+                    handleClickUpdateTime(quiz.quizId);
+                    handleClickIncreaseView(quiz.quizId);
+                  }}
+                  onMouseEnter={() => {
+                    document.body.style.cursor = "pointer";
+                  }}
+                  onMouseLeave={() => {
+                    document.body.style.cursor = "auto";
+                  }}
+                >
+                  <Card.Section>
+                    <Stack className="gap-2">
+                      <Text fw={500}>{quiz.quizName}</Text>
+                      <Badge color="indigo">{quiz.numberOfQuestions} Question</Badge>
+                    </Stack>
+                  </Card.Section>
+                  <Card.Section>
+                    <Group gap={"xs"}>
+                      <Avatar variant="filled" radius="xl" size="sm" />
+                      <Text size="sm">{quiz.userName}</Text>
+                    </Group>
+                  </Card.Section>
+                </Flex>
+              </Card>
+            </Carousel.Slide>
+          ))}
         </Carousel>
       </div>
     </>

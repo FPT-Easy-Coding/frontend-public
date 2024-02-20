@@ -79,7 +79,9 @@ const userBtn = (data: any, submit: any) => {
             leftSection={
               <IconLogout style={{ width: rem(14), height: rem(14) }} />
             }
-            onClick={() => submit(null, { method: "post", action: "/logout" })}
+            onClick={() => submit(null, { method: "post", action: "/logout" })
+          }
+            
           >
             Logout
           </Menu.Item>
