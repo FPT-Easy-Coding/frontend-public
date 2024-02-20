@@ -20,6 +20,8 @@ import {
 import "@mantine/core/styles.css";
 import UserDashboard from "./pages/after_login/UserDashboard";
 import { ErrorPage } from "./pages/errorpage/ErrorPage";
+import QuizLearnPage from "./pages/after_login/QuizLearn";
+import FlashCardsPage from "./pages/after_login/FlashCardsPage";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -51,6 +53,17 @@ const router = createBrowserRouter([
       { path: "logout", action: logout },
     ],
   },
+  {
+    path: "quiz/set/:id",
+    loader: checkAuth,
+    children: [{ index: true, path: "learn", element: <QuizLearnPage />, },
+    { path: "flashcards", element: < FlashCardsPage /> }
+    ],
+  },
+
+
+  { path: "/quiz/flashcards/:quizId", element: <FlashCardsPage />, loader: checkAuth },
+  { path: "*", element: <ErrorPage /> },
 ]);
 
 function App() {

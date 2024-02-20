@@ -23,22 +23,26 @@ function RecentQuiz() {
     // Add other properties as needed
   }
 
-  const [listRecentQuiz, setListRecentQuiz] = useState<Quiz[]>([]);
+  const [recentQuiz, setrecentQuiz] = useState<Quiz[]>([]);
 
   useEffect(() => {
     axios.get('http://localhost:8080/api/v1/quiz/get-all-quiz')
       .then(res => {
         const sortedList = res && res.data ? res.data.sort((a: { timeRecentViewQuiz: string | number | Date; }, b: { timeRecentViewQuiz: string | number | Date; }) => {
-          const currentTime = new Date().getTime();
           const timeA = new Date(a.timeRecentViewQuiz).getTime();
           const timeB = new Date(b.timeRecentViewQuiz).getTime();
-          const diffA = Math.abs(currentTime - timeA);
-          const diffB = Math.abs(currentTime - timeB);
-          return diffA - diffB;
+          return timeB - timeA; // Sort in descending order for most recent views first
         }) : [];
-        setListRecentQuiz(sortedList);
+        setrecentQuiz(sortedList);
       })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+        // Handle error gracefully, e.g., display an error message to the user
+      });
   }, []);
+
+
+
 
   const handleClickUpdateTime = async (quizId: any) => {
     await axios.put(`http://localhost:8080/api/v1/quiz/update-time-quiz/${quizId}`);
@@ -62,7 +66,7 @@ function RecentQuiz() {
           dragFree
           classNames={classes}
         >
-          {listRecentQuiz.map((quiz, index) => (
+          {recentQuiz.map((quiz, index) => (
             <Carousel.Slide key={index}>
               <Card
                 shadow="sm"

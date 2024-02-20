@@ -28,14 +28,14 @@ interface User {
 function PopularAuthor() {
 
 
-  const [ListAuthor, setListPopularAuthors] = useState<User[]>([]);
+  const [popularAuthor, setpopularAuthor] = useState<User[]>([]);
 
   useEffect(() => {
     axios.get('http://localhost:8080/api/v1/admin/users-dashboard')
       .then(res => {
         // Sort the users by the 'view' property
-        const sortedUsers = res.data.sort((a: { view: number; }, b: { view: number; }) => b.view - a.view);
-        setListPopularAuthors(sortedUsers);
+        const sortedAuthors = res.data.sort((a: { view: number; }, b: { view: number; }) => b.view - a.view);
+        setpopularAuthor(sortedAuthors);
       })
   }, [])
 
@@ -52,7 +52,7 @@ function PopularAuthor() {
           dragFree
           classNames={classes}
         >
-          {ListAuthor.map((user, index) => (
+          {popularAuthor.map((user, index) => (
             <Carousel.Slide key={index}>
               <Card
                 shadow="sm"
