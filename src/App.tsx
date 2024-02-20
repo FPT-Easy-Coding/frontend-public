@@ -22,6 +22,7 @@ import UserDashboard from "./pages/after_login/UserDashboard";
 import { ErrorPage } from "./pages/errorpage/ErrorPage";
 import SetDetails from "./pages/quiz/set/SetDetails";
 import { loader as SetLoader } from "./pages/quiz/set/SetDetails";
+import FlashcardMode from "./pages/study-mode/flashcard/FlashcardMode";
 
 const router = createBrowserRouter([
   {
@@ -61,23 +62,12 @@ const router = createBrowserRouter([
         loader: checkAuth,
         children: [
           { index: true, element: <SetDetails />, loader: SetLoader },
-          // { path: "learn", element: <QuizSetDetails /> },
+          { path: "flashcard", element: <FlashcardMode /> },
         ],
       },
       { path: "logout", action: logout },
     ],
-  },
-  {
-    path: "quiz/set/:id",
-    loader: checkAuth,
-    children: [{ index: true, path: "learn", element: <QuizLearnPage />, },
-    { path: "flashcards", element: < FlashCardsPage /> }
-    ],
-  },
-
-
-  { path: "/quiz/flashcards/:quizId", element: <FlashCardsPage />, loader: checkAuth },
-  { path: "*", element: <ErrorPage /> },
+  }
 ]);
 
 function App() {
