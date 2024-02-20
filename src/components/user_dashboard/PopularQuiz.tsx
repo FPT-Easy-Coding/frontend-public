@@ -12,7 +12,6 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import classes from "./Carousel.module.css";
 import { useNavigate } from "react-router-dom";
-import QuizLearnPage from "../../pages/after_login/QuizLearn";
 
 interface Quiz {
   quizId: string;
@@ -84,8 +83,8 @@ function PopularQuiz() {
                   onClick={() => {
                     handleClickUpdateTime(quiz.quizId);
                     handleClickIncreaseView(quiz.quizId);
-                    navigate(`/quiz/set/${quiz.quizId}/learn`),
-                      <QuizLearnPage />
+                    // navigate(`/quiz/set/${quiz.quizId}/learn`),
+                    navigate(`/quiz/set/${quiz.quizId}`)
                   }}
                   onMouseEnter={() => {
                     document.body.style.cursor = "pointer";

@@ -11,7 +11,7 @@ import {
 import axios from "axios";
 import { useEffect, useState } from "react";
 import classes from "./Carousel.module.css";
-
+import { useNavigate } from "react-router-dom";
 function RecentQuiz() {
   interface Quiz {
     quizId: string;
@@ -24,7 +24,7 @@ function RecentQuiz() {
   }
 
   const [recentQuiz, setrecentQuiz] = useState<Quiz[]>([]);
-
+  const navigate = useNavigate();
   useEffect(() => {
     axios.get('http://localhost:8080/api/v1/quiz/get-all-quiz')
       .then(res => {
@@ -50,7 +50,6 @@ function RecentQuiz() {
   };
 
   const handleClickIncreaseView = async (quizId: any) => {
-    alert("me");
     await axios.put(`http://localhost:8080/api/v1/quiz/increase-view/${quizId}`);
   };
   return (
@@ -82,6 +81,7 @@ function RecentQuiz() {
                   onClick={() => {
                     handleClickUpdateTime(quiz.quizId);
                     handleClickIncreaseView(quiz.quizId);
+                    navigate(`/quiz/set/${quiz.quizId}`)
                   }}
                   onMouseEnter={() => {
                     document.body.style.cursor = "pointer";
