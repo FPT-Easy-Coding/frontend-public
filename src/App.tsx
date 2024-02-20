@@ -22,7 +22,7 @@ import UserDashboard from "./pages/after_login/UserDashboard";
 import { ErrorPage } from "./pages/errorpage/ErrorPage";
 import SetDetails from "./pages/quiz/set/SetDetails";
 import { loader as SetLoader } from "./pages/quiz/set/SetDetails";
-import FlashcardMode from "./pages/study-mode/flashcard/FlashcardMode";
+import FlashcardMode from "./pages/study-mode/flashcard/FlashcardPage";
 
 const router = createBrowserRouter([
   {
@@ -67,7 +67,7 @@ const router = createBrowserRouter([
       },
       { path: "logout", action: logout },
     ],
-  }
+  },
 ]);
 
 function App() {
