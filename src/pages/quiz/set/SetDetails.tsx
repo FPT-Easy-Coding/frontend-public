@@ -24,6 +24,7 @@ import {
 import { useCallback, useEffect, useRef, useState } from "react";
 import classes from "./SetDetails.module.css";
 import Autoplay from "embla-carousel-autoplay";
+import { toast } from "react-toastify";
 
 interface SetDetails {
   userId: number | null;
@@ -85,6 +86,12 @@ function SetDetails() {
   function handleFlashcardClick() {
     setIsQuestion(!isQuestion);
   }
+
+  useEffect(() => {
+    isAutoPlaying
+      ? toast.info("Flashcard autoplay is on")
+      : toast.info("Flashcard autoplay is off");
+  }, [isAutoPlaying]);
 
   const rows = questionsData?.map((question, index) => (
     <Paper shadow="md" radius="lg" p="xl" withBorder key={index}>
@@ -155,14 +162,16 @@ function SetDetails() {
           <Title order={1}>{loaderData?.quizName}</Title>
           <Group>
             <Badge leftSection={<IconUsers size={14} />}>999 learners</Badge>
-            <Rating size={"sm"} value={loaderData?.rate} fractions={2} />
+            <Rating size={"sm"} value={loaderData?.rate} fractions={2} readOnly/>
           </Group>
         </Stack>
         {/* Button section */}
         <Group className="mt-10">
-          <Button variant="filled">Flashcard</Button>
-          <Button variant="filled">Learn</Button>
-          <Button variant="filled">Practice</Button>
+          <Button.Group>
+            <Button variant="filled">Flashcard</Button>
+            <Button variant="filled">Learn</Button>
+            <Button variant="filled">Practice</Button>
+          </Button.Group>
         </Group>
         {/* Flashcard section */}
         <Carousel
