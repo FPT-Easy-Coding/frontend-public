@@ -7,6 +7,7 @@ import { MantineProvider } from "@mantine/core";
 
 // Supports weights 300-800
 import "@fontsource-variable/open-sans";
+import UserCredentialsProvider from "./store/user-credentials-context.tsx";
 const theme = {
   fontFamily: "Open Sans Variable, Helvetica, sans-serif",
   headings: {
@@ -15,6 +16,8 @@ const theme = {
 };
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <MantineProvider defaultColorScheme="light" theme={theme}>
-    <App />
+    <UserCredentialsProvider>
+      <App />
+    </UserCredentialsProvider>
   </MantineProvider>
 );

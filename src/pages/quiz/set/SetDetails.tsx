@@ -21,10 +21,11 @@ import {
   IconPlayerPlay,
   IconUsers,
 } from "@tabler/icons-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import classes from "./SetDetails.module.css";
 import Autoplay from "embla-carousel-autoplay";
 import { toast } from "react-toastify";
+import { UserCredentialsContext } from "../../../store/user-credentials-context";
 
 interface SetDetails {
   userId: number | null;
@@ -56,6 +57,8 @@ interface SetDetails {
     | null;
 }
 function SetDetails() {
+  const { info } = useContext(UserCredentialsContext);
+  console.log(info);
   const loaderData = useLoaderData() as SetDetails;
   const questionsData = loaderData?.questions;
   const [isQuestion, setIsQuestion] = useState(true);

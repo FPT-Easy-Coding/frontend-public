@@ -28,8 +28,10 @@ import {
 } from "@tabler/icons-react";
 
 import { DarkModeSwitch } from "react-toggle-dark-mode";
+import { useContext, useEffect } from "react";
+import { UserCredentialsContext } from "../../store/user-credentials-context";
 
-const userBtn = (data: any, submit: any) => {
+const userBtn = (data: LoaderData, submit: any, handleLogout: () => void) => {
   return (
     <>
       <Menu shadow="md" width={200}>
@@ -79,9 +81,10 @@ const userBtn = (data: any, submit: any) => {
             leftSection={
               <IconLogout style={{ width: rem(14), height: rem(14) }} />
             }
-            onClick={() => submit(null, { method: "post", action: "/logout" })
-          }
-            
+            onClick={() => {
+              submit(null, { method: "post", action: "/logout" });
+              handleLogout();
+            }}
           >
             Logout
           </Menu.Item>
@@ -123,14 +126,30 @@ const guestBtn = (mode: string) => {
 
 interface LoaderData {
   error?: boolean;
-  firstname?: string | null;
-  lastname?: string | null;
-  email?: string | null;
+  userId: number;
+  userName?: string;
+  firstName?: string;
+  lastName?: string;
+  email: string;
+  telephone: string;
+  role: string;
+  premium: boolean;
+  banned: boolean;
 }
 
 function Navbar() {
+  const { assignUserCredentials, clearUserCredentials, info } = useContext(
+    UserCredentialsContext
+  );
   const mode = useSearchParams()[0].get("mode");
   const data: LoaderData = useLoaderData() as LoaderData;
+  useEffect(() => {
+    if (data !== null) {
+      assignUserCredentials({
+        ...data,
+      });
+    }
+  }, [data]);
   const submit = useSubmit();
   const { colorScheme, setColorScheme } = useMantineColorScheme({
     keepTransitions: true,
@@ -139,9 +158,13 @@ function Navbar() {
   const toggleColorScheme = () => {
     setColorScheme(computedColorScheme === "dark" ? "light" : "dark");
   };
-  const btnState = data?.error || !data ? guestBtn(mode as string) : userBtn(data, submit);
+  const btnState =
+    data?.error || !data
+      ? guestBtn(mode as string)
+      : userBtn(data, submit, clearUserCredentials);
   const whichHomepage = data?.error || !data ? "/" : "/home";
 
+  console.log(info);
   return (
     <>
       <header className="w-full h-16 flex items-center justify-between sticky top-0 z-20 shadow-sm bg-[--mantine-color-body]">
