@@ -21,10 +21,14 @@ import "@mantine/core/styles.css";
 import UserDashboard from "./pages/after_login/UserDashboard";
 import { ErrorPage } from "./pages/errorpage/ErrorPage";
 import QuizSetDetails from "./pages/quiz/quiz-sets/SetDetails";
-import { forgotPasswordAction, resetPasswordAction } from "./utils/action/forgot-password/ForgotPasswordAction";
-import SetDetails from "./pages/quiz/set/SetDetails";
+import {
+  forgotPasswordAction,
+  resetPasswordAction,
+} from "./utils/action/forgot-password/ForgotPasswordAction";
+import SetDetails, { loader } from "./pages/quiz/set/SetDetails";
 import { loader as SetLoader } from "./pages/quiz/set/SetDetails";
 import FlashcardMode from "./pages/study-mode/flashcard/FlashcardPage";
+import { fetchUserProfileData } from "./components/account/user/Profile";
 
 const router = createBrowserRouter([
   {
@@ -44,13 +48,23 @@ const router = createBrowserRouter([
       {
         path: "forgotten",
         element: <ForgotPassword />,
-        action: forgotPasswordAction
+        action: forgotPasswordAction,
       },
-      { path: "reset-password", element: <ResetPassword />, action: resetPasswordAction},
+      {
+        path: "reset-password",
+        element: <ResetPassword />,
+        action: resetPasswordAction,
+      },
       { path: "home", element: <UserDashboard />, loader: checkAuth },
       {
-        path: "user",
-        children: [{ index: true, path: "profile", element: <ProfilePage /> }],
+        path: "user/profile",
+        children: [
+          {
+            index: true,
+            element: <ProfilePage />,
+            loader: fetchUserProfileData,
+          },
+        ],
       },
       {
         path: "quiz/set/:id",

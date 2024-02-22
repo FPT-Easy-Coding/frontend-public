@@ -49,13 +49,15 @@ const userBtn = (data: any, submit: any) => {
 
         <Menu.Dropdown>
           <Menu.Label>Menu</Menu.Label>
-          <Menu.Item
-            leftSection={
-              <IconUserCircle style={{ width: rem(14), height: rem(14) }} />
-            }
-          >
-            Profile
-          </Menu.Item>
+          <NavLink to={"/user/profile"}>
+            <Menu.Item
+              leftSection={
+                <IconUserCircle style={{ width: rem(14), height: rem(14) }} />
+              }
+            >
+              Profile
+            </Menu.Item>
+          </NavLink>
 
           <Menu.Item
             leftSection={
@@ -79,9 +81,7 @@ const userBtn = (data: any, submit: any) => {
             leftSection={
               <IconLogout style={{ width: rem(14), height: rem(14) }} />
             }
-            onClick={() => submit(null, { method: "post", action: "/logout" })
-          }
-            
+            onClick={() => submit(null, { method: "post", action: "/logout" })}
           >
             Logout
           </Menu.Item>
@@ -139,7 +139,8 @@ function Navbar() {
   const toggleColorScheme = () => {
     setColorScheme(computedColorScheme === "dark" ? "light" : "dark");
   };
-  const btnState = data?.error || !data ? guestBtn(mode as string) : userBtn(data, submit);
+  const btnState =
+    data?.error || !data ? guestBtn(mode as string) : userBtn(data, submit);
   const whichHomepage = data?.error || !data ? "/" : "/home";
 
   return (
