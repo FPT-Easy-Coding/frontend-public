@@ -11,6 +11,7 @@ import AuthPage, {
 import ForgotPassword from "./pages/authentication/forgot-password/ForgotPassword";
 import ResetPassword from "./pages/authentication/forgot-password/ResetPassword";
 import ProfilePage from "./pages/account/user/ProfilePage";
+import ClassPage from "./pages/class/ClassPage";
 import logout from "./utils/loader/auth/logout";
 import {
   checkAuth,
@@ -29,6 +30,7 @@ import SetDetails, { loader } from "./pages/quiz/set/SetDetails";
 import { loader as SetLoader } from "./pages/quiz/set/SetDetails";
 import FlashcardMode from "./pages/study-mode/flashcard/FlashcardPage";
 import { fetchUserProfileData } from "./components/account/user/Profile";
+import FolderPage from "./pages/folder/FolderPage";
 
 const router = createBrowserRouter([
   {
@@ -63,6 +65,24 @@ const router = createBrowserRouter([
             index: true,
             element: <ProfilePage />,
             loader: fetchUserProfileData,
+          },
+        ],
+      },
+      {
+        path: "class/:id",
+        children: [
+          {
+            index: true,
+            element: <ClassPage />,
+          },
+        ],
+      },
+      {
+        path: "folder/:id",
+        children: [
+          {
+            index: true,
+            element: <FolderPage />,
           },
         ],
       },

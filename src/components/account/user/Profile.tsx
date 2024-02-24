@@ -9,6 +9,7 @@ import {
   Avatar,
   Group,
   Box,
+  Select,
 } from "@mantine/core";
 import {
   IconFolder,
@@ -16,6 +17,7 @@ import {
   IconUsers,
   IconUsersGroup,
 } from "@tabler/icons-react";
+import { Link } from "react-router-dom";
 
 interface UserData {
   userId: number;
@@ -30,11 +32,13 @@ interface UserData {
 }
 
 interface StudySet {
+  quizId: number;
   numberOfQuestion: number;
   author: string;
   authorFirstName: string;
   authorLastName: string;
   quizName: string;
+  createdAt: Date;
 }
 
 interface Classes {
@@ -43,23 +47,29 @@ interface Classes {
   numberOfQuizSet: number;
 }
 
+interface Folder {
+  folderName: string;
+  numberOfQuizSet: number;
+  createdAt: Date;
+}
+
 function Profile({ userData }: { userData: UserData }) {
   const [studySets, setStudySets] = useState<StudySet[]>([]);
   const [loadingStudySets, setLoadingStudySets] = useState<boolean>(false);
   const [classes, setClasses] = useState<Classes[]>([]);
   const [loadingClasses, setLoadingClasses] = useState<boolean>(false);
+  const [folders, setFolders] = useState<Folder[]>([]);
+  const [loadingFolders, setLoadingFolders] = useState<boolean>(false);
 
   const iconStyle = { width: rem(12), height: rem(12) };
+  const [studySetsFilter, setStudySetsFilter] = useState<string>("Recent");
+  const [foldersFilter, setFoldersFilter] = useState<string>("Recent");
 
   useEffect(() => {
     if (userData) {
       fetchStudySets(userData.userId);
-    }
-  }, [userData]);
-
-  useEffect(() => {
-    if (userData) {
       fetchClasses(userData.userId);
+      fetchFolders(userData.userId);
     }
   }, [userData]);
 
@@ -87,9 +97,21 @@ function Profile({ userData }: { userData: UserData }) {
     }
   }
 
+  async function fetchFolders(userId: number) {
+    setLoadingFolders(true);
+    try {
+      const foldersData = await fetchFolderData(userId);
+      setFolders(foldersData);
+    } catch (error) {
+      console.error("Error fetching folders:", error);
+    } finally {
+      setLoadingFolders(false);
+    }
+  }
+
   return (
     <div>
-      <Group className="mt-10 ml-5">
+      <Group className="mt-10 ml-14">
         <Avatar src={null} alt="no image here" size={"lg"}>
           {userData?.firstName!.charAt(0).toUpperCase() +
             userData?.lastName!.charAt(0).toUpperCase()}
@@ -127,38 +149,128 @@ function Profile({ userData }: { userData: UserData }) {
           </Tabs.Tab>
         </Tabs.List>
         <Tabs.Panel value="study">
+          {/* Select component for filtering */}
+          <Select
+            className="my-5 w-[120px]"
+            placeholder="Recent"
+            checkIconPosition="right"
+            data={["Recent", "Created", "Studied"]}
+            value={studySetsFilter}
+            onChange={(value) => setStudySetsFilter(value || "Recent")}
+            allowDeselect={false}
+          />
+          {/* Content rendering based on the filter */}
           {loadingStudySets ? (
             <Loader />
           ) : (
             <div>
-              {studySets.map((set, index) => (
-                <Box
-                  key={index}
-                  className="pl-4 mb-4 mt-2 shadow-md rounded-md border-s h-[88px] pt-4"
-                >
-                  <Group key={index}>
-                    <Text className="font-semibold text-sm">
-                      {set.numberOfQuestion}{" "}
-                      {set.numberOfQuestion > 1 ? "terms" : "term"}
-                    </Text>
-                    <Group className="pl-4 ">
-                      <Avatar src={null} alt="no image here" size={"sm"}>
-                        {set?.authorFirstName!.charAt(0).toUpperCase() +
-                          set?.authorLastName!.charAt(0).toUpperCase()}
-                      </Avatar>
-                      <Text className="font-semibold text-sm">
-                        {set.author}
+              {studySets
+                .filter((set) => {
+                  if (studySetsFilter === "Recent") {
+                    // Filter sets created within the last month
+                    const oneMonthAgo = new Date();
+                    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+                    return new Date(set.createdAt) > oneMonthAgo;
+                  }
+                  // else if (studySetsFilter === "Created") {
+                  //   // Apply your logic for filtering by creation date
+                  //   // Example: Filter sets created within the last 6 months
+                  //   const sixMonthsAgo = new Date();
+                  //   sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+                  //   return new Date(set.created) > sixMonthsAgo;
+                  // } else if (studySetsFilter === "Studied") {
+                  //   // Apply your logic for filtering by studied date
+                  //   // Example: Filter sets last studied within the last week
+                  //   const oneWeekAgo = new Date();
+                  //   oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+                  //   return new Date(set.lastStudied) > oneWeekAgo;
+                  // }
+                  // Default case: return true if no filtering is applied
+                  return true;
+                })
+                .map((set, index) => (
+                  <Link to={`/quiz/set/${set.quizId}`} key={index}>
+                    <Box className="pl-4 mb-4 mt-2 shadow-md rounded-md border-s h-[88px] pt-4">
+                      <Group key={index}>
+                        <Text className="font-semibold text-sm">
+                          {set.numberOfQuestion}{" "}
+                          {set.numberOfQuestion > 1 ? "terms" : "term"}
+                        </Text>
+                        <Group className="pl-4 ">
+                          <Avatar src={null} alt="no image here" size={"sm"}>
+                            {set?.authorFirstName!.charAt(0).toUpperCase() +
+                              set?.authorLastName!.charAt(0).toUpperCase()}
+                          </Avatar>
+                          <Text className="font-semibold text-sm">
+                            {set.author}
+                          </Text>
+                        </Group>
+                      </Group>
+                      <Text className="font-bold text-xl pt-1">
+                        {set.quizName}
                       </Text>
-                    </Group>
-                  </Group>
-                  <Text className="font-bold text-xl pt-1">{set.quizName}</Text>
-                </Box>
-              ))}
+                    </Box>
+                  </Link>
+                ))}
             </div>
           )}
         </Tabs.Panel>
 
-        <Tabs.Panel value="folder">Folder content</Tabs.Panel>
+        <Tabs.Panel value="folder">
+          <Select
+            className="my-5 w-[120px]"
+            placeholder="Recent"
+            checkIconPosition="right"
+            data={["Recent", "Created", "Studied"]}
+            value={studySetsFilter}
+            onChange={(value) => setFoldersFilter(value || "Recent")}
+            allowDeselect={false}
+          />
+          {loadingFolders ? (
+            <Loader />
+          ) : (
+            <div>
+              {folders
+                .filter((set) => {
+                  if (foldersFilter === "Recent") {
+                    // Filter sets created within the last month
+                    const oneMonthAgo = new Date();
+                    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+                    return new Date(set.createdAt) > oneMonthAgo;
+                  }
+                  //   // else if (studySetsFilter === "Created") {
+                  //   //   // Apply your logic for filtering by creation date
+                  //   //   // Example: Filter sets created within the last 6 months
+                  //   //   const sixMonthsAgo = new Date();
+                  //   //   sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+                  //   //   return new Date(set.created) > sixMonthsAgo;
+                  //   // } else if (studySetsFilter === "Studied") {
+                  //   //   // Apply your logic for filtering by studied date
+                  //   //   // Example: Filter sets last studied within the last week
+                  //   //   const oneWeekAgo = new Date();
+                  //   //   oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+                  //   //   return new Date(set.lastStudied) > oneWeekAgo;
+                  //   // }
+                  //   // Default case: return true if no filtering is applied
+                  return true;
+                })
+                .map((folder, index) => (
+                  <Box
+                    key={index}
+                    className="pl-4 mb-4 mt-2 shadow-md rounded-md border-s h-[88px] pt-4"
+                  >
+                    <Text className="font-semibold text-sm">
+                      {folder.numberOfQuizSet}{" "}
+                      {folder.numberOfQuizSet > 1 ? "sets" : "set"}
+                    </Text>
+                    <Text className="font-bold text-xl pt-1">
+                      {folder.folderName}
+                    </Text>
+                  </Box>
+                ))}
+            </div>
+          )}
+        </Tabs.Panel>
 
         <Tabs.Panel value="class">
           {loadingClasses ? (
@@ -200,7 +312,6 @@ function Profile({ userData }: { userData: UserData }) {
     </div>
   );
 }
-
 export async function fetchUserProfileData() {
   try {
     const userId = localStorage.getItem("uid");
@@ -211,6 +322,17 @@ export async function fetchUserProfileData() {
   } catch (error) {
     console.error("Error fetching user profile data:", error);
     throw new Error("Error fetching user profile data");
+  }
+}
+
+export async function fetchFolderData(userId: number) {
+  try {
+    const response = await axios.get(
+      `http://localhost:8080/api/v1/folder/create/user-id=${userId}`
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error("Error fetching folders");
   }
 }
 

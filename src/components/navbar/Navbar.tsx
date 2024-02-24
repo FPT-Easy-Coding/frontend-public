@@ -8,6 +8,9 @@ import {
   Text,
   useMantineColorScheme,
   useComputedColorScheme,
+  Modal,
+  Input,
+  Checkbox,
 } from "@mantine/core";
 import logo from "../../assets/logo.svg";
 import {
@@ -28,6 +31,7 @@ import {
 } from "@tabler/icons-react";
 
 import { DarkModeSwitch } from "react-toggle-dark-mode";
+import { useDisclosure } from "@mantine/hooks";
 
 const userBtn = (data: any, submit: any) => {
   return (
@@ -129,6 +133,7 @@ interface LoaderData {
 }
 
 function Navbar() {
+  const [opened, { open, close }] = useDisclosure(false);
   const mode = useSearchParams()[0].get("mode");
   const data: LoaderData = useLoaderData() as LoaderData;
   const submit = useSubmit();
@@ -216,7 +221,9 @@ function Navbar() {
                 >
                   Folder
                 </Menu.Item>
+
                 <Menu.Item
+                  onClick={() => open()}
                   leftSection={
                     <IconPhoto style={{ width: rem(14), height: rem(14) }} />
                   }
@@ -224,6 +231,52 @@ function Navbar() {
                   Classes
                 </Menu.Item>
               </Menu.Dropdown>
+              <Modal
+                styles={{
+                  root: { borderRadius: "calc(var(--modal-radius) - 20px)" },
+                }}
+                opened={opened}
+                onClose={close}
+                centered
+                size="xl"
+              >
+                <Modal.Title>
+                  <Text className="font-bold text-3xl mb-5 mx-4">
+                    Create a new class
+                  </Text>
+                </Modal.Title>
+
+                <Input
+                  className="my-5 mx-4 w-[96%]"
+                  placeholder="Enter class name (course, teacher, year, section etc.)"
+                  variant="filled"
+                />
+                <Input
+                  className="my-5 mx-4 w-[96%]"
+                  placeholder="Enter a description (optional)"
+                  variant="filled"
+                />
+                <Checkbox
+                  className="my-5 mx-4"
+                  defaultChecked
+                  label="Allow class members to add and remove sets"
+                  color="gray"
+                />
+                <Checkbox
+                  className="my-5 mx-4"
+                  defaultChecked
+                  label="Allow class members to invite new members"
+                  color="gray"
+                />
+                <div className="flex justify-end">
+                  <Button
+                    className="mb-5 mx-4 w-[120px] h-[50px] rounded-xl"
+                    variant="filled"
+                  >
+                    Button
+                  </Button>
+                </div>
+              </Modal>
             </Menu>
             <Group>{btnState}</Group>
           </Group>
