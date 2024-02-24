@@ -24,6 +24,7 @@ import { forgotPasswordAction, resetPasswordAction } from "./utils/action/forgot
 import SetDetails from "./pages/quiz/set/SetDetails";
 import { loader as SetLoader } from "./pages/quiz/set/SetDetails";
 import FlashcardMode from "./pages/study-mode/flashcard/FlashcardPage";
+import QuizLearnPage from "./pages/study-mode/learn/QuizLearn";
 
 const router = createBrowserRouter([
   {
@@ -45,7 +46,7 @@ const router = createBrowserRouter([
         element: <ForgotPassword />,
         action: forgotPasswordAction
       },
-      { path: "reset-password", element: <ResetPassword />, action: resetPasswordAction},
+      { path: "reset-password", element: <ResetPassword />, action: resetPasswordAction },
       { path: "home", element: <UserDashboard />, loader: checkAuth },
       {
         path: "user",
@@ -56,10 +57,18 @@ const router = createBrowserRouter([
         loader: checkAuth,
         children: [
           { index: true, element: <SetDetails />, loader: SetLoader },
+          // { path: "learn", element: <QuizLearnPage />, loader: SetLoader },
           { path: "flashcard", element: <FlashcardMode /> },
         ],
       },
       { path: "logout", action: logout },
+    ],
+  },
+  {
+    path: "quiz/set/:id",
+    loader: checkAuth,
+    children: [
+      { path: "learn", element: <QuizLearnPage />, loader: SetLoader },
     ],
   },
 ]);

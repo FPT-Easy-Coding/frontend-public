@@ -26,7 +26,7 @@ import classes from "./SetDetails.module.css";
 import Autoplay from "embla-carousel-autoplay";
 import { toast } from "react-toastify";
 import { UserCredentialsContext } from "../../../store/user-credentials-context";
-
+import { useNavigate } from "react-router-dom";
 interface SetDetails {
   userId: number | null;
   userImg: string | null;
@@ -43,18 +43,18 @@ interface SetDetails {
   view: number | null;
   timeRecentViewQuiz: string | number | null;
   questions:
-    | [
+  | [
+    {
+      questionContent: string | null;
+      answers: [
         {
-          questionContent: string | null;
-          answers: [
-            {
-              content: string | null;
-              isCorrect: boolean | null;
-            }
-          ];
+          content: string | null;
+          isCorrect: boolean | null;
         }
-      ]
-    | null;
+      ];
+    }
+  ]
+  | null;
 }
 function SetDetails() {
   const { info } = useContext(UserCredentialsContext);
@@ -66,7 +66,7 @@ function SetDetails() {
   const [embla, setEmbla] = useState<Embla | null>(null);
   const autoplay = useRef(Autoplay({ delay: 5000 }));
   const [isAutoPlaying, setIsAutoPlaying] = useState(false);
-
+  const navigate = useNavigate();
   if (!isAutoPlaying) {
     autoplay.current.stop();
   } else {
@@ -153,7 +153,9 @@ function SetDetails() {
       )}
     </Carousel.Slide>
   ));
-
+  const handleClickSaveUserDoQuiz = async () => {
+    await axios.post(`http://localhost:8080/api/v1/quiz/user-do-quiz?user-id=${info?.userId}&quiz-id=${loaderData.quizId}`)
+  };
   return (
     <>
       <Container>
@@ -165,14 +167,17 @@ function SetDetails() {
           <Title order={1}>{loaderData?.quizName}</Title>
           <Group>
             <Badge leftSection={<IconUsers size={14} />}>999 learners</Badge>
-            <Rating size={"sm"} value={loaderData?.rate} fractions={2} readOnly/>
+            <Rating size={"sm"} value={loaderData?.rate} fractions={2} readOnly />
           </Group>
         </Stack>
         {/* Button section */}
         <Group className="mt-10">
           <Button.Group>
             <Button variant="filled">Flashcard</Button>
-            <Button variant="filled">Learn</Button>
+            <Button variant="filled" onClick={() => {
+              handleClickSaveUserDoQuiz();
+              navigate(`/quiz/set/${loaderData.quizId}/learn`)
+            }}>Learn</Button>
             <Button variant="filled">Practice</Button>
           </Button.Group>
         </Group>
@@ -263,3 +268,7 @@ export async function loader({ params }: { params: Readonly<Params> }) {
     }
   }
 }
+function async(userId: number | undefined, quizId: number | null) {
+  throw new Error("Function not implemented.");
+}
+
