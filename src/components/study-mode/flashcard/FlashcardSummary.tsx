@@ -14,16 +14,30 @@ import {
 import partyPopper from "../../../assets/emoji/party-popper.svg";
 import {
   IconBook,
-  IconChevronLeft,
   IconChevronRight,
   IconCircleCheck,
   IconRotateClockwise2,
 } from "@tabler/icons-react";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { QuizInfoContext } from "../../../store/quiz-info-context";
+import { useNavigate } from "react-router-dom";
 
 function FlashcardSummary({ handleRestart }: { handleRestart: () => void }) {
-  const { totalQuestion } = useContext(QuizInfoContext);
+  const { totalQuestion, id } = useContext(QuizInfoContext);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key) {
+        navigate(`/quiz/set/${id}`);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [id, navigate]);
+
   return (
     <>
       <Lottie

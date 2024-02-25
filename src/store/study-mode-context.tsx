@@ -2,28 +2,30 @@ import { Reducer, createContext, useReducer } from "react";
 
 interface StudyMode {
   mode: string | null;
-  flashcardSettings: {
-    isShuffled: boolean | null;
-    isSorted: boolean | null;
+  settings: {
+    flashcard: {
+      isSorted: boolean;
+    };
   };
 }
 
 interface StudyModeContextProps extends StudyMode {
-  assignStudyMode: (studyMode: any) => void;
+  assignStudyMode: (mode: any) => void;
   clearStudyMode: () => void;
-  changeShuffled: (newShuffle: boolean, mode: string) => void;
-  changeSorted: (newSorted: boolean, mode: string) => void;
+  // changeShuffled: (newShuffle: boolean, mode: string) => void;
+  changeSorted: (isSorted: boolean, mode: string) => void;
 }
 
 export const StudyModeContext = createContext<StudyModeContextProps>({
   mode: null,
-  flashcardSettings: {
-    isShuffled: null,
-    isSorted: null,
+  settings: {
+    flashcard: {
+      isSorted: false,
+    },
   },
   assignStudyMode: () => {},
   clearStudyMode: () => {},
-  changeShuffled: () => {},
+  // changeShuffled: () => {},
   changeSorted: () => {},
 });
 
@@ -37,19 +39,28 @@ function studyModeReducer(state: StudyMode, action: any) {
     case "CLEAR_STUDY_MODE":
       return {
         mode: null,
-        flashcardSettings: {
-          isShuffled: null,
-          isSorted: null,
-        },
+        settings: {
+          flashcard: {
+            isSorted: false,
+          }
+        }
       };
-    case "CHANGE_SHUFFLE":
-      return {
-        mode: state.mode,
-      };
+    // case "CHANGE_SHUFFLE":
+    //   return {
+    //     mode: state.mode,
+    //   };
     case "CHANGE_SORTED":
-      return {
-        mode: state.mode,
-      };
+      if (state.mode === action.payload.mode) {
+        return {
+          mode: state.mode,
+          settings: {
+            flashcard: {
+              isSorted: action.payload.isSorted
+            }
+          }
+        }
+      }
+      return state;
     default:
       return state;
   }
@@ -60,17 +71,18 @@ export default function StudyModeProvider({ children }: any) {
     studyModeReducer as Reducer<StudyMode, any>,
     {
       mode: null,
-      flashcardSettings: {
-        isShuffled: null,
-        isSorted: null,
+      settings: {
+        flashcard: {
+          isSorted: false,
+        },
       },
     }
   );
 
-  function handleAssignStudyMode(newMode: string) {
+  function handleAssignStudyMode(mode: string) {
     studyModeDispatch({
       type: "ASSIGN_STUDY_MODE",
-      payload: newMode,
+      payload: mode,
     });
   }
 
@@ -80,21 +92,21 @@ export default function StudyModeProvider({ children }: any) {
     });
   }
 
-  function handleShuffle(newShuffled: boolean, mode: string) {
-    studyModeDispatch({
-      type: "CHANGE_SHUFFLE",
-      payload: {
-        newShuffled: newShuffled,
-        mode: mode,
-      },
-    });
-  }
+  // function handleShuffle(newShuffled: boolean, mode: string) {
+  //   studyModeDispatch({
+  //     type: "CHANGE_SHUFFLE",
+  //     payload: {
+  //       newShuffled: newShuffled,
+  //       mode: mode,
+  //     },
+  //   });
+  // }
 
-  function handleSorted(newSorted: boolean, mode: string) {
+  function handleSorted(isSorted: boolean, mode: string) {
     studyModeDispatch({
       type: "CHANGE_SORTED",
       payload: {
-        newSorted: newSorted,
+        isSorted: isSorted,
         mode: mode,
       },
     });
@@ -104,7 +116,7 @@ export default function StudyModeProvider({ children }: any) {
     ...studyModeState,
     assignStudyMode: handleAssignStudyMode,
     clearStudyMode: handleClearStudyMode,
-    changeShuffled: handleShuffle,
+    // changeShuffled: handleShuffle,
     changeSorted: handleSorted,
   };
 

@@ -1,5 +1,12 @@
 import axios from "axios";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Params, useLoaderData } from "react-router-dom";
 import { SetDetails } from "../../quiz/set/SetDetails";
 import { Carousel, Embla } from "@mantine/carousel";
@@ -20,9 +27,11 @@ import {
 } from "@tabler/icons-react";
 import { QuizInfoContext } from "../../../store/quiz-info-context";
 import FlashcardSummary from "../../../components/study-mode/flashcard/FlashcardSummary";
+import { StudyModeContext } from "../../../store/study-mode-context";
 
 function FlashcardPage() {
   const { assignQuizInfo } = useContext(QuizInfoContext);
+  const { settings } = useContext(StudyModeContext);
   const loaderData = useLoaderData() as SetDetails;
   const questionsData = loaderData?.questions;
   const [isQuestion, setIsQuestion] = useState(true);
@@ -30,7 +39,6 @@ function FlashcardPage() {
   const [embla, setEmbla] = useState<Embla | null>(null);
   const autoplay = useRef(Autoplay({ delay: 5000 }));
   const [isAutoPlaying, setIsAutoPlaying] = useState(false);
-  const [shuffle, setShuffle] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [done, setDone] = useState(false);
 
@@ -69,43 +77,88 @@ function FlashcardPage() {
     setDone(false);
   }
 
-
-  const flashcards = questionsData?.map((question, index) => (
-    <Carousel.Slide key={index}>
-      {isQuestion ? (
-        <Paper
-          shadow="md"
-          radius="lg"
-          p="xl"
-          withBorder
-          h={"100%"}
-          className="flex flex-col items-center justify-center"
-          onClick={() => handleFlashcardClick()}
-        >
-          <Text className="text-3xl text-justify" fw={600}>
-            {question.questionContent}
-          </Text>
-        </Paper>
-      ) : (
-        <Paper
-          shadow="md"
-          radius="lg"
-          p="xl"
-          withBorder
-          h={"100%"}
-          className="flex flex-col items-center justify-center"
-          onClick={() => handleFlashcardClick()}
-        >
-          {question.answers.map((answer) => (
-            <Text className="text-3xl text-justify" fw={600}>
-              {answer.isCorrect && answer.content}
-            </Text>
-          ))}
-        </Paper>
-      )}
-    </Carousel.Slide>
-  ));
-
+  const flashcards = useMemo(() => {
+    if (settings.flashcard.isSorted) {
+      return questionsData
+        ?.slice()
+        .sort((a, b) => {
+          const contentA = a.questionContent!.toUpperCase();
+          const contentB = b.questionContent!.toUpperCase();
+          return contentA.localeCompare(contentB);
+        })
+        .map((question, index) => (
+          <Carousel.Slide key={index}>
+            {isQuestion ? (
+              <Paper
+                shadow="md"
+                radius="lg"
+                p="xl"
+                withBorder
+                h={"100%"}
+                className="flex flex-col items-center justify-center"
+                onClick={() => handleFlashcardClick()}
+              >
+                <Text className="text-3xl text-justify" fw={600}>
+                  {question.questionContent}
+                </Text>
+              </Paper>
+            ) : (
+              <Paper
+                shadow="md"
+                radius="lg"
+                p="xl"
+                withBorder
+                h={"100%"}
+                className="flex flex-col items-center justify-center"
+                onClick={() => handleFlashcardClick()}
+              >
+                {question.answers.map((answer) => (
+                  <Text className="text-3xl text-justify" fw={600}>
+                    {answer.isCorrect && answer.content}
+                  </Text>
+                ))}
+              </Paper>
+            )}
+          </Carousel.Slide>
+        ));
+    } else {
+      return questionsData?.map((question, index) => (
+        <Carousel.Slide key={index}>
+          {isQuestion ? (
+            <Paper
+              shadow="md"
+              radius="lg"
+              p="xl"
+              withBorder
+              h={"100%"}
+              className="flex flex-col items-center justify-center"
+              onClick={() => handleFlashcardClick()}
+            >
+              <Text className="text-3xl text-justify" fw={600}>
+                {question.questionContent}
+              </Text>
+            </Paper>
+          ) : (
+            <Paper
+              shadow="md"
+              radius="lg"
+              p="xl"
+              withBorder
+              h={"100%"}
+              className="flex flex-col items-center justify-center"
+              onClick={() => handleFlashcardClick()}
+            >
+              {question.answers.map((answer) => (
+                <Text className="text-3xl text-justify" fw={600}>
+                  {answer.isCorrect && answer.content}
+                </Text>
+              ))}
+            </Paper>
+          )}
+        </Carousel.Slide>
+      ));
+    }
+  }, [settings.flashcard.isSorted, questionsData, isQuestion]);
   return (
     <>
       {done ? (
