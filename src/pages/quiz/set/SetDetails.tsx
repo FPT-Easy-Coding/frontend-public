@@ -14,7 +14,7 @@ import {
   Text,
   Title,
 } from "@mantine/core";
-import { Params, useLoaderData } from "react-router-dom";
+import { Link, Params, useLoaderData } from "react-router-dom";
 import axios from "axios";
 import {
   IconPlayerPause,
@@ -27,7 +27,7 @@ import Autoplay from "embla-carousel-autoplay";
 import { toast } from "react-toastify";
 import { UserCredentialsContext } from "../../../store/user-credentials-context";
 
-interface SetDetails {
+export interface SetDetails {
   userId: number | null;
   userImg: string | null;
   quizId: number | null;
@@ -57,8 +57,6 @@ interface SetDetails {
     | null;
 }
 function SetDetails() {
-  const { info } = useContext(UserCredentialsContext);
-  console.log(info);
   const loaderData = useLoaderData() as SetDetails;
   const questionsData = loaderData?.questions;
   const [isQuestion, setIsQuestion] = useState(true);
@@ -165,13 +163,22 @@ function SetDetails() {
           <Title order={1}>{loaderData?.quizName}</Title>
           <Group>
             <Badge leftSection={<IconUsers size={14} />}>999 learners</Badge>
-            <Rating size={"sm"} value={loaderData?.rate} fractions={2} readOnly/>
+            <Rating
+              size={"sm"}
+              value={loaderData?.rate}
+              fractions={2}
+              readOnly
+            />
           </Group>
         </Stack>
         {/* Button section */}
         <Group className="mt-10">
           <Button.Group>
-            <Button variant="filled">Flashcard</Button>
+            <Button variant="filled">
+              <Link to={`/${loaderData?.quizId}/study/flashcard/`}>
+                Flashcard
+              </Link>
+            </Button>
             <Button variant="filled">Learn</Button>
             <Button variant="filled">Practice</Button>
           </Button.Group>

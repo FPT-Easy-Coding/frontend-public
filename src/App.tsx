@@ -20,10 +20,15 @@ import {
 import "@mantine/core/styles.css";
 import UserDashboard from "./pages/after_login/UserDashboard";
 import { ErrorPage } from "./pages/errorpage/ErrorPage";
-import { forgotPasswordAction, resetPasswordAction } from "./utils/action/forgot-password/ForgotPasswordAction";
+import {
+  forgotPasswordAction,
+  resetPasswordAction,
+} from "./utils/action/forgot-password/ForgotPasswordAction";
 import SetDetails from "./pages/quiz/set/SetDetails";
 import { loader as SetLoader } from "./pages/quiz/set/SetDetails";
 import FlashcardMode from "./pages/study-mode/flashcard/FlashcardPage";
+import StudyModeRoot from "./pages/study-mode/StudyModeRoot";
+import { loader as FlashcardLoader } from "./pages/study-mode/flashcard/FlashcardPage";
 
 const router = createBrowserRouter([
   {
@@ -43,9 +48,13 @@ const router = createBrowserRouter([
       {
         path: "forgotten",
         element: <ForgotPassword />,
-        action: forgotPasswordAction
+        action: forgotPasswordAction,
       },
-      { path: "reset-password", element: <ResetPassword />, action: resetPasswordAction},
+      {
+        path: "reset-password",
+        element: <ResetPassword />,
+        action: resetPasswordAction,
+      },
       { path: "home", element: <UserDashboard />, loader: checkAuth },
       {
         path: "user",
@@ -54,13 +63,21 @@ const router = createBrowserRouter([
       {
         path: "quiz/set/:id",
         loader: checkAuth,
-        children: [
-          { index: true, element: <SetDetails />, loader: SetLoader },
-          { path: "flashcard", element: <FlashcardMode /> },
-        ],
+        children: [{ index: true, element: <SetDetails />, loader: SetLoader }],
       },
       { path: "logout", action: logout },
     ],
+  },
+  {
+    path: ":id/study",
+    element: <StudyModeRoot />,
+    errorElement: <ErrorPage />,
+    loader: checkAuth,
+    children: [
+      {
+        path: "flashcard", element: <FlashcardMode />, loader: FlashcardLoader
+      }
+    ]
   },
 ]);
 
