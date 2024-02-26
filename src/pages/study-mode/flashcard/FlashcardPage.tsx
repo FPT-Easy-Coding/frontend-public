@@ -165,6 +165,7 @@ function FlashcardPage() {
         <FlashcardSummary handleRestart={handleRestart} />
       ) : (
         <>
+          <Progress value={scrollProgress} size="xs" />
           <Container>
             <Carousel
               align={"start"}
@@ -186,14 +187,7 @@ function FlashcardPage() {
               {flashcards}
             </Carousel>
             <Group className="justify-between mt-5">
-              <Progress
-                value={scrollProgress}
-                size="sm"
-                className="basis-1/3"
-              />
-              <Text className="basis-1/3">{`${currentIndex + 1}/${
-                flashcards?.length
-              }`}</Text>
+              <Text>{`${currentIndex + 1}/${flashcards?.length}`}</Text>
               <Group>
                 <ActionIcon
                   variant="subtle"
