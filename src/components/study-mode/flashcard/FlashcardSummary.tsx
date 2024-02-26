@@ -112,6 +112,7 @@ function FlashcardSummary({ handleRestart }: { handleRestart: () => void }) {
             variant="light"
             radius={"lg"}
             rightSection={<IconChevronRight size={18} />}
+            onClick={() => navigate(`/quiz/set/${id}`)}
           >
             Press any key to continue
           </Button>
