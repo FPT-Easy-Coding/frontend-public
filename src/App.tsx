@@ -31,6 +31,7 @@ import { loader as SetLoader } from "./pages/quiz/set/SetDetails";
 import FlashcardMode from "./pages/study-mode/flashcard/FlashcardPage";
 import { fetchUserProfileData } from "./components/account/user/Profile";
 import FolderPage from "./pages/folder/FolderPage";
+import CreateQuizPage from "./pages/quiz/create_form/CreateQuizPage";
 
 const router = createBrowserRouter([
   {
@@ -74,6 +75,15 @@ const router = createBrowserRouter([
           {
             index: true,
             element: <ClassPage />,
+          },
+        ],
+      },
+      {
+        path: "create-quiz",
+        children: [
+          {
+            index: true,
+            element: <CreateQuizPage />,
           },
         ],
       },

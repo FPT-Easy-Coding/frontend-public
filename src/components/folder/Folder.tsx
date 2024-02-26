@@ -1,10 +1,10 @@
 import {
-  ActionIcon,
   Avatar,
   Box,
   Button,
   Group,
   Menu,
+  Modal,
   rem,
   Select,
   Stack,
@@ -18,7 +18,6 @@ import {
   IconSearch,
   IconSettings,
   IconFolder,
-  IconUsersGroup,
   IconBook,
   IconShare2,
   IconBookmarkPlus,
@@ -26,11 +25,14 @@ import {
   IconCirclePlus,
   IconEraser,
   IconEdit,
+  IconXboxX,
 } from "@tabler/icons-react";
+import { useState } from "react";
 
 function Folder() {
   const iconStyle = { width: rem(12), height: rem(12) };
   const iconSearch = <IconSearch style={{ width: rem(16), height: rem(16) }} />;
+  const [addSetsModalOpened, setAddSetsModalOpened] = useState(false);
   return (
     <div>
       <Group className="mt-10 ml-14 mb-[-25px]">
@@ -100,6 +102,7 @@ function Folder() {
                         style={{ width: rem(14), height: rem(14) }}
                       />
                     }
+                    onClick={() => setAddSetsModalOpened(true)}
                   >
                     Add sets
                   </Menu.Item>
@@ -156,6 +159,69 @@ function Folder() {
           </Group>
         </Stack>
       </Group>
+      {/* Add quiz sets modal */}
+      <Modal.Root
+        opened={addSetsModalOpened}
+        onClose={() => setAddSetsModalOpened(false)}
+        centered
+        size="lg"
+      >
+        <Modal.Overlay />
+        <Modal.Content>
+          <div className="modal-header bg-blue-600 p-4">
+            <Modal.Header className="bg-blue-600 p-4">
+              <Modal.Title className="text-white font-bold text-size text-3xl">
+                Add quiz sets
+              </Modal.Title>
+              <Modal.CloseButton
+                icon={
+                  <IconXboxX
+                    size={60}
+                    stroke={1.5}
+                    className="hover:text-red-500"
+                  />
+                }
+                className="text-white bg-blue-600"
+              />
+            </Modal.Header>
+          </div>
+          <Modal.Body className="bg-gray-50">
+            <div className="mx-4 mr-[50px]">
+              <Button
+                variant="white"
+                color="rgba(0, 0, 0, 1)"
+                size="md"
+                className="my-5 mx-4 w-full mr-5 bg-white hover:text-yellow-400 uppercase font-mono border-b-2 border-black"
+              >
+                + Create a new sets
+              </Button>
+            </div>
+            <Select
+              className="my-5 mx-8 w-[150px] mr-[220px]"
+              checkIconPosition="right"
+              data={["Your sets", "Folder sets", "Study sets"]}
+              defaultValue={"Your sets"}
+              allowDeselect={false}
+            />
+            <div className="my-5 mx-8 bg-white">
+              <Group className="my-5 mx-8">
+                <Text className="font-bold text-lg text-gray-800">
+                  Quiz Set 1
+                </Text>
+                <Button
+                  variant="default"
+                  color="rgba(0, 0, 0, 1)"
+                  size="sm"
+                  radius="md"
+                  className="my-5 ml-[300px] text-2xl font-light bg-white hover:text-yellow-400 uppercase font-mono"
+                >
+                  +
+                </Button>
+              </Group>
+            </div>
+          </Modal.Body>
+        </Modal.Content>
+      </Modal.Root>
 
       <div className="ml-20 w-[50%]">
         <Box className="pl-4 mb-4 mt-2 shadow-md rounded-md border-s h-[88px] pt-4">
