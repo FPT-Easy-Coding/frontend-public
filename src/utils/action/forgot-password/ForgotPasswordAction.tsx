@@ -11,7 +11,6 @@ export async function forgotPasswordAction({ request }: { request: Request }) {
           throw new Error("Cannot send email at the moment.");
         });
     }
-
     return response?.data;
   } catch (error) {
     if (error instanceof Error) {

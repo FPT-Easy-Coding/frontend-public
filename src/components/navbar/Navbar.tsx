@@ -8,6 +8,9 @@ import {
   Text,
   useMantineColorScheme,
   useComputedColorScheme,
+  Modal,
+  Input,
+  Checkbox,
 } from "@mantine/core";
 import logo from "../../assets/logo.svg";
 import {
@@ -30,6 +33,8 @@ import {
 import { DarkModeSwitch } from "react-toggle-dark-mode";
 import { useContext, useEffect } from "react";
 import { UserCredentialsContext } from "../../store/user-credentials-context";
+import { useDisclosure } from "@mantine/hooks";
+import { useState } from "react";
 
 const userBtn = (data: LoaderData, submit: any, handleLogout: () => void) => {
   return (
@@ -51,13 +56,15 @@ const userBtn = (data: LoaderData, submit: any, handleLogout: () => void) => {
 
         <Menu.Dropdown>
           <Menu.Label>Menu</Menu.Label>
-          <Menu.Item
-            leftSection={
-              <IconUserCircle style={{ width: rem(14), height: rem(14) }} />
-            }
-          >
-            Profile
-          </Menu.Item>
+          <NavLink to={"/user/profile"}>
+            <Menu.Item
+              leftSection={
+                <IconUserCircle style={{ width: rem(14), height: rem(14) }} />
+              }
+            >
+              Profile
+            </Menu.Item>
+          </NavLink>
 
           <Menu.Item
             leftSection={
@@ -138,6 +145,10 @@ interface LoaderData {
 }
 
 function Navbar() {
+  const [folderModalOpened, setFolderModalOpened] = useState(false); // State for folder modal
+  const [classModalOpened, setClassModalOpened] = useState(false);
+  const [classTitle, setClassTitle] = useState("");
+  const [folderTitle, setFolderTitle] = useState("");
   const { assignUserCredentials, clearUserCredentials, info } = useContext(
     UserCredentialsContext
   );
@@ -165,6 +176,16 @@ function Navbar() {
   const whichHomepage = data?.error || !data ? "/" : "/home";
 
   console.log(info);
+  const createClass = () => {
+    // Logic to create a class
+    console.log("Creating class:", classTitle);
+    // You can put your logic here to create the class
+  };
+  const createFolder = () => {
+    // Logic to create a folder
+    console.log("Creating folder:", folderTitle);
+    // You can put your logic here to create the folder
+  };
   return (
     <>
       <header className="w-full h-16 flex items-center justify-between sticky top-0 z-20 shadow-sm bg-[--mantine-color-body]">
@@ -230,6 +251,7 @@ function Navbar() {
                   Quiz set
                 </Menu.Item>
                 <Menu.Item
+                  onClick={() => setFolderModalOpened(true)}
                   leftSection={
                     <IconMessageCircle
                       style={{ width: rem(14), height: rem(14) }}
@@ -238,7 +260,9 @@ function Navbar() {
                 >
                   Folder
                 </Menu.Item>
+
                 <Menu.Item
+                  onClick={() => setClassModalOpened(true)}
                   leftSection={
                     <IconPhoto style={{ width: rem(14), height: rem(14) }} />
                   }
@@ -246,6 +270,95 @@ function Navbar() {
                   Classes
                 </Menu.Item>
               </Menu.Dropdown>
+              {/* Modal content for folder */}
+              <Modal
+                styles={{
+                  root: { borderRadius: "calc(var(--modal-radius) - 20px)" },
+                }}
+                opened={folderModalOpened}
+                onClose={() => setFolderModalOpened(false)} // Close the folder modal
+                centered
+                size="xl"
+              >
+                <Modal.Title>
+                  <Text className="font-bold text-3xl mb-5 mx-4">
+                    Create a new folder
+                  </Text>
+                </Modal.Title>
+                <Input
+                  className="my-5 mx-4 w-[96%]"
+                  placeholder="Enter folder title"
+                  variant="filled"
+                  value={folderTitle}
+                  onChange={(event) => setFolderTitle(event.target.value)}
+                />
+                <Input
+                  className="my-5 mx-4 w-[96%]"
+                  placeholder="Enter a description (optional)"
+                  variant="filled"
+                />
+                <div className="flex justify-end">
+                  <Button
+                    className="mb-5 mx-4 w-[120px] h-[50px] rounded-xl"
+                    variant="filled"
+                    disabled={!folderTitle.trim()}
+                    onClick={createFolder}
+                  >
+                    Create folder
+                  </Button>
+                </div>
+              </Modal>
+              {/* Modal content for class */}
+              <Modal
+                styles={{
+                  root: { borderRadius: "calc(var(--modal-radius) - 20px)" },
+                }}
+                opened={classModalOpened}
+                onClose={() => setClassModalOpened(false)}
+                centered
+                size="xl"
+              >
+                <Modal.Title>
+                  <Text className="font-bold text-3xl mb-5 mx-4">
+                    Create a new class
+                  </Text>
+                </Modal.Title>
+
+                <Input
+                  className="my-5 mx-4 w-[96%]"
+                  placeholder="Enter class name (course, teacher, year, section etc.)"
+                  variant="filled"
+                  value={classTitle}
+                  onChange={(event) => setClassTitle(event.target.value)}
+                />
+                <Input
+                  className="my-5 mx-4 w-[96%]"
+                  placeholder="Enter a description (optional)"
+                  variant="filled"
+                />
+                <Checkbox
+                  className="my-5 mx-4"
+                  defaultChecked
+                  label="Allow class members to add and remove sets"
+                  color="gray"
+                />
+                <Checkbox
+                  className="my-5 mx-4"
+                  defaultChecked
+                  label="Allow class members to invite new members"
+                  color="gray"
+                />
+                <div className="flex justify-end">
+                  <Button
+                    className="mb-5 mx-4 w-[120px] h-[50px] rounded-xl"
+                    variant="filled"
+                    disabled={!classTitle.trim()}
+                    onClick={createClass}
+                  >
+                    Create class
+                  </Button>
+                </div>
+              </Modal>
             </Menu>
             <Group>{btnState}</Group>
           </Group>

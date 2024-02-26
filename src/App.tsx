@@ -11,6 +11,7 @@ import AuthPage, {
 import ForgotPassword from "./pages/authentication/forgot-password/ForgotPassword";
 import ResetPassword from "./pages/authentication/forgot-password/ResetPassword";
 import ProfilePage from "./pages/account/user/ProfilePage";
+import ClassPage from "./pages/class/ClassPage";
 import logout from "./utils/loader/auth/logout";
 import {
   checkAuth,
@@ -20,13 +21,17 @@ import {
 import "@mantine/core/styles.css";
 import UserDashboard from "./pages/after_login/UserDashboard";
 import { ErrorPage } from "./pages/errorpage/ErrorPage";
+import QuizSetDetails from "./pages/quiz/quiz-sets/SetDetails";
 import {
   forgotPasswordAction,
   resetPasswordAction,
 } from "./utils/action/forgot-password/ForgotPasswordAction";
-import SetDetails from "./pages/quiz/set/SetDetails";
+import SetDetails, { loader } from "./pages/quiz/set/SetDetails";
 import { loader as SetLoader } from "./pages/quiz/set/SetDetails";
 import FlashcardMode from "./pages/study-mode/flashcard/FlashcardPage";
+import { fetchUserProfileData } from "./components/account/user/Profile";
+import FolderPage from "./pages/folder/FolderPage";
+import CreateQuizPage from "./pages/quiz/create_form/CreateQuizPage";
 import StudyModeRoot from "./pages/study-mode/StudyModeRoot";
 import { loader as FlashcardLoader } from "./pages/study-mode/flashcard/FlashcardPage";
 
@@ -57,8 +62,41 @@ const router = createBrowserRouter([
       },
       { path: "home", element: <UserDashboard />, loader: checkAuth },
       {
-        path: "user",
-        children: [{ index: true, path: "profile", element: <ProfilePage /> }],
+        path: "user/profile",
+        children: [
+          {
+            index: true,
+            element: <ProfilePage />,
+            loader: fetchUserProfileData,
+          },
+        ],
+      },
+      {
+        path: "class/:id",
+        children: [
+          {
+            index: true,
+            element: <ClassPage />,
+          },
+        ],
+      },
+      {
+        path: "create-quiz",
+        children: [
+          {
+            index: true,
+            element: <CreateQuizPage />,
+          },
+        ],
+      },
+      {
+        path: "folder/:id",
+        children: [
+          {
+            index: true,
+            element: <FolderPage />,
+          },
+        ],
       },
       {
         path: "quiz/set/:id",
