@@ -6,6 +6,7 @@ import {
   Grid,
   Group,
   Input,
+  LoadingOverlay,
   Menu,
   Modal,
   Paper,
@@ -30,6 +31,7 @@ import {
   IconEdit,
   IconEraser,
   IconLayersSubtract,
+  IconMinus,
   IconPlus,
   IconSearch,
   IconSettings,
@@ -38,124 +40,243 @@ import {
   IconUsers,
   IconUsersGroup,
 } from "@tabler/icons-react";
-import { useState } from "react";
-
-function Class() {
+import { useEffect, useState } from "react";
+import {
+  StudySet,
+  ClassData,
+  fetchStudySetsData,
+  fetchClassData,
+  fetchMembersData,
+  Member,
+  fetchUserCreatedStudySetsData,
+  addQuizToClassApi,
+  removeQuizFromClassApi,
+} from "../../pages/class/ClassPage";
+import { Link } from "react-router-dom";
+const iconStyle = { width: rem(12), height: rem(12) };
+function Class({ classId }: { classId: number }) {
   const iconSearch = <IconSearch style={{ width: rem(16), height: rem(16) }} />;
   const [inviteModalOpened, setInviteModalOpened] = useState(false);
   const [addSetsModalOpened, setAddSetsModalOpened] = useState(false);
   const [jsonContent, setJsonContent] = useState("");
+  const [studySets, setStudySets] = useState<StudySet[]>([]);
+  const [studyUserCreatedSets, setUserCreatedSets] = useState<StudySet[]>([]);
+  const [classData, setClassData] = useState<ClassData | null>(null);
+  const [members, setMembers] = useState<Member[]>([]);
+  const [isLoading, setLoading] = useState<boolean>(true);
+  const [filterOption, setFilterOption] = useState<string>("Latest");
+  const [deleteModalOpened, setDeleteModalOpened] = useState(false);
+  const [inputValue, setInputValue] = useState("");
   const clipboard = useClipboard();
+  const uid = Number(localStorage.getItem("uid"));
+  // Find common quiz IDs between studySets and studyUserCreatedSets
+  const [commonQuizIds, setCommonQuizIds] = useState<number[]>([]);
+
   const inviteMembers = () => {
     // Logic to create a folder
     console.log("invite", jsonContent);
     // You can put your logic here to create the folder
   };
+  useEffect(() => {
+    fetchStudySets(classId);
+    fetchClassEntityData(classId);
+    fetchMembers(classId);
+  }, [classId]);
+
+  useEffect(() => {
+    if (classData) {
+      setInputValue(`http://localhost:5173/class/${classData.slugCode || ""}`);
+    }
+  }, [classData]);
+  useEffect(() => {
+    // Check if uid exists
+    if (uid) {
+      // Fetch quiz sets associated with the user ID
+      fetchUserCreatedStudySets(uid);
+    }
+  }, [uid]);
+  useEffect(() => {
+    // Logic to fetch commonQuizIds or initialize it based on your requirements
+    // This useEffect hook will run whenever studySets or studyUserCreatedSets change
+    const updatedCommonQuizIds = studySets
+      .filter((set) => {
+        // Check if the quiz ID from studySets exists in studyUserCreatedSets
+        return studyUserCreatedSets.some(
+          (userSet) => userSet.quizId === set.quizId
+        );
+      })
+      .map((set) => set.quizId);
+
+    setCommonQuizIds(updatedCommonQuizIds);
+  }, [studySets, studyUserCreatedSets]);
+
+  async function fetchStudySets(classId: number) {
+    setLoading(true);
+    try {
+      const sets = await fetchStudySetsData(classId);
+      setStudySets(sets);
+    } catch (error) {
+      console.error("Error fetching study sets:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function fetchUserCreatedStudySets(userId: number) {
+    setLoading(true);
+    try {
+      const sets = await fetchUserCreatedStudySetsData(userId);
+      setUserCreatedSets(sets);
+    } catch (error) {
+      console.error("Error fetching user created study sets:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+  async function fetchClassEntityData(classId: number) {
+    setLoading(true);
+    try {
+      const classData = await fetchClassData(classId);
+      setClassData(classData);
+    } catch (error) {
+      console.error("Error fetching class data:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+  async function fetchMembers(classId: number) {
+    setLoading(true);
+    try {
+      const memberData = await fetchMembersData(classId);
+      setMembers(memberData);
+    } catch (error) {
+      console.error("Error fetching class data:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function addQuizToClass(classId: number, quizId: number) {
+    setLoading(true);
+    try {
+      // Make API call to add quiz to class
+      await addQuizToClassApi(classId, quizId);
+
+      // After successful API call, refresh studySets data
+      await fetchStudySets(classId);
+    } catch (error) {
+      console.error("Error adding quiz to class:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function removeQuizFromClass(classId: number, quizId: number) {
+    setLoading(true);
+    try {
+      // Make API call to remove quiz from class
+      await removeQuizFromClassApi(classId, quizId);
+
+      // After successful API call, refresh studySets data
+      await fetchStudySets(classId);
+    } catch (error) {
+      console.error("Error removing quiz from class:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+  function fetchFilteredStudySetsData(
+    classId: number,
+    filterOption: string
+  ): StudySet[] {
+    let filteredSets: StudySet[] = [];
+
+    if (filterOption === "Latest") {
+      // Filter the study sets based on the createdAt date in descending order (latest first)
+      filteredSets = studySets
+        .slice()
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+    } else if (filterOption === "Alphabetical") {
+      // Filter the study sets based on the quiz set name in alphabetical order
+      filteredSets = studySets
+        .slice()
+        .sort((a, b) => a.quizName.localeCompare(b.quizName));
+    } else {
+      // Handle other filter options if needed
+      // For example, handle other types of filters or default behavior
+      filteredSets = studySets;
+    }
+
+    return filteredSets;
+  }
+
+  const fetchFilteredStudySets = async (classId: number) => {
+    try {
+      // Make API call to fetch study sets based on the filter option
+      const filteredSets = await fetchFilteredStudySetsData(
+        classId,
+        filterOption
+      );
+      setStudySets(filteredSets);
+    } catch (error) {
+      console.error("Error fetching filtered study sets:", error);
+    }
+  };
+  useEffect(() => {
+    fetchFilteredStudySets(classId);
+  }, [classId, filterOption]);
+
+  // Event handler for when the filter option changes
+  // Event handler for when the filter option changes
+  const handleFilterChange = (value: string | null) => {
+    if (value !== null) {
+      setFilterOption(value);
+    }
+  };
+
   return (
     <div>
-      <Group className="mt-10 ml-14 mb-[-40px]">
-        {
-          <IconUsers
-            style={iconStyle}
-            className="w-[100px] h-[40px] text-blue-600/100 mr-[-20px]"
-          />
-        }
-        <Text className="font-bold text-[40px] uppercase">class</Text>
-        <Menu shadow="md" width={200} className="ml-[500px]">
-          <Menu.Target>
-            <Button variant="light" color="gray" className="w-[50px]">
-              <IconDots />
-            </Button>
-          </Menu.Target>
-
-          <Menu.Dropdown>
-            <Menu.Label>Actions</Menu.Label>
-            <Menu.Item
-              leftSection={
-                <IconBook style={{ width: rem(14), height: rem(14) }} />
-              }
-              color="blue"
-            >
-              Study
-            </Menu.Item>
-            <Menu.Item
-              leftSection={
-                <IconBellFilled style={{ width: rem(14), height: rem(14) }} />
-              }
-            >
-              Notification
-            </Menu.Item>
-            <Menu.Item
-              leftSection={
-                <IconShare2 style={{ width: rem(14), height: rem(14) }} />
-              }
-            >
-              Share
-            </Menu.Item>
-            <Menu.Item
-              leftSection={
-                <IconAlertTriangleFilled
-                  style={{ width: rem(14), height: rem(14) }}
-                />
-              }
-              color="red"
-            >
-              Report
-            </Menu.Item>
-
-            <Menu.Divider />
-            <Menu.Item>
-              <Menu trigger="hover" position="right" className="ml-[-18px]">
-                <Menu.Target>
-                  <Group className="ml-[2px]">
-                    <IconSettings style={{ width: rem(14), height: rem(14) }} />{" "}
-                    Settings
-                  </Group>
-                </Menu.Target>
-                <Menu.Dropdown className="ml-2">
-                  <Menu.Item
-                    leftSection={
-                      <IconCirclePlus
-                        style={{ width: rem(14), height: rem(14) }}
-                      />
-                    }
-                    onClick={() => setAddSetsModalOpened(true)}
-                  >
-                    Add sets
-                  </Menu.Item>
-                  <Menu.Item
-                    leftSection={
-                      <IconUserPlus
-                        style={{ width: rem(14), height: rem(14) }}
-                      />
-                    }
-                    onClick={() => setInviteModalOpened(true)}
-                  >
-                    Invite members
-                  </Menu.Item>
-                  <Menu.Item
-                    leftSection={
-                      <IconEdit style={{ width: rem(14), height: rem(14) }} />
-                    }
-                  >
-                    Edit
-                  </Menu.Item>
-                  <Menu.Item
-                    color="red"
-                    leftSection={
-                      <IconEraser style={{ width: rem(14), height: rem(14) }} />
-                    }
-                  >
-                    Delete
-                  </Menu.Item>
-                </Menu.Dropdown>
-              </Menu>
-            </Menu.Item>
-
-            <Menu.Divider />
-          </Menu.Dropdown>
-        </Menu>
-      </Group>
+      <Modal.Root
+        opened={deleteModalOpened}
+        onClose={() => setDeleteModalOpened(false)}
+        centered
+      >
+        <Modal.Overlay />
+        <Modal.Content>
+          <div className="p-4">
+            <Modal.Header>
+              <Modal.Title className="font-bold text-size text-2xl">
+                Confirm Deletion
+              </Modal.Title>
+              <Modal.CloseButton />
+            </Modal.Header>
+            <Modal.Body>
+              <Text>Are you sure you want to delete this item?</Text>
+            </Modal.Body>
+            <Group className="flex justify-center">
+              {" "}
+              <Button
+                variant="light"
+                onClick={() => setDeleteModalOpened(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="filled"
+                color="red"
+                onClick={() => {
+                  setDeleteModalOpened(false);
+                }}
+              >
+                Delete
+              </Button>
+            </Group>
+          </div>
+        </Modal.Content>
+      </Modal.Root>
 
       {/* Add quiz sets modal */}
       <Modal.Root
@@ -178,7 +299,7 @@ function Class() {
           <Modal.Body>
             <Stack p={"xl"}>
               <Button variant="subtle" size="sm" leftSection={<IconPlus />}>
-                Create new sets
+                <Link to="/create-quiz">Create new sets</Link>
               </Button>
               <div>
                 <Select
@@ -186,17 +307,65 @@ function Class() {
                   checkIconPosition="right"
                   data={["Your sets", "Folder sets", "Study sets"]}
                   defaultValue={"Your sets"}
+                  onChange={(value) => handleFilterChange(value)}
                   allowDeselect={false}
                 />
               </div>
-              <Paper shadow="lg" radius="md" withBorder p="xl" className="py-4">
-                <Group className="justify-between">
-                  <Text className="font-bold text-lg">Quiz Set 1</Text>
-                  <Button variant="default" size="sm" radius="md">
-                    <IconPlus size={12} />
-                  </Button>
-                </Group>
-              </Paper>
+              {!isLoading ? (
+                studyUserCreatedSets.map((set) => (
+                  <Stack key={set.quizId}>
+                    <Paper
+                      shadow="lg"
+                      radius="md"
+                      withBorder
+                      p="xl"
+                      className="py-4"
+                    >
+                      <Group className="justify-between">
+                        <Text className="font-bold text-lg">
+                          {set.quizName}
+                        </Text>
+                        {commonQuizIds.includes(set.quizId) ? (
+                          // If the quiz ID exists, render the minus button
+                          <Button
+                            variant="default"
+                            size="sm"
+                            radius="md"
+                            onClick={() => {
+                              removeQuizFromClass(classId, set.quizId);
+                              const updatedCommonQuizIds = commonQuizIds.filter(
+                                (id) => id !== set.quizId
+                              );
+                              setCommonQuizIds(updatedCommonQuizIds);
+                            }}
+                          >
+                            <IconMinus size={12} />
+                          </Button>
+                        ) : (
+                          // If the quiz ID does not exist, render the plus button
+                          <Button
+                            variant="default"
+                            size="sm"
+                            radius="md"
+                            onClick={() => {
+                              addQuizToClass(classId, set.quizId);
+                              const updatedCommonQuizIds = [
+                                ...commonQuizIds,
+                                set.quizId,
+                              ];
+                              setCommonQuizIds(updatedCommonQuizIds);
+                            }}
+                          >
+                            <IconPlus size={12} />
+                          </Button>
+                        )}
+                      </Group>
+                    </Paper>
+                  </Stack>
+                ))
+              ) : (
+                <LoadingOverlay visible={true} zIndex={1000} />
+              )}
             </Stack>
           </Modal.Body>
         </Modal.Content>
@@ -211,14 +380,14 @@ function Class() {
                 <Text>created by</Text>
                 <Group gap={0}>
                   <Avatar size={"sm"} />
-                  <Text>username</Text>
+                  <Text>{classData?.teacherName}</Text>
                 </Group>
               </Group>
               <Group className="justify-between">
                 <Group>
                   <IconUsers size={35} color="blue" />
                   <Text className="font-bold text-3xl uppercase">
-                    Class name
+                    {classData?.className}
                   </Text>
                 </Group>
 
@@ -316,6 +485,7 @@ function Class() {
                                 style={{ width: rem(14), height: rem(14) }}
                               />
                             }
+                            onClick={() => setDeleteModalOpened(true)}
                           >
                             Delete
                           </Menu.Item>
@@ -349,34 +519,123 @@ function Class() {
                         className="w-[375px]"
                       />
                     </Group>
-                    <Stack>
+                    {isLoading ? (
+                      <LoadingOverlay visible={true} zIndex={1000} />
+                    ) : (
+                      fetchFilteredStudySetsData(classId, filterOption).map(
+                        (set, index) => (
+                          <Link to={`/quiz/set/${set.quizId}`} key={index}>
+                            <Stack>
+                              <Paper
+                                key={index}
+                                className="mt-3"
+                                shadow="lg"
+                                radius="md"
+                                withBorder
+                                p="xl"
+                              >
+                                <Group key={index}>
+                                  <Text className="font-semibold text-sm">
+                                    {set.numberOfQuestion}{" "}
+                                    {set.numberOfQuestion > 1
+                                      ? "terms"
+                                      : "term"}
+                                  </Text>
+                                  <Group className="pl-4 ">
+                                    <Avatar
+                                      src={null}
+                                      alt="no image here"
+                                      size={"sm"}
+                                    >
+                                      {set
+                                        ?.authorFirstName!.charAt(0)
+                                        .toUpperCase() +
+                                        set
+                                          ?.authorLastName!.charAt(0)
+                                          .toUpperCase()}
+                                    </Avatar>
+                                    <Text className="font-semibold text-sm">
+                                      {set.author}
+                                    </Text>
+                                  </Group>
+                                </Group>
+                                <Text className="font-bold text-xl pt-1">
+                                  {set.quizName}
+                                </Text>
+                              </Paper>
+                            </Stack>
+                          </Link>
+                        )
+                      )
+                    )}
+                  </Stack>
+                </Tabs.Panel>
+
+                <Tabs.Panel value="members">
+                  {isLoading ? (
+                    <LoadingOverlay visible={true} zIndex={1000} />
+                  ) : (
+                    <Stack gap={"sm"} className="mt-5">
                       <Paper
+                        className="mt-3"
                         shadow="lg"
                         radius="md"
                         withBorder
                         p="xl"
-                        className="py-4"
                       >
                         <Group>
+                          <Avatar
+                            src={null} // Set the member's avatar source here
+                            alt={`Avatar of ${classData?.teacherName} ${classData?.teacherName}`}
+                            size={"sm"}
+                          >
+                            {`${classData?.teacherName
+                              .charAt(0)
+                              .toUpperCase()}${classData?.teacherName
+                              .charAt(0)
+                              .toUpperCase()}`}
+                          </Avatar>
                           <Text className="font-semibold text-sm">
-                            5 {5 > 1 ? "terms" : "term"}
+                            {`${classData?.teacherName} Teacher`}
                           </Text>
+                        </Group>
+                        <Text className="font-normal text-sm">
+                          {classData?.teacherName}
+                        </Text>
+                      </Paper>
+                      {members.map((member, index) => (
+                        <Paper
+                          key={index}
+                          className="mt-3"
+                          shadow="lg"
+                          radius="md"
+                          withBorder
+                          p="xl"
+                        >
                           <Group>
-                            <Avatar src={null} alt="no image here" size={"sm"}>
-                              HH
+                            <Avatar
+                              src={null} // Set the member's avatar source here
+                              alt={`Avatar of ${member.userFirstName} ${member.userLastName}`}
+                              size={"sm"}
+                            >
+                              {`${member.userFirstName
+                                .charAt(0)
+                                .toUpperCase()}${member.userLastName
+                                .charAt(0)
+                                .toUpperCase()}`}
                             </Avatar>
-                            <Text className="font-semibold text-sm ">
-                              author
+                            <Text className="font-semibold text-sm">
+                              {`${member.userFirstName} ${member.userLastName}`}
                             </Text>
                           </Group>
-                        </Group>
-                        <Text className="font-bold text-xl">quiz name</Text>
-                      </Paper>
+                          <Text className="font-normal text-sm">
+                            {member.userName}
+                          </Text>
+                        </Paper>
+                      ))}
                     </Stack>
-                  </Stack>
+                  )}
                 </Tabs.Panel>
-
-                <Tabs.Panel value="members">Under development</Tabs.Panel>
               </Tabs>
             </Stack>
           </Grid.Col>
@@ -389,7 +648,8 @@ function Class() {
                   </Title>
                   <Group>
                     <Input
-                      value="link@example"
+                      value={inputValue}
+                      onChange={(event) => setInputValue(event.target.value)}
                       readOnly
                       radius="sm"
                       w={"100%"}
@@ -424,11 +684,7 @@ function Class() {
                         fullWidth
                         radius="xl"
                         size="sm"
-                        onClick={() =>
-                          clipboard.copy(
-                            "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-                          )
-                        }
+                        onClick={() => clipboard.copy(inputValue)}
                       >
                         Copy link to clipboard
                       </Button>
@@ -443,12 +699,22 @@ function Class() {
                   <Stack gap="xs">
                     <Group>
                       <IconLayersSubtract size={20} color="gray" />
-                      <Text className="font-semibold text-[14px]">9 sets</Text>
+                      <Text className="font-semibold text-[14px]">
+                        {classData?.numberOfQuizSet !== undefined
+                          ? classData?.numberOfQuizSet > 1
+                            ? `${classData?.numberOfQuizSet} sets`
+                            : `${classData?.numberOfQuizSet} set`
+                          : "No quiz sets available"}
+                      </Text>
                     </Group>
                     <Group>
                       <IconUsersGroup size={20} color="gray" />
                       <Text className="font-semibold text-[14px]">
-                        9 members
+                        {classData?.numberOfStudent !== undefined
+                          ? classData?.numberOfQuizSet > 1
+                            ? `${classData?.numberOfQuizSet} members`
+                            : `${classData?.numberOfQuizSet} member`
+                          : "1 member"}
                       </Text>
                     </Group>
                   </Stack>

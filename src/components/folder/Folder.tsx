@@ -6,6 +6,7 @@ import {
   Grid,
   Group,
   JsonInput,
+  LoadingOverlay,
   Menu,
   Modal,
   Paper,
@@ -31,17 +32,55 @@ import {
   IconShare2,
   IconXboxX,
 } from "@tabler/icons-react";
-import { useState } from "react";
-function Folder() {
+import { useEffect, useState } from "react";
+import {
+  StudySet,
+  FolderData,
+  fetchFolderData,
+  fetchStudySetsData,
+} from "../../pages/folder/FolderPage";
+import { Link } from "react-router-dom";
+function Folder({ folderId }: { folderId: number }) {
   const iconSearch = <IconSearch style={{ width: rem(16), height: rem(16) }} />;
   const [inviteModalOpened, setInviteModalOpened] = useState(false);
   const [addSetsModalOpened, setAddSetsModalOpened] = useState(false);
   const [jsonContent, setJsonContent] = useState("");
+  const [studySets, setStudySets] = useState<StudySet[]>([]);
+  const [folder, setFolder] = useState<FolderData | null>(null);
+  const [isLoading, setLoading] = useState<boolean>(true);
+  const [studySetsFilter, setStudySetsFilter] = useState<string>("Latest");
   const inviteMembers = () => {
     // Logic to create a folder
     console.log("invite", jsonContent);
     // You can put your logic here to create the folder
   };
+  useEffect(() => {
+    fetchStudySets(folderId);
+    fetchFolder(folderId);
+  }, [folderId]);
+  async function fetchStudySets(userId: number) {
+    setLoading(true);
+    try {
+      const sets = await fetchStudySetsData(userId);
+      setStudySets(sets);
+    } catch (error) {
+      console.error("Error fetching study sets:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+  async function fetchFolder(userId: number) {
+    setLoading(true);
+    try {
+      const folderData = await fetchFolderData(userId);
+      setFolder(folderData);
+    } catch (error) {
+      console.error("Error fetching folders:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <>
       {/* Invite members modal */}
@@ -148,19 +187,19 @@ function Folder() {
           <Grid.Col span={12}>
             <Stack gap={"lg"}>
               <Group>
-                <Text c={"dimmed"}>0 sets</Text>
+                <Text c={"dimmed"}>{folder?.numberOfQuizSet} sets</Text>
                 <Divider orientation="vertical" />
-                <Text>created by</Text>
+                <Text>created by </Text>
                 <Group gap={0}>
                   <Avatar size={"sm"} />
-                  <Text>username</Text>
+                  <Text>{folder?.authorName}</Text>
                 </Group>
               </Group>
               <Group className="justify-between">
                 <Group>
                   <IconFolder size={35} color="blue" />
                   <Text className="font-bold text-3xl uppercase">
-                    Folder name
+                    {folder?.folderName}
                   </Text>
                 </Group>
                 <Menu shadow="md" width={200}>
@@ -263,6 +302,7 @@ function Folder() {
                   data={["Latest", "Alphabetical"]}
                   defaultValue={"Latest"}
                   allowDeselect={false}
+                  onChange={(value) => setStudySetsFilter(value || "Latest")}
                 />
                 <TextInput
                   variant="filled"
@@ -274,28 +314,57 @@ function Folder() {
                 />
               </Group>
               <Divider />
-              <Stack>
-                <Paper
-                  shadow="lg"
-                  radius="md"
-                  withBorder
-                  p="xl"
-                  className="py-4"
-                >
-                  <Group>
-                    <Text className="font-semibold text-sm">
-                      5 {5 > 1 ? "terms" : "term"}
-                    </Text>
-                    <Group>
-                      <Avatar src={null} alt="no image here" size={"sm"}>
-                        HH
-                      </Avatar>
-                      <Text className="font-semibold text-sm ">author</Text>
-                    </Group>
-                  </Group>
-                  <Text className="font-bold text-xl">quiz name</Text>
-                </Paper>
-              </Stack>
+              {isLoading ? (
+                <LoadingOverlay visible={true} zIndex={1000} />
+              ) : (
+                studySets
+                  .filter((set) => {
+                    if (studySetsFilter === "Recent") {
+                      // Filter sets created within the last month
+                      const oneMonthAgo = new Date();
+                      oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+                      return new Date(set.createdAt) > oneMonthAgo;
+                    }
+                    return true;
+                  })
+                  .map((set, index) => (
+                    <Link to={`/quiz/set/${set.quizId}`} key={index}>
+                      <Stack>
+                        <Paper
+                          key={index}
+                          className="mt-3"
+                          shadow="lg"
+                          radius="md"
+                          withBorder
+                          p="xl"
+                        >
+                          <Group key={index}>
+                            <Text className="font-semibold text-sm">
+                              {set.numberOfQuestion}{" "}
+                              {set.numberOfQuestion > 1 ? "terms" : "term"}
+                            </Text>
+                            <Group className="pl-4 ">
+                              <Avatar
+                                src={null}
+                                alt="no image here"
+                                size={"sm"}
+                              >
+                                {set?.authorFirstName!.charAt(0).toUpperCase() +
+                                  set?.authorLastName!.charAt(0).toUpperCase()}
+                              </Avatar>
+                              <Text className="font-semibold text-sm">
+                                {set.author}
+                              </Text>
+                            </Group>
+                          </Group>
+                          <Text className="font-bold text-xl pt-1">
+                            {set.quizName}
+                          </Text>
+                        </Paper>
+                      </Stack>
+                    </Link>
+                  ))
+              )}
             </Stack>
           </Grid.Col>
         </Grid>
