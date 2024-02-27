@@ -13,11 +13,13 @@ import { Carousel, Embla } from "@mantine/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import {
   ActionIcon,
+  Badge,
   Container,
   Group,
   Paper,
   Progress,
   Text,
+  Transition,
 } from "@mantine/core";
 import classes from "../../quiz/set/SetDetails.module.css";
 import {
@@ -187,7 +189,9 @@ function FlashcardPage() {
               {flashcards}
             </Carousel>
             <Group className="justify-between mt-5">
-              <Text>{`${currentIndex + 1}/${flashcards?.length}`}</Text>
+              <Badge size="lg">{`${currentIndex + 1}/${
+                flashcards?.length
+              }`}</Badge>
               <Group>
                 <ActionIcon
                   variant="subtle"

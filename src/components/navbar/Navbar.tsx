@@ -8,9 +8,6 @@ import {
   Text,
   useMantineColorScheme,
   useComputedColorScheme,
-  Modal,
-  Input,
-  Checkbox,
 } from "@mantine/core";
 import logo from "../../assets/logo.svg";
 import {
@@ -34,7 +31,6 @@ import { DarkModeSwitch } from "react-toggle-dark-mode";
 import { useContext, useEffect } from "react";
 import { UserCredentialsContext } from "../../store/user-credentials-context";
 import { useDisclosure } from "@mantine/hooks";
-import { useState } from "react";
 import FolderModal from "../modal/navbar/create/FolderModal";
 import ClassModal from "../modal/navbar/create/ClassModal";
 
@@ -58,7 +54,7 @@ const userBtn = (data: LoaderData, submit: any, handleLogout: () => void) => {
 
         <Menu.Dropdown>
           <Menu.Label>Menu</Menu.Label>
-          <NavLink to={"/user/profile"}>
+          <NavLink to={"/user/profile/sets"}>
             <Menu.Item
               leftSection={
                 <IconUserCircle style={{ width: rem(14), height: rem(14) }} />
