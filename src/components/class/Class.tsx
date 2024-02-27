@@ -1,13 +1,11 @@
 import {
   Avatar,
-  Box,
   Button,
   Container,
   Divider,
   Grid,
   Group,
   Input,
-  JsonInput,
   Menu,
   Modal,
   Paper,
@@ -17,7 +15,6 @@ import {
   Tabs,
   Text,
   TextInput,
-  ThemeIcon,
   Title,
   Tooltip,
 } from "@mantine/core";
@@ -40,7 +37,6 @@ import {
   IconUserPlus,
   IconUsers,
   IconUsersGroup,
-  IconXboxX,
 } from "@tabler/icons-react";
 import { useState } from "react";
 

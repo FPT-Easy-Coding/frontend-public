@@ -111,10 +111,7 @@ export default function Profile({
         onChange={(value) => navigate(`/user/profile/${value}`)}
       >
         <Tabs.List>
-          <Tabs.Tab
-            value="sets"
-            leftSection={<IconSchool style={iconStyle} />}
-          >
+          <Tabs.Tab value="sets" leftSection={<IconSchool style={iconStyle} />}>
             Study sets
           </Tabs.Tab>
           <Tabs.Tab
@@ -143,10 +140,7 @@ export default function Profile({
           />
           {/* Content rendering based on the filter */}
           {isLoading ? (
-            <LoadingOverlay
-              visible={true}
-              zIndex={1000}
-            />
+            <LoadingOverlay visible={true} zIndex={1000} />
           ) : (
             studySets
               .filter((set) => {
@@ -220,24 +214,26 @@ export default function Profile({
                 return true;
               })
               .map((folder, index) => (
-                <Paper
-                  key={index}
-                  className="mt-3"
-                  shadow="lg"
-                  radius="md"
-                  withBorder
-                  p="xl"
-                >
-                  <Stack gap="xs">
-                    <Text className="font-semibold text-sm">
-                      {folder.numberOfQuizSet}{" "}
-                      {folder.numberOfQuizSet > 1 ? "sets" : "set"}
-                    </Text>
-                    <Text className="font-bold text-xl">
-                      {folder.folderName}
-                    </Text>
-                  </Stack>
-                </Paper>
+                <Link to={`/folder/${folder.folderId}`} key={index}>
+                  <Paper
+                    key={index}
+                    className="mt-3"
+                    shadow="lg"
+                    radius="md"
+                    withBorder
+                    p="xl"
+                  >
+                    <Stack gap="xs">
+                      <Text className="font-semibold text-sm">
+                        {folder.numberOfQuizSet}{" "}
+                        {folder.numberOfQuizSet > 1 ? "sets" : "set"}
+                      </Text>
+                      <Text className="font-bold text-xl">
+                        {folder.folderName}
+                      </Text>
+                    </Stack>
+                  </Paper>
+                </Link>
               ))
           )}
         </Tabs.Panel>
@@ -251,36 +247,38 @@ export default function Profile({
             />
           ) : (
             classes.map((classItem, index) => (
-              <Paper
-                key={index}
-                className="mt-3"
-                shadow="lg"
-                radius="md"
-                withBorder
-                p="xl"
-              >
-                <Group key={index}>
-                  <Text className="font-semibold text-sm">
-                    {classItem.numberOfQuizSet}{" "}
-                    {classItem.numberOfQuizSet > 1 ? "sets" : "set"}
-                  </Text>
-                  <Text className="font-semibold text-sm">
-                    {classItem.numberOfStudent}{" "}
-                    {classItem.numberOfStudent > 1 ? "members" : "member"}
-                  </Text>
-                </Group>
-                <Group>
-                  {
-                    <IconUsers
-                      style={iconStyle}
-                      className="w-5 h-5 text-blue-600/100"
-                    />
-                  }
-                  <Text className="font-bold text-xl">
-                    {classItem.className}
-                  </Text>
-                </Group>
-              </Paper>
+              <Link to={`/class/${classItem.classId}`} key={index}>
+                <Paper
+                  key={index}
+                  className="mt-3"
+                  shadow="lg"
+                  radius="md"
+                  withBorder
+                  p="xl"
+                >
+                  <Group key={index}>
+                    <Text className="font-semibold text-sm">
+                      {classItem.numberOfQuizSet}{" "}
+                      {classItem.numberOfQuizSet > 1 ? "sets" : "set"}
+                    </Text>
+                    <Text className="font-semibold text-sm">
+                      {classItem.numberOfStudent}{" "}
+                      {classItem.numberOfStudent > 1 ? "members" : "member"}
+                    </Text>
+                  </Group>
+                  <Group>
+                    {
+                      <IconUsers
+                        style={iconStyle}
+                        className="w-5 h-5 text-blue-600/100"
+                      />
+                    }
+                    <Text className="font-bold text-xl">
+                      {classItem.className}
+                    </Text>
+                  </Group>
+                </Paper>
+              </Link>
             ))
           )}
         </Tabs.Panel>

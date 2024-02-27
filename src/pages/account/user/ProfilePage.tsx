@@ -24,22 +24,33 @@ export interface StudySet {
 }
 
 export interface Classes {
+  classId: number;
   className: string;
   numberOfStudent: number;
   numberOfQuizSet: number;
 }
 
+export interface FolderResponse {
+  messageResponse: {
+    success: boolean;
+    msg: string;
+  };
+  entityResponses: Folder[];
+}
+
 export interface Folder {
+  folderId: number;
   folderName: string;
   numberOfQuizSet: number;
-  createdAt: Date;
+  createdAt: string;
 }
+
 export async function fetchFolderData(userId: number) {
   try {
     const response = await axios.get(
-      `http://localhost:8080/api/v1/folder/create/user-id=${userId}`
+      `http://localhost:8080/api/v1/folder/created/user-id=${userId}`
     );
-    return response.data;
+    return response.data.entityResponses;
   } catch (error) {
     throw new Error("Error fetching folders");
   }
