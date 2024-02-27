@@ -462,7 +462,7 @@ function Class() {
           </Grid.Col>
         </Grid>
       </Container>
-    </>
+    </div>
   );
 }
 
