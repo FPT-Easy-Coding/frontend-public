@@ -19,12 +19,6 @@ function FlashcardSettings({
   close: () => void;
 }) {
   const { changeSorted, settings } = useContext(StudyModeContext);
-//   console.log(settings);
-//   const [isSorted, setIsSorted] = useState(settings.flashcard.isSorted);
-
-//   const handleSorted = () => {
-//     changeSorted(isSorted, "Flashcard");
-//   }
   return (
     <>
       <Modal

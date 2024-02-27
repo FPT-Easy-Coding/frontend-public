@@ -5,7 +5,7 @@ interface StudyMode {
   settings: {
     flashcard: {
       isSorted: boolean;
-    };
+    }
   };
 }
 

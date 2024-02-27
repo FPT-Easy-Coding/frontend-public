@@ -2,27 +2,38 @@ import {
   Avatar,
   Box,
   Button,
+  Container,
+  Divider,
+  Grid,
   Group,
   Input,
   JsonInput,
   Menu,
   Modal,
+  Paper,
   rem,
   Select,
   Stack,
+  Tabs,
   Text,
   TextInput,
   ThemeIcon,
+  Title,
+  Tooltip,
 } from "@mantine/core";
+import { useClipboard } from "@mantine/hooks";
 import {
   IconAlertTriangleFilled,
   IconBellFilled,
   IconBook,
+  IconCheck,
   IconCirclePlus,
+  IconCopy,
   IconDots,
   IconEdit,
   IconEraser,
   IconLayersSubtract,
+  IconPlus,
   IconSearch,
   IconSettings,
   IconShare2,
@@ -34,131 +45,18 @@ import {
 import { useState } from "react";
 
 function Class() {
-  const iconStyle = { width: rem(12), height: rem(12) };
   const iconSearch = <IconSearch style={{ width: rem(16), height: rem(16) }} />;
   const [inviteModalOpened, setInviteModalOpened] = useState(false);
   const [addSetsModalOpened, setAddSetsModalOpened] = useState(false);
   const [jsonContent, setJsonContent] = useState("");
+  const clipboard = useClipboard();
   const inviteMembers = () => {
     // Logic to create a folder
     console.log("invite", jsonContent);
     // You can put your logic here to create the folder
   };
-  const copyToClipboard = () => {
-    navigator.clipboard
-      .writeText(inputValue)
-      .then(() => {
-        alert("Copied to clipboard!");
-      })
-      .catch((error) => {
-        console.error("Unable to copy:", error);
-      });
-  };
   return (
-    <div>
-      <Group className="mt-10 ml-14 mb-[-40px]">
-        {
-          <IconUsers
-            style={iconStyle}
-            className="w-[100px] h-[40px] text-blue-600/100 mr-[-20px]"
-          />
-        }
-        <Text className="font-bold text-[40px] uppercase">class</Text>
-        <Menu shadow="md" width={200} className="ml-[500px]">
-          <Menu.Target>
-            <Button variant="light" color="gray" className="w-[50px]">
-              <IconDots />
-            </Button>
-          </Menu.Target>
-
-          <Menu.Dropdown>
-            <Menu.Label>Actions</Menu.Label>
-            <Menu.Item
-              leftSection={
-                <IconBook style={{ width: rem(14), height: rem(14) }} />
-              }
-              color="blue"
-            >
-              Study
-            </Menu.Item>
-            <Menu.Item
-              leftSection={
-                <IconBellFilled style={{ width: rem(14), height: rem(14) }} />
-              }
-            >
-              Notification
-            </Menu.Item>
-            <Menu.Item
-              leftSection={
-                <IconShare2 style={{ width: rem(14), height: rem(14) }} />
-              }
-            >
-              Share
-            </Menu.Item>
-            <Menu.Item
-              leftSection={
-                <IconAlertTriangleFilled
-                  style={{ width: rem(14), height: rem(14) }}
-                />
-              }
-              color="red"
-            >
-              Report
-            </Menu.Item>
-
-            <Menu.Divider />
-            <Menu.Item>
-              <Menu trigger="hover" position="right" className="ml-[-18px]">
-                <Menu.Target>
-                  <Group className="ml-[2px]">
-                    <IconSettings style={{ width: rem(14), height: rem(14) }} />{" "}
-                    Settings
-                  </Group>
-                </Menu.Target>
-                <Menu.Dropdown className="ml-2">
-                  <Menu.Item
-                    leftSection={
-                      <IconCirclePlus
-                        style={{ width: rem(14), height: rem(14) }}
-                      />
-                    }
-                    onClick={() => setAddSetsModalOpened(true)}
-                  >
-                    Add sets
-                  </Menu.Item>
-                  <Menu.Item
-                    leftSection={
-                      <IconUserPlus
-                        style={{ width: rem(14), height: rem(14) }}
-                      />
-                    }
-                    onClick={() => setInviteModalOpened(true)}
-                  >
-                    Invite members
-                  </Menu.Item>
-                  <Menu.Item
-                    leftSection={
-                      <IconEdit style={{ width: rem(14), height: rem(14) }} />
-                    }
-                  >
-                    Edit
-                  </Menu.Item>
-                  <Menu.Item
-                    color="red"
-                    leftSection={
-                      <IconEraser style={{ width: rem(14), height: rem(14) }} />
-                    }
-                  >
-                    Delete
-                  </Menu.Item>
-                </Menu.Dropdown>
-              </Menu>
-            </Menu.Item>
-
-            <Menu.Divider />
-          </Menu.Dropdown>
-        </Menu>
-      </Group>
+    <>
       {/* Invite members modal */}
       <Modal.Root
         opened={inviteModalOpened}
@@ -223,137 +121,299 @@ function Class() {
       >
         <Modal.Overlay />
         <Modal.Content>
-          <div className="modal-header bg-blue-600 p-4">
-            <Modal.Header className="bg-blue-600 p-4">
-              <Modal.Title className="text-white font-bold text-size text-3xl">
+          <div className="p-4">
+            <Modal.Header>
+              <Modal.Title className="font-bold text-size text-2xl">
                 Add quiz sets
               </Modal.Title>
-              <Modal.CloseButton
-                icon={
-                  <IconXboxX
-                    size={60}
-                    stroke={1.5}
-                    className="hover:text-red-500"
-                  />
-                }
-                className="text-white bg-blue-600"
-              />
+              <Modal.CloseButton />
             </Modal.Header>
           </div>
-          <Modal.Body className="bg-gray-50">
-            <div className="mx-4 mr-[50px]">
-              <Button
-                variant="white"
-                color="rgba(0, 0, 0, 1)"
-                size="md"
-                className="my-5 mx-4 w-full mr-5 bg-white hover:text-yellow-400 uppercase font-mono border-b-2 border-black"
-              >
-                + Create a new sets
+
+          <Modal.Body>
+            <Stack p={"xl"}>
+              <Button variant="subtle" size="sm" leftSection={<IconPlus />}>
+                Create new sets
               </Button>
-            </div>
-            <Select
-              className="my-5 mx-8 w-[150px] mr-[220px]"
-              checkIconPosition="right"
-              data={["Your sets", "Folder sets", "Study sets"]}
-              defaultValue={"Your sets"}
-              allowDeselect={false}
-            />
-            <div className="my-5 mx-8 bg-white">
-              <Group className="my-5 mx-8">
-                <Text className="font-bold text-lg text-gray-800">
-                  Quiz Set 1
-                </Text>
-                <Button
-                  variant="default"
-                  color="rgba(0, 0, 0, 1)"
-                  size="sm"
-                  radius="md"
-                  className="my-5 ml-[300px] text-2xl font-light bg-white hover:text-yellow-400 uppercase font-mono"
-                >
-                  +
-                </Button>
-              </Group>
-            </div>
+              <div>
+                <Select
+                  className="w-1/4"
+                  checkIconPosition="right"
+                  data={["Your sets", "Folder sets", "Study sets"]}
+                  defaultValue={"Your sets"}
+                  allowDeselect={false}
+                />
+              </div>
+              <Paper shadow="lg" radius="md" withBorder p="xl" className="py-4">
+                <Group className="justify-between">
+                  <Text className="font-bold text-lg">Quiz Set 1</Text>
+                  <Button variant="default" size="sm" radius="md">
+                    <IconPlus size={12} />
+                  </Button>
+                </Group>
+              </Paper>
+            </Stack>
           </Modal.Body>
         </Modal.Content>
       </Modal.Root>
+      <Container className="container">
+        <Grid gutter={"lg"}>
+          <Grid.Col span={8}>
+            <Stack gap={"lg"}>
+              <Group>
+                <Text c={"dimmed"}>0 sets</Text>
+                <Divider orientation="vertical" />
+                <Text>created by</Text>
+                <Group gap={0}>
+                  <Avatar size={"sm"} />
+                  <Text>username</Text>
+                </Group>
+              </Group>
+              <Group className="justify-between">
+                <Group>
+                  <IconUsers size={35} color="blue" />
+                  <Text className="font-bold text-3xl uppercase">
+                    Class name
+                  </Text>
+                </Group>
 
-      <Group className="mt-2 ml-20">
-        <Select
-          className="my-5 w-[150px] mr-[220px]"
-          checkIconPosition="right"
-          data={["Latest", "Alphabetical"]}
-          defaultValue={"Latest"}
-          allowDeselect={false}
-        />
-        <TextInput
-          variant="filled"
-          radius="xl"
-          placeholder="Filter by title"
-          rightSectionPointerEvents="none"
-          rightSection={iconSearch}
-          className="w-[375px]"
-        />
-        <Stack className="ml-[150px] mt-[70px]">
-          <Text className="uppercase font-semibold text-[14px] text-gray-700">
-            invite link
-          </Text>
-          <Group>
-            <Input
-              value="link@example"
-              readOnly
-              radius="sm"
-              style={{ flex: "1" }}
-              className="w-[250px] text-[14px]  text-gray-400"
-            />
-            <Button
-              onClick={copyToClipboard}
-              variant="filled"
-              color="indigo"
-              style={{ marginLeft: "8px" }}
-            >
-              Copy
-            </Button>
-          </Group>
-          <Text className="uppercase font-semibold text-[14px] text-gray-700">
-            Class details
-          </Text>
-          <Group className="ml-[-10px] my-[-10px]">
-            <ThemeIcon variant="white" size="lg" color="gray">
-              <IconLayersSubtract style={{ width: "70%", height: "70%" }} />
-            </ThemeIcon>
-            <Text className=" font-semibold text-[14px] text-gray-900">
-              9 sets
-            </Text>
-          </Group>
-          <Group className="ml-[-10px] my-[-5px]">
-            <ThemeIcon variant="white" size="lg" color="gray">
-              <IconUsersGroup style={{ width: "70%", height: "70%" }} />
-            </ThemeIcon>
-            <Text className=" font-semibold text-[14px] text-gray-900">
-              9 members
-            </Text>
-          </Group>
-        </Stack>
-      </Group>
+                <Menu shadow="md" width={200}>
+                  <Menu.Target>
+                    <Button variant="light" color="gray" className="w-[50px]">
+                      <IconDots />
+                    </Button>
+                  </Menu.Target>
 
-      <div className="ml-20 w-[50%]">
-        <Box className="pl-4 mb-4 mt-2 shadow-md rounded-md border-s h-[88px] pt-4">
-          <Group>
-            <Text className="font-semibold text-sm">
-              5 {5 > 1 ? "terms" : "term"}
-            </Text>
-            <Group className="pl-4 ">
-              <Avatar src={null} alt="no image here" size={"sm"}>
-                HH
-              </Avatar>
-              <Text className="font-semibold text-sm ">author</Text>
-            </Group>
-          </Group>
-          <Text className="font-bold text-xl pt-1">quiz name</Text>
-        </Box>
-      </div>
-    </div>
+                  <Menu.Dropdown>
+                    <Menu.Label>Actions</Menu.Label>
+                    <Menu.Item
+                      leftSection={
+                        <IconBook style={{ width: rem(14), height: rem(14) }} />
+                      }
+                      color="blue"
+                    >
+                      Study
+                    </Menu.Item>
+                    <Menu.Item
+                      leftSection={
+                        <IconBellFilled
+                          style={{ width: rem(14), height: rem(14) }}
+                        />
+                      }
+                    >
+                      Notification
+                    </Menu.Item>
+                    <Menu.Item
+                      leftSection={
+                        <IconShare2
+                          style={{ width: rem(14), height: rem(14) }}
+                        />
+                      }
+                    >
+                      Share
+                    </Menu.Item>
+                    <Menu.Item
+                      leftSection={
+                        <IconAlertTriangleFilled
+                          style={{ width: rem(14), height: rem(14) }}
+                        />
+                      }
+                      color="red"
+                    >
+                      Report
+                    </Menu.Item>
+
+                    <Menu.Divider />
+                    <Menu.Item>
+                      <Menu trigger="hover" position="right">
+                        <Menu.Target>
+                          <Group className="ml-[2px]">
+                            <IconSettings
+                              style={{ width: rem(14), height: rem(14) }}
+                            />{" "}
+                            Settings
+                          </Group>
+                        </Menu.Target>
+                        <Menu.Dropdown className="ml-2">
+                          <Menu.Item
+                            leftSection={
+                              <IconCirclePlus
+                                style={{ width: rem(14), height: rem(14) }}
+                              />
+                            }
+                            onClick={() => setAddSetsModalOpened(true)}
+                          >
+                            Add sets
+                          </Menu.Item>
+                          <Menu.Item
+                            leftSection={
+                              <IconUserPlus
+                                style={{ width: rem(14), height: rem(14) }}
+                              />
+                            }
+                            onClick={() => setInviteModalOpened(true)}
+                          >
+                            Invite members
+                          </Menu.Item>
+                          <Menu.Item
+                            leftSection={
+                              <IconEdit
+                                style={{ width: rem(14), height: rem(14) }}
+                              />
+                            }
+                          >
+                            Edit
+                          </Menu.Item>
+                          <Menu.Item
+                            color="red"
+                            leftSection={
+                              <IconEraser
+                                style={{ width: rem(14), height: rem(14) }}
+                              />
+                            }
+                          >
+                            Delete
+                          </Menu.Item>
+                        </Menu.Dropdown>
+                      </Menu>
+                    </Menu.Item>
+                  </Menu.Dropdown>
+                </Menu>
+              </Group>
+              <Tabs color="indigo" defaultValue="gallery">
+                <Tabs.List>
+                  <Tabs.Tab value="sets">Sets</Tabs.Tab>
+                  <Tabs.Tab value="members">Members</Tabs.Tab>
+                </Tabs.List>
+
+                <Tabs.Panel value="sets">
+                  <Stack gap={"sm"} className="mt-5">
+                    <Group className="justify-between">
+                      <Select
+                        checkIconPosition="right"
+                        data={["Latest", "Alphabetical"]}
+                        defaultValue={"Latest"}
+                        allowDeselect={false}
+                      />
+                      <TextInput
+                        variant="filled"
+                        radius="xl"
+                        placeholder="Filter by title"
+                        rightSectionPointerEvents="none"
+                        rightSection={iconSearch}
+                        className="w-[375px]"
+                      />
+                    </Group>
+                    <Stack>
+                      <Paper
+                        shadow="lg"
+                        radius="md"
+                        withBorder
+                        p="xl"
+                        className="py-4"
+                      >
+                        <Group>
+                          <Text className="font-semibold text-sm">
+                            5 {5 > 1 ? "terms" : "term"}
+                          </Text>
+                          <Group>
+                            <Avatar src={null} alt="no image here" size={"sm"}>
+                              HH
+                            </Avatar>
+                            <Text className="font-semibold text-sm ">
+                              author
+                            </Text>
+                          </Group>
+                        </Group>
+                        <Text className="font-bold text-xl">quiz name</Text>
+                      </Paper>
+                    </Stack>
+                  </Stack>
+                </Tabs.Panel>
+
+                <Tabs.Panel value="members">Under development</Tabs.Panel>
+              </Tabs>
+            </Stack>
+          </Grid.Col>
+          <Grid.Col span={4} className="flex justify-end">
+            <Paper className="w-4/5" shadow="lg" radius="md" withBorder p="xl">
+              <Stack>
+                <Stack gap="xs">
+                  <Title order={5} className="uppercase font-medium">
+                    Invite link
+                  </Title>
+                  <Group>
+                    <Input
+                      value="link@example"
+                      readOnly
+                      radius="sm"
+                      w={"100%"}
+                      variant="filled"
+                    />
+                    <Tooltip
+                      label="Link copied!"
+                      offset={5}
+                      position="bottom"
+                      radius="xl"
+                      transitionProps={{
+                        duration: 100,
+                        transition: "slide-down",
+                      }}
+                      opened={clipboard.copied}
+                    >
+                      <Button
+                        variant="light"
+                        rightSection={
+                          clipboard.copied ? (
+                            <IconCheck
+                              style={{ width: rem(20), height: rem(20) }}
+                              stroke={1.5}
+                            />
+                          ) : (
+                            <IconCopy
+                              style={{ width: rem(20), height: rem(20) }}
+                              stroke={1.5}
+                            />
+                          )
+                        }
+                        fullWidth
+                        radius="xl"
+                        size="sm"
+                        onClick={() =>
+                          clipboard.copy(
+                            "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                          )
+                        }
+                      >
+                        Copy link to clipboard
+                      </Button>
+                    </Tooltip>
+                  </Group>
+                </Stack>
+                <Divider />
+                <Stack>
+                  <Title order={5} className="uppercase font-normal">
+                    Class details
+                  </Title>
+                  <Stack gap="xs">
+                    <Group>
+                      <IconLayersSubtract size={20} color="gray" />
+                      <Text className="font-semibold text-[14px]">9 sets</Text>
+                    </Group>
+                    <Group>
+                      <IconUsersGroup size={20} color="gray" />
+                      <Text className="font-semibold text-[14px]">
+                        9 members
+                      </Text>
+                    </Group>
+                  </Stack>
+                </Stack>
+              </Stack>
+            </Paper>
+          </Grid.Col>
+        </Grid>
+      </Container>
+    </>
   );
 }
 

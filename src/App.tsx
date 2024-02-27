@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
 import Root from "./pages/Root";
 import { ToastContainer } from "react-toastify";
 
@@ -21,15 +21,13 @@ import {
 import "@mantine/core/styles.css";
 import UserDashboard from "./pages/after_login/UserDashboard";
 import { ErrorPage } from "./pages/errorpage/ErrorPage";
-import QuizSetDetails from "./pages/quiz/quiz-sets/SetDetails";
 import {
   forgotPasswordAction,
   resetPasswordAction,
 } from "./utils/action/forgot-password/ForgotPasswordAction";
-import SetDetails, { loader } from "./pages/quiz/set/SetDetails";
+import SetDetails from "./pages/quiz/set/SetDetails";
 import { loader as SetLoader } from "./pages/quiz/set/SetDetails";
 import FlashcardMode from "./pages/study-mode/flashcard/FlashcardPage";
-import { fetchUserProfileData } from "./components/account/user/Profile";
 import FolderPage from "./pages/folder/FolderPage";
 import CreateQuizPage from "./pages/quiz/create_form/CreateQuizPage";
 import StudyModeRoot from "./pages/study-mode/StudyModeRoot";
@@ -62,12 +60,13 @@ const router = createBrowserRouter([
       },
       { path: "home", element: <UserDashboard />, loader: checkAuth },
       {
-        path: "user/profile",
+        path: "user/profile/:tab",
+        loader: getAuthCredentials,
+        id: "profile-loader",
         children: [
           {
             index: true,
             element: <ProfilePage />,
-            loader: fetchUserProfileData,
           },
         ],
       },
@@ -113,9 +112,11 @@ const router = createBrowserRouter([
     loader: checkAuth,
     children: [
       {
-        path: "flashcard", element: <FlashcardMode />, loader: FlashcardLoader
-      }
-    ]
+        path: "flashcard",
+        element: <FlashcardMode />,
+        loader: FlashcardLoader,
+      },
+    ],
   },
 ]);
 

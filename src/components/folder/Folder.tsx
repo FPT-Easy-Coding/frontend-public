@@ -1,168 +1,53 @@
 import {
   Avatar,
-  Box,
   Button,
+  Container,
+  Divider,
+  Grid,
   Group,
+  JsonInput,
   Menu,
   Modal,
+  Paper,
   rem,
   Select,
   Stack,
   Text,
   TextInput,
-  ThemeIcon,
 } from "@mantine/core";
+import { useClipboard } from "@mantine/hooks";
 import {
   IconAlertTriangleFilled,
-  IconLayersSubtract,
+  IconBook,
+  IconBookmarkPlus,
+  IconCirclePlus,
+  IconDots,
+  IconEdit,
+  IconEraser,
+  IconFolder,
+  IconPlus,
   IconSearch,
   IconSettings,
-  IconFolder,
-  IconBook,
   IconShare2,
-  IconBookmarkPlus,
-  IconDots,
-  IconCirclePlus,
-  IconEraser,
-  IconEdit,
   IconXboxX,
 } from "@tabler/icons-react";
 import { useState } from "react";
-
 function Folder() {
-  const iconStyle = { width: rem(12), height: rem(12) };
   const iconSearch = <IconSearch style={{ width: rem(16), height: rem(16) }} />;
+  const [inviteModalOpened, setInviteModalOpened] = useState(false);
   const [addSetsModalOpened, setAddSetsModalOpened] = useState(false);
+  const [jsonContent, setJsonContent] = useState("");
+  const inviteMembers = () => {
+    // Logic to create a folder
+    console.log("invite", jsonContent);
+    // You can put your logic here to create the folder
+  };
   return (
-    <div>
-      <Group className="mt-10 ml-14 mb-[-25px]">
-        {
-          <IconFolder
-            style={iconStyle}
-            className="w-[100px] h-[40px] text-blue-600/100 mr-[-20px]"
-          />
-        }
-        <Text className="font-bold text-[40px] uppercase">Folder</Text>
-        <Menu shadow="md" width={200} className="ml-[700px]">
-          <Menu.Target>
-            <Button variant="light" color="gray" className="w-[50px]">
-              <IconDots />
-            </Button>
-          </Menu.Target>
-
-          <Menu.Dropdown>
-            <Menu.Label>Actions</Menu.Label>
-            <Menu.Item
-              leftSection={
-                <IconBook style={{ width: rem(14), height: rem(14) }} />
-              }
-              color="blue"
-            >
-              Study
-            </Menu.Item>
-            <Menu.Item
-              leftSection={
-                <IconShare2 style={{ width: rem(14), height: rem(14) }} />
-              }
-            >
-              Share
-            </Menu.Item>
-            <Menu.Item
-              leftSection={
-                <IconBookmarkPlus style={{ width: rem(14), height: rem(14) }} />
-              }
-            >
-              Bookmark
-            </Menu.Item>
-            <Menu.Item
-              leftSection={
-                <IconAlertTriangleFilled
-                  style={{ width: rem(14), height: rem(14) }}
-                />
-              }
-              color="red"
-            >
-              Report
-            </Menu.Item>
-
-            <Menu.Divider />
-            <Menu.Item
-              leftSection={
-                <IconSettings style={{ width: rem(14), height: rem(14) }} />
-              }
-            >
-              <Menu trigger="hover" position="right" className="ml-[-18px]">
-                <Menu.Target>
-                  <Group className="ml-[2px]"> Settings</Group>
-                </Menu.Target>
-                <Menu.Dropdown className="ml-2">
-                  <Menu.Item
-                    leftSection={
-                      <IconCirclePlus
-                        style={{ width: rem(14), height: rem(14) }}
-                      />
-                    }
-                    onClick={() => setAddSetsModalOpened(true)}
-                  >
-                    Add sets
-                  </Menu.Item>
-                  <Menu.Item
-                    leftSection={
-                      <IconEdit style={{ width: rem(14), height: rem(14) }} />
-                    }
-                  >
-                    Edit
-                  </Menu.Item>
-                  <Menu.Item
-                    color="red"
-                    leftSection={
-                      <IconEraser style={{ width: rem(14), height: rem(14) }} />
-                    }
-                  >
-                    Delete
-                  </Menu.Item>
-                </Menu.Dropdown>
-              </Menu>
-            </Menu.Item>
-
-            <Menu.Divider />
-          </Menu.Dropdown>
-        </Menu>
-      </Group>
-      <Group className="mt-2 ml-20">
-        <Select
-          className="my-5 w-[150px] mr-[220px]"
-          checkIconPosition="right"
-          data={["Latest", "Alphabetical"]}
-          defaultValue={"Latest"}
-          allowDeselect={false}
-        />
-        <TextInput
-          variant="filled"
-          radius="xl"
-          placeholder="Filter by title"
-          rightSectionPointerEvents="none"
-          rightSection={iconSearch}
-          className="w-[375px]"
-        />
-        <Stack className="ml-[150px] mt-12">
-          <Text className="uppercase font-semibold text-[14px] text-gray-700">
-            Folder details
-          </Text>
-          <Group className="ml-[-10px] my-[-10px]">
-            <ThemeIcon variant="white" size="lg" color="gray">
-              <IconLayersSubtract style={{ width: "70%", height: "70%" }} />
-            </ThemeIcon>
-            <Text className=" font-semibold text-[14px] text-gray-900">
-              9 sets
-            </Text>
-          </Group>
-        </Stack>
-      </Group>
-      {/* Add quiz sets modal */}
+    <>
+      {/* Invite members modal */}
       <Modal.Root
-        opened={addSetsModalOpened}
-        onClose={() => setAddSetsModalOpened(false)}
+        opened={inviteModalOpened}
+        onClose={() => setInviteModalOpened(false)}
         centered
         size="lg"
       >
@@ -171,7 +56,7 @@ function Folder() {
           <div className="modal-header bg-blue-600 p-4">
             <Modal.Header className="bg-blue-600 p-4">
               <Modal.Title className="text-white font-bold text-size text-3xl">
-                Add quiz sets
+                Invite members
               </Modal.Title>
               <Modal.CloseButton
                 icon={
@@ -185,61 +70,237 @@ function Folder() {
               />
             </Modal.Header>
           </div>
-          <Modal.Body className="bg-gray-50">
-            <div className="mx-4 mr-[50px]">
-              <Button
-                variant="white"
-                color="rgba(0, 0, 0, 1)"
-                size="md"
-                className="my-5 mx-4 w-full mr-5 bg-white hover:text-yellow-400 uppercase font-mono border-b-2 border-black"
-              >
-                + Create a new sets
-              </Button>
-            </div>
-            <Select
-              className="my-5 mx-8 w-[150px] mr-[220px]"
-              checkIconPosition="right"
-              data={["Your sets", "Folder sets", "Study sets"]}
-              defaultValue={"Your sets"}
-              allowDeselect={false}
+          <Modal.Body>
+            <Text className="my-5 mx-4">
+              To invite members to this class, add their Quiztoast usernames or
+              emails below (separate by commas or line breaks).
+            </Text>
+            <JsonInput
+              className="my-5 mx-4"
+              size="lg"
+              placeholder="Enter usernames or email addresses (separated by commas or new lines)"
+              validationError="Invalid JSON"
+              formatOnBlur
+              autosize
+              minRows={4}
+              value={jsonContent}
+              onChange={(value) => setJsonContent(value)}
             />
-            <div className="my-5 mx-8 bg-white">
-              <Group className="my-5 mx-8">
-                <Text className="font-bold text-lg text-gray-800">
-                  Quiz Set 1
-                </Text>
-                <Button
-                  variant="default"
-                  color="rgba(0, 0, 0, 1)"
-                  size="sm"
-                  radius="md"
-                  className="my-5 ml-[300px] text-2xl font-light bg-white hover:text-yellow-400 uppercase font-mono"
-                >
-                  +
-                </Button>
-              </Group>
+            <div className="flex justify-end">
+              <Button
+                className="mb-5 mx-4 w-[100%] h-[50px] rounded-xl"
+                variant="filled"
+                disabled={!jsonContent.trim()}
+                onClick={inviteMembers}
+              >
+                Send invites
+              </Button>
             </div>
           </Modal.Body>
         </Modal.Content>
       </Modal.Root>
+      {/* Add quiz sets modal */}
+      <Modal.Root
+        opened={addSetsModalOpened}
+        onClose={() => setAddSetsModalOpened(false)}
+        centered
+        size="lg"
+      >
+        <Modal.Overlay />
+        <Modal.Content>
+          <div className="p-4">
+            <Modal.Header>
+              <Modal.Title className="font-bold text-size text-2xl">
+                Add quiz sets
+              </Modal.Title>
+              <Modal.CloseButton />
+            </Modal.Header>
+          </div>
 
-      <div className="ml-20 w-[50%]">
-        <Box className="pl-4 mb-4 mt-2 shadow-md rounded-md border-s h-[88px] pt-4">
-          <Group>
-            <Text className="font-semibold text-sm">
-              5 {5 > 1 ? "terms" : "term"}
-            </Text>
-            <Group className="pl-4 ">
-              <Avatar src={null} alt="no image here" size={"sm"}>
-                HH
-              </Avatar>
-              <Text className="font-semibold text-sm">author</Text>
-            </Group>
-          </Group>
-          <Text className="font-bold text-xl pt-1">quiz name</Text>
-        </Box>
-      </div>
-    </div>
+          <Modal.Body>
+            <Stack p={"xl"}>
+              <Button variant="subtle" size="sm" leftSection={<IconPlus />}>
+                Create new sets
+              </Button>
+              <div>
+                <Select
+                  className="w-1/4"
+                  checkIconPosition="right"
+                  data={["Your sets", "Folder sets", "Study sets"]}
+                  defaultValue={"Your sets"}
+                  allowDeselect={false}
+                />
+              </div>
+              <Paper shadow="lg" radius="md" withBorder p="xl" className="py-4">
+                <Group className="justify-between">
+                  <Text className="font-bold text-lg">Quiz Set 1</Text>
+                  <Button variant="default" size="sm" radius="md">
+                    <IconPlus size={12} />
+                  </Button>
+                </Group>
+              </Paper>
+            </Stack>
+          </Modal.Body>
+        </Modal.Content>
+      </Modal.Root>
+      <Container className="container">
+        <Grid gutter={"lg"}>
+          <Grid.Col span={12}>
+            <Stack gap={"lg"}>
+              <Group>
+                <Text c={"dimmed"}>0 sets</Text>
+                <Divider orientation="vertical" />
+                <Text>created by</Text>
+                <Group gap={0}>
+                  <Avatar size={"sm"} />
+                  <Text>username</Text>
+                </Group>
+              </Group>
+              <Group className="justify-between">
+                <Group>
+                  <IconFolder size={35} color="blue" />
+                  <Text className="font-bold text-3xl uppercase">
+                    Folder name
+                  </Text>
+                </Group>
+                <Menu shadow="md" width={200}>
+                  <Menu.Target>
+                    <Button variant="light" color="gray" className="w-[50px]">
+                      <IconDots />
+                    </Button>
+                  </Menu.Target>
+
+                  <Menu.Dropdown>
+                    <Menu.Label>Actions</Menu.Label>
+                    <Menu.Item
+                      leftSection={
+                        <IconBook style={{ width: rem(14), height: rem(14) }} />
+                      }
+                      color="blue"
+                    >
+                      Study
+                    </Menu.Item>
+                    <Menu.Item
+                      leftSection={
+                        <IconShare2
+                          style={{ width: rem(14), height: rem(14) }}
+                        />
+                      }
+                    >
+                      Share
+                    </Menu.Item>
+                    <Menu.Item
+                      leftSection={
+                        <IconBookmarkPlus
+                          style={{ width: rem(14), height: rem(14) }}
+                        />
+                      }
+                    >
+                      Bookmark
+                    </Menu.Item>
+                    <Menu.Item
+                      leftSection={
+                        <IconAlertTriangleFilled
+                          style={{ width: rem(14), height: rem(14) }}
+                        />
+                      }
+                      color="red"
+                    >
+                      Report
+                    </Menu.Item>
+
+                    <Menu.Divider />
+                    <Menu.Item
+                      leftSection={
+                        <IconSettings
+                          style={{ width: rem(14), height: rem(14) }}
+                        />
+                      }
+                    >
+                      <Menu trigger="hover" position="right">
+                        <Menu.Target>
+                          <Group className="ml-[2px]"> Settings</Group>
+                        </Menu.Target>
+                        <Menu.Dropdown className="ml-2">
+                          <Menu.Item
+                            leftSection={
+                              <IconCirclePlus
+                                style={{ width: rem(14), height: rem(14) }}
+                              />
+                            }
+                            onClick={() => setAddSetsModalOpened(true)}
+                          >
+                            Add sets
+                          </Menu.Item>
+                          <Menu.Item
+                            leftSection={
+                              <IconEdit
+                                style={{ width: rem(14), height: rem(14) }}
+                              />
+                            }
+                          >
+                            Edit
+                          </Menu.Item>
+                          <Menu.Item
+                            color="red"
+                            leftSection={
+                              <IconEraser
+                                style={{ width: rem(14), height: rem(14) }}
+                              />
+                            }
+                          >
+                            Delete
+                          </Menu.Item>
+                        </Menu.Dropdown>
+                      </Menu>
+                    </Menu.Item>
+                  </Menu.Dropdown>
+                </Menu>
+              </Group>
+              <Group className="justify-between">
+                <Select
+                  checkIconPosition="right"
+                  data={["Latest", "Alphabetical"]}
+                  defaultValue={"Latest"}
+                  allowDeselect={false}
+                />
+                <TextInput
+                  variant="filled"
+                  radius="xl"
+                  placeholder="Filter by title"
+                  rightSectionPointerEvents="none"
+                  rightSection={iconSearch}
+                  className="w-[375px]"
+                />
+              </Group>
+              <Divider />
+              <Stack>
+                <Paper
+                  shadow="lg"
+                  radius="md"
+                  withBorder
+                  p="xl"
+                  className="py-4"
+                >
+                  <Group>
+                    <Text className="font-semibold text-sm">
+                      5 {5 > 1 ? "terms" : "term"}
+                    </Text>
+                    <Group>
+                      <Avatar src={null} alt="no image here" size={"sm"}>
+                        HH
+                      </Avatar>
+                      <Text className="font-semibold text-sm ">author</Text>
+                    </Group>
+                  </Group>
+                  <Text className="font-bold text-xl">quiz name</Text>
+                </Paper>
+              </Stack>
+            </Stack>
+          </Grid.Col>
+        </Grid>
+      </Container>
+    </>
   );
 }
 
