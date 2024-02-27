@@ -50,7 +50,7 @@ function RecentQuiz() {
   };
 
   const handleClickIncreaseView = async (quizId: any) => {
-    await axios.put(`http://localhost:8080/api/v1/quiz/increase-view/${quizId}`);
+    await axios.put(`http://localhost:8080/api/v1/quiz/increase-view?quiz-id=${quizId}`);
   };
   return (
     <>
