@@ -56,62 +56,111 @@ function Class() {
     // You can put your logic here to create the folder
   };
   return (
-    <>
-      {/* Invite members modal */}
-      <Modal.Root
-        opened={inviteModalOpened}
-        onClose={() => setInviteModalOpened(false)}
-        centered
-        size="lg"
-      >
-        <Modal.Overlay />
-        <Modal.Content>
-          <div className="modal-header bg-blue-600 p-4">
-            <Modal.Header className="bg-blue-600 p-4">
-              <Modal.Title className="text-white font-bold text-size text-3xl">
-                Invite members
-              </Modal.Title>
-              <Modal.CloseButton
-                icon={
-                  <IconXboxX
-                    size={60}
-                    stroke={1.5}
-                    className="hover:text-red-500"
-                  />
-                }
-                className="text-white bg-blue-600"
-              />
-            </Modal.Header>
-          </div>
-          <Modal.Body>
-            <Text className="my-5 mx-4">
-              To invite members to this class, add their Quiztoast usernames or
-              emails below (separate by commas or line breaks).
-            </Text>
-            <JsonInput
-              className="my-5 mx-4"
-              size="lg"
-              placeholder="Enter usernames or email addresses (separated by commas or new lines)"
-              validationError="Invalid JSON"
-              formatOnBlur
-              autosize
-              minRows={4}
-              value={jsonContent}
-              onChange={(value) => setJsonContent(value)}
-            />
-            <div className="flex justify-end">
-              <Button
-                className="mb-5 mx-4 w-[100%] h-[50px] rounded-xl"
-                variant="filled"
-                disabled={!jsonContent.trim()}
-                onClick={inviteMembers}
-              >
-                Send invites
-              </Button>
-            </div>
-          </Modal.Body>
-        </Modal.Content>
-      </Modal.Root>
+    <div>
+      <Group className="mt-10 ml-14 mb-[-40px]">
+        {
+          <IconUsers
+            style={iconStyle}
+            className="w-[100px] h-[40px] text-blue-600/100 mr-[-20px]"
+          />
+        }
+        <Text className="font-bold text-[40px] uppercase">class</Text>
+        <Menu shadow="md" width={200} className="ml-[500px]">
+          <Menu.Target>
+            <Button variant="light" color="gray" className="w-[50px]">
+              <IconDots />
+            </Button>
+          </Menu.Target>
+
+          <Menu.Dropdown>
+            <Menu.Label>Actions</Menu.Label>
+            <Menu.Item
+              leftSection={
+                <IconBook style={{ width: rem(14), height: rem(14) }} />
+              }
+              color="blue"
+            >
+              Study
+            </Menu.Item>
+            <Menu.Item
+              leftSection={
+                <IconBellFilled style={{ width: rem(14), height: rem(14) }} />
+              }
+            >
+              Notification
+            </Menu.Item>
+            <Menu.Item
+              leftSection={
+                <IconShare2 style={{ width: rem(14), height: rem(14) }} />
+              }
+            >
+              Share
+            </Menu.Item>
+            <Menu.Item
+              leftSection={
+                <IconAlertTriangleFilled
+                  style={{ width: rem(14), height: rem(14) }}
+                />
+              }
+              color="red"
+            >
+              Report
+            </Menu.Item>
+
+            <Menu.Divider />
+            <Menu.Item>
+              <Menu trigger="hover" position="right" className="ml-[-18px]">
+                <Menu.Target>
+                  <Group className="ml-[2px]">
+                    <IconSettings style={{ width: rem(14), height: rem(14) }} />{" "}
+                    Settings
+                  </Group>
+                </Menu.Target>
+                <Menu.Dropdown className="ml-2">
+                  <Menu.Item
+                    leftSection={
+                      <IconCirclePlus
+                        style={{ width: rem(14), height: rem(14) }}
+                      />
+                    }
+                    onClick={() => setAddSetsModalOpened(true)}
+                  >
+                    Add sets
+                  </Menu.Item>
+                  <Menu.Item
+                    leftSection={
+                      <IconUserPlus
+                        style={{ width: rem(14), height: rem(14) }}
+                      />
+                    }
+                    onClick={() => setInviteModalOpened(true)}
+                  >
+                    Invite members
+                  </Menu.Item>
+                  <Menu.Item
+                    leftSection={
+                      <IconEdit style={{ width: rem(14), height: rem(14) }} />
+                    }
+                  >
+                    Edit
+                  </Menu.Item>
+                  <Menu.Item
+                    color="red"
+                    leftSection={
+                      <IconEraser style={{ width: rem(14), height: rem(14) }} />
+                    }
+                  >
+                    Delete
+                  </Menu.Item>
+                </Menu.Dropdown>
+              </Menu>
+            </Menu.Item>
+
+            <Menu.Divider />
+          </Menu.Dropdown>
+        </Menu>
+      </Group>
+
       {/* Add quiz sets modal */}
       <Modal.Root
         opened={addSetsModalOpened}

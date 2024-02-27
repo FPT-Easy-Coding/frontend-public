@@ -228,15 +228,18 @@ function Navbar() {
 
               <Menu.Dropdown>
                 <Menu.Label>Create</Menu.Label>
-                <Menu.Item
-                  leftSection={
-                    <IconLibraryPlus
-                      style={{ width: rem(14), height: rem(14) }}
-                    />
-                  }
-                >
-                  Quiz set
-                </Menu.Item>
+                <NavLink to={"/create-quiz"}>
+                  <Menu.Item
+                    leftSection={
+                      <IconLibraryPlus
+                        style={{ width: rem(14), height: rem(14) }}
+                      />
+                    }
+                  >
+                    Quiz set
+                  </Menu.Item>
+                </NavLink>
+
                 <Menu.Item
                   onClick={open}
                   leftSection={

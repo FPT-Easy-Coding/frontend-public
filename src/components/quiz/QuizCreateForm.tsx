@@ -1,12 +1,13 @@
 import { useState } from "react";
+import _debounce from "lodash/debounce";
+import _throttle from "lodash/throttle";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import {
   TextInput,
   Text,
   Group,
   Button,
-  Box,
   Stack,
-  rem,
   Container,
   Paper,
 } from "@mantine/core";
@@ -92,6 +93,8 @@ const QuestionBox = ({ question, index, onDelete, onChange }) => {
 };
 
 const QuizCreateForm = () => {
+  const DEBOUNCE_DELAY = 100; // Adjust as needed
+  const THROTTLE_DELAY = 100; // Adjust as needed
   const [quiz, setQuiz] = useState({
     title: "",
     questions: [{ question: "", options: [""], correctAnswer: "" }],
@@ -130,7 +133,18 @@ const QuizCreateForm = () => {
     e.preventDefault();
     console.log(quiz);
   };
+  const handleDragEnd = _throttle(
+    _debounce((result) => {
+      if (!result.destination) return;
 
+      const reorderedQuestions = Array.from(quiz.questions);
+      const [removed] = reorderedQuestions.splice(result.source.index, 1);
+      reorderedQuestions.splice(result.destination.index, 0, removed);
+
+      setQuiz({ ...quiz, questions: reorderedQuestions });
+    }, DEBOUNCE_DELAY),
+    THROTTLE_DELAY
+  );
   return (
     <Container>
       <Text className="font-bold text-3xl my-5">Create a new study set</Text>
@@ -155,18 +169,38 @@ const QuizCreateForm = () => {
           value={quiz.title}
           onChange={(e) => setQuiz({ ...quiz, title: e.target.value })}
         />
-        <div>
-          {" "}
-          {quiz.questions.map((question, index) => (
-            <QuestionBox
-              key={index}
-              index={index}
-              question={question}
-              onDelete={handleDeleteQuestion}
-              onChange={handleChange}
-            />
-          ))}
-        </div>
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <Droppable droppableId="questions">
+            {(provided) => (
+              <div ref={provided.innerRef} {...provided.droppableProps}>
+                {quiz.questions.map((question, index) => (
+                  <Draggable
+                    key={index}
+                    draggableId={index.toString()}
+                    index={index}
+                  >
+                    {(provided) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                      >
+                        <QuestionBox
+                          index={index}
+                          question={question}
+                          onDelete={handleDeleteQuestion}
+                          onChange={handleChange}
+                        />
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
+
         <Button
           type="button"
           onClick={handleAddQuestion}
