@@ -11,6 +11,7 @@ import AuthPage, {
 import ForgotPassword from "./pages/authentication/forgot-password/ForgotPassword";
 import ResetPassword from "./pages/authentication/forgot-password/ResetPassword";
 import ProfilePage from "./pages/account/user/ProfilePage";
+import ClassPage from "./pages/class/ClassPage";
 import logout from "./utils/loader/auth/logout";
 import {
   checkAuth,
@@ -20,11 +21,20 @@ import {
 import "@mantine/core/styles.css";
 import UserDashboard from "./pages/after_login/UserDashboard";
 import { ErrorPage } from "./pages/errorpage/ErrorPage";
-import { forgotPasswordAction, resetPasswordAction } from "./utils/action/forgot-password/ForgotPasswordAction";
-import SetDetails from "./pages/quiz/set/SetDetails";
+import QuizSetDetails from "./pages/quiz/set/SetDetails";
+import {
+  forgotPasswordAction,
+  resetPasswordAction,
+} from "./utils/action/forgot-password/ForgotPasswordAction";
+import SetDetails, { loader } from "./pages/quiz/set/SetDetails";
 import { loader as SetLoader } from "./pages/quiz/set/SetDetails";
 import FlashcardMode from "./pages/study-mode/flashcard/FlashcardPage";
-import QuizLearnPage from "./pages/study-mode/learn/QuizLearn";
+import { fetchUserProfileData } from "./components/account/user/Profile";
+import FolderPage from "./pages/folder/FolderPage";
+import CreateQuizPage from "./pages/quiz/create_form/CreateQuizPage";
+import StudyModeRoot from "./pages/study-mode/StudyModeRoot";
+import { loader as FlashcardLoader } from "./pages/study-mode/flashcard/FlashcardPage";
+import LearnQuiz from "./pages/study-mode/learn/LearnQuiz";
 
 const router = createBrowserRouter([
   {
@@ -44,32 +54,72 @@ const router = createBrowserRouter([
       {
         path: "forgotten",
         element: <ForgotPassword />,
-        action: forgotPasswordAction
+        action: forgotPasswordAction,
       },
-      { path: "reset-password", element: <ResetPassword />, action: resetPasswordAction },
+      {
+        path: "reset-password",
+        element: <ResetPassword />,
+        action: resetPasswordAction,
+      },
       { path: "home", element: <UserDashboard />, loader: checkAuth },
       {
-        path: "user",
-        children: [{ index: true, path: "profile", element: <ProfilePage /> }],
+        path: "user/profile",
+        children: [
+          {
+            index: true,
+            element: <ProfilePage />,
+            loader: fetchUserProfileData,
+          },
+        ],
+      },
+      {
+        path: "class/:id",
+        children: [
+          {
+            index: true,
+            element: <ClassPage />,
+          },
+        ],
+      },
+      {
+        path: "create-quiz",
+        children: [
+          {
+            index: true,
+            element: <CreateQuizPage />,
+          },
+        ],
+      },
+      {
+        path: "folder/:id",
+        children: [
+          {
+            index: true,
+            element: <FolderPage />,
+          },
+        ],
       },
       {
         path: "quiz/set/:id",
         loader: checkAuth,
-        children: [
-          { index: true, element: <SetDetails />, loader: SetLoader },
-          // { path: "learn", element: <QuizLearnPage />, loader: SetLoader },
-          { path: "flashcard", element: <FlashcardMode /> },
-        ],
+        children: [{ index: true, element: <SetDetails />, loader: SetLoader }],
       },
       { path: "logout", action: logout },
     ],
   },
   {
-    path: "quiz/set/:id",
+    path: ":id/study",
+    element: <StudyModeRoot />,
+    errorElement: <ErrorPage />,
     loader: checkAuth,
     children: [
-      { path: "learn", element: <QuizLearnPage />, loader: SetLoader },
-    ],
+      {
+        path: "flashcard", element: <FlashcardMode />, loader: FlashcardLoader
+      },
+      {
+        path: "learn", element: <LearnQuiz />, loader: FlashcardLoader
+      }
+    ]
   },
 ]);
 
