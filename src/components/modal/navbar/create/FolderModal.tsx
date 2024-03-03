@@ -1,6 +1,6 @@
-import { Button, Input, Modal, Stack, Text, TextInput } from "@mantine/core";
+import { Button, Modal, Stack, TextInput } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
-import { Form } from "react-router-dom";
+import { Form, useSubmit } from "react-router-dom";
 
 function FolderModal({
   opened,
@@ -9,6 +9,7 @@ function FolderModal({
   opened: boolean;
   close: () => void;
 }) {
+  const submit = useSubmit();
   const form = useForm({
     initialValues: {
       folderTitle: "",
@@ -28,7 +29,18 @@ function FolderModal({
         size="xl"
         title="Create a new folder"
       >
-        <Form onSubmit={form.onSubmit(() => {})}>
+        <Form
+          onSubmit={form.onSubmit(() => {
+            submit(
+              {
+                folderTitle: form.values.folderTitle,
+                folderDescription: form.values.folderDescription,
+                action: "create-folder",
+              },
+              { method: "post" }
+            );
+          })}
+        >
           <Stack gap={"md"}>
             <TextInput
               placeholder="Enter folder title"
@@ -42,7 +54,12 @@ function FolderModal({
               name="folderDescription"
               {...form.getInputProps("folderDescription")}
             />
-            <Button className="self-end" type="submit">
+            <Button
+              className="self-end"
+              type="submit"
+              name="action"
+              value="create-folder"
+            >
               Create folder
             </Button>
           </Stack>

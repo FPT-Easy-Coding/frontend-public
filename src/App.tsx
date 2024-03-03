@@ -32,11 +32,13 @@ import FolderPage from "./pages/folder/FolderPage";
 import CreateQuizPage from "./pages/quiz/create_form/CreateQuizPage";
 import StudyModeRoot from "./pages/study-mode/StudyModeRoot";
 import { loader as FlashcardLoader } from "./pages/study-mode/flashcard/FlashcardPage";
+import { action as NavbarAction } from "./pages/Root";
 
 const router = createBrowserRouter([
   {
     path: "/",
     loader: getAuthCredentials,
+    action: NavbarAction,
     id: "root-loader",
     element: <Root />,
     errorElement: <ErrorPage />,

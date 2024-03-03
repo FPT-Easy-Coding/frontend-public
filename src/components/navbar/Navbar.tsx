@@ -12,6 +12,7 @@ import {
 import logo from "../../assets/logo.svg";
 import {
   NavLink,
+  useActionData,
   useLoaderData,
   useSearchParams,
   useSubmit,
@@ -33,6 +34,7 @@ import { UserCredentialsContext } from "../../store/user-credentials-context";
 import { useDisclosure } from "@mantine/hooks";
 import FolderModal from "../modal/navbar/create/FolderModal";
 import ClassModal from "../modal/navbar/create/ClassModal";
+import { toast } from "react-toastify";
 
 const userBtn = (data: LoaderData, submit: any, handleLogout: () => void) => {
   return (
@@ -152,6 +154,7 @@ function Navbar() {
   );
   const mode = useSearchParams()[0].get("mode");
   const data: LoaderData = useLoaderData() as LoaderData;
+  const actionData = useActionData() as { success: boolean; msg: string };
   useEffect(() => {
     if (data !== null) {
       assignUserCredentials({
@@ -159,6 +162,15 @@ function Navbar() {
       });
     }
   }, [data]);
+
+  useEffect(() => {
+    if (actionData?.success) {
+      toast.success(actionData.msg);
+    }
+    if (!actionData?.success) {
+      toast.error(actionData?.msg);
+    }
+  }, [actionData]);
   const submit = useSubmit();
   const { colorScheme, setColorScheme } = useMantineColorScheme({
     keepTransitions: true,
@@ -173,6 +185,7 @@ function Navbar() {
       : userBtn(data, submit, clearUserCredentials);
   const whichHomepage = data?.error || !data ? "/" : "/home";
 
+  useEffect(() => {});
   return (
     <>
       <header className="w-full h-16 flex items-center justify-between sticky top-0 z-20 shadow-sm bg-[--mantine-color-body]">

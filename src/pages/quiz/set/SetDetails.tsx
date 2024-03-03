@@ -185,7 +185,6 @@ function SetDetails() {
         </Group>
         {/* Flashcard section */}
         <Carousel
-          withIndicators
           align={"start"}
           height={500}
           className="mt-10 rounded-md"
@@ -199,7 +198,7 @@ function SetDetails() {
           {flashcards}
         </Carousel>
         <Group className="justify-between mt-5">
-          <Progress value={scrollProgress} size="sm" className="basis-2/3" />
+          <Progress value={scrollProgress} size="sm" className="basis-1/3" />
           <ActionIcon
             variant="subtle"
             size="lg"
