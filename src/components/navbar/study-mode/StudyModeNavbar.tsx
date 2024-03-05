@@ -92,18 +92,20 @@ function StudyModeNavbar() {
             </Menu.Target>
             <Menu.Dropdown>
               <Menu.Label>Study mode</Menu.Label>
-              <Link to={`/${id}/study/flashcard`}>
-                <Menu.Item
-                  leftSection={<IconLayersSubtract style={iconStyle} />}
-                >
-                  Flashcard
-                </Menu.Item>
-              </Link>
-              <Link to={`/${id}/study/learn`}>
-                <Menu.Item leftSection={<IconBook style={iconStyle} />}>
-                  Learn
-                </Menu.Item>
-              </Link>
+              <Menu.Item
+                leftSection={<IconLayersSubtract style={iconStyle} />}
+                component="a"
+                href={`/${id}/study/flashcard`}
+              >
+                Flashcard
+              </Menu.Item>
+              <Menu.Item
+                leftSection={<IconBook style={iconStyle} />}
+                component="a"
+                href={`/${id}/study/learn`}
+              >
+                Learn
+              </Menu.Item>
               <Menu.Item leftSection={<IconFileText style={iconStyle} />}>
                 Test
               </Menu.Item>
