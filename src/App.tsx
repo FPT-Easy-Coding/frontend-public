@@ -1,17 +1,11 @@
-import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Root from "./pages/Root";
 import { ToastContainer } from "react-toastify";
 
 import "react-toastify/dist/ReactToastify.css";
 
 import Homepage from "./pages/guest/homepage/Homepage";
-import AuthPage, {
-  action as authAction,
-} from "./pages/authentication/authpage/AuthPage";
-import ForgotPassword from "./pages/authentication/forgot-password/ForgotPassword";
-import ResetPassword from "./pages/authentication/forgot-password/ResetPassword";
-import ProfilePage from "./pages/account/user/ProfilePage";
-import ClassPage from "./pages/class/ClassPage";
+import { action as authAction } from "./pages/authentication/authpage/AuthPage";
 import logout from "./utils/loader/auth/logout";
 import {
   checkAuth,
@@ -19,20 +13,54 @@ import {
   preventAuth,
 } from "./utils/loader/auth/auth";
 import "@mantine/core/styles.css";
-import UserDashboard from "./pages/after_login/UserDashboard";
 import { ErrorPage } from "./pages/errorpage/ErrorPage";
 import {
   forgotPasswordAction,
   resetPasswordAction,
 } from "./utils/action/forgot-password/ForgotPasswordAction";
-import SetDetails from "./pages/quiz/set/SetDetails";
 import { loader as SetLoader } from "./pages/quiz/set/SetDetails";
-import FlashcardMode from "./pages/study-mode/flashcard/FlashcardPage";
-import FolderPage from "./pages/folder/FolderPage";
-import CreateQuizPage from "./pages/quiz/create_form/CreateQuizPage";
 import StudyModeRoot from "./pages/study-mode/StudyModeRoot";
 import { loader as FlashcardLoader } from "./pages/study-mode/flashcard/FlashcardPage";
 import { action as NavbarAction } from "./pages/Root";
+import { lazy, Suspense } from "react";
+import { Box, LoadingOverlay } from "@mantine/core";
+
+const AuthPage = lazy(() => import("./pages/authentication/authpage/AuthPage"));
+const ForgotPassword = lazy(
+  () => import("./pages/authentication/forgot-password/ForgotPassword")
+);
+const ResetPassword = lazy(
+  () => import("./pages/authentication/forgot-password/ResetPassword")
+);
+const UserDashboard = lazy(() => import("./pages/after_login/UserDashboard"));
+
+const ProfilePage = lazy(() => import("./pages/account/user/ProfilePage"));
+
+const ClassPage = lazy(() => import("./pages/class/ClassPage"));
+const CreateQuizPage = lazy(
+  () => import("./pages/quiz/create_form/CreateQuizPage")
+);
+
+const FolderPage = lazy(() => import("./pages/folder/FolderPage"));
+const SetDetails = lazy(() => import("./pages/quiz/set/SetDetails"));
+const FlashcardMode = lazy(
+  () => import("./pages/study-mode/flashcard/FlashcardPage")
+);
+const loadingIndicator = (
+  <Box
+    pos={"relative"}
+    h={"100vh"}
+    w={"100vw"}
+    className="items-center justify-center"
+  >
+    <LoadingOverlay
+      visible
+      zIndex={1000}
+      overlayProps={{ radius: "sm", blur: 2 }}
+      loaderProps={{ color: "orange", type: "oval" }}
+    />
+  </Box>
+);
 
 const router = createBrowserRouter([
   {
@@ -46,21 +74,41 @@ const router = createBrowserRouter([
       { index: true, element: <Homepage /> },
       {
         path: "auth",
-        element: <AuthPage />,
+        element: (
+          <Suspense fallback={loadingIndicator}>
+            <AuthPage />
+          </Suspense>
+        ),
         action: authAction,
         loader: preventAuth,
       },
       {
         path: "forgotten",
-        element: <ForgotPassword />,
+        element: (
+          <Suspense fallback={loadingIndicator}>
+            <ForgotPassword />
+          </Suspense>
+        ),
         action: forgotPasswordAction,
       },
       {
         path: "reset-password",
-        element: <ResetPassword />,
+        element: (
+          <Suspense fallback={loadingIndicator}>
+            <ResetPassword />
+          </Suspense>
+        ),
         action: resetPasswordAction,
       },
-      { path: "home", element: <UserDashboard />, loader: checkAuth },
+      {
+        path: "home",
+        element: (
+          <Suspense fallback={loadingIndicator}>
+            <UserDashboard />
+          </Suspense>
+        ),
+        loader: checkAuth,
+      },
       {
         path: "user/profile/:tab",
         loader: getAuthCredentials,
@@ -68,7 +116,11 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <ProfilePage />,
+            element: (
+              <Suspense fallback={loadingIndicator}>
+                <ProfilePage />
+              </Suspense>
+            ),
           },
         ],
       },
@@ -77,7 +129,11 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <ClassPage />,
+            element: (
+              <Suspense fallback={loadingIndicator}>
+                <ClassPage />
+              </Suspense>
+            ),
           },
         ],
       },
@@ -86,7 +142,11 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <CreateQuizPage />,
+            element: (
+              <Suspense fallback={loadingIndicator}>
+                <CreateQuizPage />
+              </Suspense>
+            ),
           },
         ],
       },
@@ -95,14 +155,28 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <FolderPage />,
+            element: (
+              <Suspense fallback={loadingIndicator}>
+                <FolderPage />
+              </Suspense>
+            ),
           },
         ],
       },
       {
         path: "quiz/set/:id",
         loader: checkAuth,
-        children: [{ index: true, element: <SetDetails />, loader: SetLoader }],
+        children: [
+          {
+            index: true,
+            element: (
+              <Suspense fallback={loadingIndicator}>
+                <SetDetails />
+              </Suspense>
+            ),
+            loader: SetLoader,
+          },
+        ],
       },
       { path: "logout", action: logout },
     ],
@@ -115,7 +189,11 @@ const router = createBrowserRouter([
     children: [
       {
         path: "flashcard",
-        element: <FlashcardMode />,
+        element: (
+          <Suspense fallback={loadingIndicator}>
+            <FlashcardMode />
+          </Suspense>
+        ),
         loader: FlashcardLoader,
       },
     ],
