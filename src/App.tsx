@@ -1,4 +1,8 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  Navigate,
+  RouterProvider,
+} from "react-router-dom";
 import Root from "./pages/Root";
 import { ToastContainer } from "react-toastify";
 
@@ -24,6 +28,7 @@ import { loader as FlashcardLoader } from "./pages/study-mode/flashcard/Flashcar
 import { action as NavbarAction } from "./pages/Root";
 import { lazy, Suspense } from "react";
 import { Box, LoadingOverlay } from "@mantine/core";
+import LearnPage from "./pages/study-mode/learn/LearnPage";
 
 const AuthPage = lazy(() => import("./pages/authentication/authpage/AuthPage"));
 const ForgotPassword = lazy(
@@ -194,6 +199,11 @@ const router = createBrowserRouter([
             <FlashcardMode />
           </Suspense>
         ),
+        loader: FlashcardLoader,
+      },
+      {
+        path: "learn",
+        element: <LearnPage />,
         loader: FlashcardLoader,
       },
     ],

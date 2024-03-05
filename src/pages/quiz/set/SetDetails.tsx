@@ -21,11 +21,10 @@ import {
   IconPlayerPlay,
   IconUsers,
 } from "@tabler/icons-react";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import classes from "./SetDetails.module.css";
 import Autoplay from "embla-carousel-autoplay";
 import { toast } from "react-toastify";
-import { UserCredentialsContext } from "../../../store/user-credentials-context";
 
 export interface SetDetails {
   userId: number | null;
@@ -102,13 +101,11 @@ function SetDetails() {
         </div>
         <Divider orientation="vertical" />
         <div className="basis-1/4">
-          <Text>
-            {question.answers.map((answer) => (
-              <Text key={answer.content} fw={700}>
-                {answer.isCorrect && answer.content}
-              </Text>
-            ))}
-          </Text>
+          {question.answers.map((answer) => (
+            <Text key={answer.content} fw={700}>
+              {answer.isCorrect && answer.content}
+            </Text>
+          ))}
         </div>
       </Group>
     </Paper>
@@ -179,7 +176,9 @@ function SetDetails() {
                 Flashcard
               </Link>
             </Button>
-            <Button variant="filled">Learn</Button>
+            <Button variant="filled">
+              <Link to={`/${loaderData?.quizId}/study/learn/`}>Learn</Link>
+            </Button>
             <Button variant="filled">Practice</Button>
           </Button.Group>
         </Group>

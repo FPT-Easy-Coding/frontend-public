@@ -8,7 +8,7 @@ import {
   Divider,
   UnstyledButton,
 } from "@mantine/core";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { StudyModeContext } from "../../../store/study-mode-context";
 
 function FlashcardSettings({
@@ -18,7 +18,7 @@ function FlashcardSettings({
   opened: boolean;
   close: () => void;
 }) {
-  const { changeSorted, settings } = useContext(StudyModeContext);
+  const { changeFlashcardSorted, settings } = useContext(StudyModeContext);
   return (
     <>
       <Modal
@@ -42,7 +42,7 @@ function FlashcardSettings({
               offLabel="OFF"
               checked={settings.flashcard.isSorted}
               onChange={(e) => {
-                changeSorted(e.currentTarget.checked, "Flashcard");
+                changeFlashcardSorted(e.currentTarget.checked);
               }}
             />
           </Group>
