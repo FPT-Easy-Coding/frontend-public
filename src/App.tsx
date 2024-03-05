@@ -203,7 +203,11 @@ const router = createBrowserRouter([
       },
       {
         path: "learn",
-        element: <LearnPage />,
+        element: (
+          <Suspense fallback={loadingIndicator}>
+            <LearnPage />
+          </Suspense>
+        ),
         loader: FlashcardLoader,
       },
     ],
