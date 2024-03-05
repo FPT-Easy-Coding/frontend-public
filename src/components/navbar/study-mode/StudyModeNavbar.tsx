@@ -5,7 +5,6 @@ import {
   Button,
   Group,
   Menu,
-  Stack,
   Switch,
   Text,
   Tooltip,
@@ -30,10 +29,11 @@ import { QuizInfoContext } from "../../../store/quiz-info-context";
 import { Link } from "react-router-dom";
 import { useDisclosure } from "@mantine/hooks";
 import FlashcardSettings from "../../modal/study-mode/FlashcardSettings";
+import LearnSettings from "../../modal/study-mode/LearnSettings";
 const iconStyle = { width: rem(14), height: rem(14) };
 function StudyModeNavbar() {
-  const { assignStudyMode, mode } = useContext(StudyModeContext);
-  const { name, id } = useContext(QuizInfoContext);
+  const { assignStudyMode, mode, settings } = useContext(StudyModeContext);
+  const { name, id, clearQuizInfo } = useContext(QuizInfoContext);
   const path = window.location.pathname.split("/")[3];
   const [opened, { open, close }] = useDisclosure(false);
   useEffect(() => {
@@ -41,7 +41,7 @@ function StudyModeNavbar() {
     assignStudyMode(capitalizedMode);
   }, [path]);
   const theme = useMantineTheme();
-  const { colorScheme, setColorScheme } = useMantineColorScheme({
+  const { setColorScheme } = useMantineColorScheme({
     keepTransitions: true,
   });
   const computedColorScheme = useComputedColorScheme("light");
@@ -68,6 +68,8 @@ function StudyModeNavbar() {
     switch (mode) {
       case "Flashcard":
         return <FlashcardSettings opened={opened} close={close} />;
+      case "Learn":
+        return <LearnSettings opened={opened} close={close} />;
       default:
         return null;
     }
@@ -97,9 +99,11 @@ function StudyModeNavbar() {
                   Flashcard
                 </Menu.Item>
               </Link>
-              <Menu.Item leftSection={<IconBook style={iconStyle} />}>
-                Learn
-              </Menu.Item>
+              <Link to={`/${id}/study/learn`}>
+                <Menu.Item leftSection={<IconBook style={iconStyle} />}>
+                  Learn
+                </Menu.Item>
+              </Link>
               <Menu.Item leftSection={<IconFileText style={iconStyle} />}>
                 Test
               </Menu.Item>
@@ -113,9 +117,15 @@ function StudyModeNavbar() {
             </Menu.Dropdown>
           </Menu>
           <Link to={`/quiz/set/${id}`}>
-            <Text fw={500} className="ml-6">
-              {name}
-            </Text>
+            {mode === "Flashcard" ? (
+              <Text fw={500} className="ml-6">
+                {name}
+              </Text>
+            ) : mode === "Learn" ? (
+              <Text fw={500} className="ml-6">
+                Round {settings.learn.currentRound}
+              </Text>
+            ) : null}
           </Link>
           <Group>
             <Switch
@@ -146,6 +156,7 @@ function StudyModeNavbar() {
                   size="lg"
                   radius="xl"
                   aria-label="Exit"
+                  onClick={clearQuizInfo}
                 >
                   <IconX style={{ width: "70%", height: "70%" }} stroke={1.5} />
                 </ActionIcon>

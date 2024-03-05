@@ -1,4 +1,8 @@
-import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  Navigate,
+  RouterProvider,
+} from "react-router-dom";
 import Root from "./pages/Root";
 import { ToastContainer } from "react-toastify";
 
@@ -33,6 +37,7 @@ import CreateQuizPage from "./pages/quiz/create_form/CreateQuizPage";
 import StudyModeRoot from "./pages/study-mode/StudyModeRoot";
 import { loader as FlashcardLoader } from "./pages/study-mode/flashcard/FlashcardPage";
 import { action as NavbarAction } from "./pages/Root";
+import LearnPage from "./pages/study-mode/learn/LearnPage";
 
 const router = createBrowserRouter([
   {
@@ -116,6 +121,11 @@ const router = createBrowserRouter([
       {
         path: "flashcard",
         element: <FlashcardMode />,
+        loader: FlashcardLoader,
+      },
+      {
+        path: "learn",
+        element: <LearnPage />,
         loader: FlashcardLoader,
       },
     ],
