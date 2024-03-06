@@ -13,7 +13,17 @@ import {
 } from "@mantine/core";
 import { IconPlaylistAdd, IconPlus, IconTrash } from "@tabler/icons-react";
 
-const QuestionBox = ({ question, index, onDelete, onChange }) => {
+const QuestionBox = ({
+  question,
+  index,
+  onDelete,
+  onChange,
+}: {
+  question: any;
+  index: number;
+  onDelete: any;
+  onChange: any;
+}) => {
   const [showOptions, setShowOptions] = useState(false);
 
   const toggleOptions = () => {
@@ -100,7 +110,7 @@ const QuizCreateForm = () => {
     questions: [{ question: "", options: [""], correctAnswer: "" }],
   });
 
-  const handleChange = (e, index, field) => {
+  const handleChange = (e: any, index: number, field: string) => {
     const { name, value } = e.target;
     const updatedQuestions = [...quiz.questions];
     if (field === "question") {
@@ -123,13 +133,13 @@ const QuizCreateForm = () => {
     });
   };
 
-  const handleDeleteQuestion = (index) => {
+  const handleDeleteQuestion = (index: number) => {
     const updatedQuestions = [...quiz.questions];
     updatedQuestions.splice(index, 1);
     setQuiz({ ...quiz, questions: updatedQuestions });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: any) => {
     e.preventDefault();
     console.log(quiz);
   };
