@@ -1,5 +1,6 @@
 import {
   createBrowserRouter,
+  redirect,
   RouterProvider,
 } from "react-router-dom";
 import Root from "./pages/Root";
@@ -13,6 +14,7 @@ import logout from "./utils/loader/auth/logout";
 import {
   checkAuth,
   getAuthCredentials,
+  isLoggedIn,
   preventAuth,
 } from "./utils/loader/auth/auth";
 import "@mantine/core/styles.css";
@@ -75,7 +77,16 @@ const router = createBrowserRouter([
     element: <Root />,
     errorElement: <ErrorPage />,
     children: [
-      { index: true, element: <Homepage /> },
+      {
+        index: true,
+        element: <Homepage />,
+        loader: async () => {
+          if (isLoggedIn()) {
+            return redirect("/home");
+          }
+          return null;
+        },
+      },
       {
         path: "auth",
         element: (

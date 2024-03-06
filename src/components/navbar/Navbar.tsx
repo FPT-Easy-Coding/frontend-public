@@ -149,7 +149,7 @@ function Navbar() {
   const [classOpened, { open: classOpen, close: classClose }] =
     useDisclosure(false);
 
-  const { assignUserCredentials, clearUserCredentials, info } = useContext(
+  const { assignUserCredentials, clearUserCredentials } = useContext(
     UserCredentialsContext
   );
   const mode = useSearchParams()[0].get("mode");
