@@ -79,7 +79,6 @@ function SetDetails() {
   const autoplay = useRef(Autoplay({ delay: 5000 }));
   const [isAutoPlaying, setIsAutoPlaying] = useState(false);
   const [userRating, setUserRating] = useState<UserRating | null>();
-  const [currentRating, setCurrentRating] = useState(0);
 
   if (!isAutoPlaying) {
     autoplay.current.stop();
@@ -204,16 +203,16 @@ function SetDetails() {
             <Badge
               leftSection={<IconUsers size={14} />}
             >{`${loaderData?.view} views`}</Badge>
-            <Group gap={"xs"}>
-              <Text className="text-sm">{loaderData?.rate}</Text>
-              <IconStar size={14} color="yellow" />
-            </Group>
+
+            <Badge
+              leftSection={<IconStar size={14} color="yellow" />}
+            >{`${loaderData?.rate}`}</Badge>
 
             {userRating?.isRated && (
               <Badge color="orange">{`Your rating: ${userRating?.rate}`}</Badge>
             )}
 
-            <Button variant="subtle" size="compact-sm" onClick={() => open()}>
+            <Button variant="light" size="compact-sm" onClick={() => open()}>
               Leave your rating
             </Button>
           </Group>
