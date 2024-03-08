@@ -23,7 +23,10 @@ import {
   forgotPasswordAction,
   resetPasswordAction,
 } from "./utils/action/forgot-password/ForgotPasswordAction";
-import { loader as SetLoader } from "./pages/quiz/set/SetDetails";
+import {
+  loader as SetLoader,
+  action as SetAction,
+} from "./pages/quiz/set/SetDetails";
 import StudyModeRoot from "./pages/study-mode/StudyModeRoot";
 import { loader as FlashcardLoader } from "./pages/study-mode/flashcard/FlashcardPage";
 import { action as NavbarAction } from "./pages/Root";
@@ -38,7 +41,15 @@ const ForgotPassword = lazy(
 const ResetPassword = lazy(
   () => import("./pages/authentication/forgot-password/ResetPassword")
 );
-const UserDashboard = lazy(() => import("./pages/after_login/UserDashboard"));
+// const UserDashboard = lazy(() => import("./pages/after_login/UserDashboard"));
+const UserDashboard = lazy<React.ComponentType<any>>(() => {
+  return new Promise((resolve) => {
+    setTimeout(
+      () => resolve(import("./pages/after_login/UserDashboard")),
+      1500
+    );
+  });
+});
 
 const ProfilePage = lazy(() => import("./pages/account/user/ProfilePage"));
 
@@ -53,16 +64,11 @@ const FlashcardMode = lazy(
   () => import("./pages/study-mode/flashcard/FlashcardPage")
 );
 const loadingIndicator = (
-  <Box
-    pos={"relative"}
-    h={"100vh"}
-    w={"100vw"}
-    className="items-center justify-center"
-  >
+  <Box pos={"relative"} h={"100vh"} w={"100vw"}>
     <LoadingOverlay
       visible
-      zIndex={1000}
-      overlayProps={{ radius: "sm", blur: 2 }}
+      zIndex={0}
+      overlayProps={{ radius: "sm", blur: 0, backgroundOpacity: 0 }}
       loaderProps={{ color: "orange", type: "oval" }}
     />
   </Box>
@@ -140,7 +146,7 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: "class/:id",
+        path: "class/:id/:tab",
         children: [
           {
             index: true,
@@ -190,6 +196,7 @@ const router = createBrowserRouter([
               </Suspense>
             ),
             loader: SetLoader,
+            action: SetAction,
           },
         ],
       },

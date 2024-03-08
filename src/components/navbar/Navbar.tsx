@@ -154,7 +154,7 @@ function Navbar() {
   );
   const mode = useSearchParams()[0].get("mode");
   const data: LoaderData = useLoaderData() as LoaderData;
-  const actionData = useActionData() as { success: boolean; msg: string };
+  // const actionData = useActionData() as { success: boolean; msg: string };
   useEffect(() => {
     if (data !== null) {
       assignUserCredentials({
@@ -163,14 +163,14 @@ function Navbar() {
     }
   }, [data]);
 
-  useEffect(() => {
-    if (actionData?.success) {
-      toast.success(actionData.msg);
-    }
-    if (!actionData?.success) {
-      toast.error(actionData?.msg);
-    }
-  }, [actionData]);
+  // useEffect(() => {
+  //   if (actionData?.success) {
+  //     toast.success(actionData.msg);
+  //   }
+  //   if (!actionData?.success) {
+  //     toast.error(actionData?.msg);
+  //   }
+  // }, [actionData]);
   const submit = useSubmit();
   const { colorScheme, setColorScheme } = useMantineColorScheme({
     keepTransitions: true,

@@ -1,6 +1,8 @@
 import { Button, Modal, Stack, TextInput } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
-import { Form, useSubmit } from "react-router-dom";
+import { useEffect } from "react";
+import { useFetcher } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function FolderModal({
   opened,
@@ -9,7 +11,22 @@ function FolderModal({
   opened: boolean;
   close: () => void;
 }) {
-  const submit = useSubmit();
+  const fetcher = useFetcher();
+  const { data, state } = fetcher;
+  const isSubmitting = state === "submitting";
+
+  useEffect(() => {
+    if (data?.success) {
+      toast.success(data?.msg);
+    }
+    if (!data?.success) {
+      toast.error(data?.msg);
+    }
+    setTimeout(() => {
+      close();
+    }, 1500);
+  }, [data]);
+
   const form = useForm({
     initialValues: {
       folderTitle: "",
@@ -22,16 +39,15 @@ function FolderModal({
   return (
     <>
       <Modal
-        radius={"lg"}
         opened={opened}
         onClose={close}
         centered
         size="xl"
         title="Create a new folder"
       >
-        <Form
+        <fetcher.Form
           onSubmit={form.onSubmit(() => {
-            submit(
+            fetcher.submit(
               {
                 folderTitle: form.values.folderTitle,
                 folderDescription: form.values.folderDescription,
@@ -44,13 +60,11 @@ function FolderModal({
           <Stack gap={"md"}>
             <TextInput
               placeholder="Enter folder title"
-              variant="filled"
               name="folderTitle"
               {...form.getInputProps("folderTitle")}
             />
             <TextInput
               placeholder="Enter a description (optional)"
-              variant="filled"
               name="folderDescription"
               {...form.getInputProps("folderDescription")}
             />
@@ -59,11 +73,13 @@ function FolderModal({
               type="submit"
               name="action"
               value="create-folder"
+              loading={isSubmitting}
+              disabled={isSubmitting}
             >
               Create folder
             </Button>
           </Stack>
-        </Form>
+        </fetcher.Form>
       </Modal>
     </>
   );

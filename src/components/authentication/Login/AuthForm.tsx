@@ -25,6 +25,7 @@ import {
 } from "react-router-dom";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
+import DocumentTitle from "../../document-title/DocumentTitle";
 
 interface ResData {
   error: boolean | string | null;
@@ -39,6 +40,7 @@ export default function AuthForm(props: PaperProps) {
   const [searchParams] = useSearchParams();
   const isLogin = searchParams.get("mode") === "login";
   const isSubmitting = navigation.state === "submitting";
+  DocumentTitle(`QuizToast | ${upperFirst(isLogin ? "Login" : "Register")}`);
 
   let validationLogin = () => {
     return {
@@ -233,7 +235,11 @@ export default function AuthForm(props: PaperProps) {
                     ? "Already have an account? Login"
                     : "Don't have an account? Register"}
                 </Link>
-                <Link to="/forgotten" className="text-blue-600 text-sm" onClick={() => form.reset()}>
+                <Link
+                  to="/forgotten"
+                  className="text-blue-600 text-sm"
+                  onClick={() => form.reset()}
+                >
                   Forgot your password?
                 </Link>
               </Stack>

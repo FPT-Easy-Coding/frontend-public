@@ -25,7 +25,6 @@ const QUESTION_PER_ROUND = 5;
 function MultipleChoices({ data }: { data: QuizData }) {
   const { changeRoundIndicator, settings } = useContext(StudyModeContext);
   const { assignQuizInfo } = useContext(QuizInfoContext);
-  const questionsData = [...(data.questions ?? [])];
   const [quizData, setQuizData] = useState([...(data.questions ?? [])]);
 
   const CORRECT_SENTENCE = CORRECT_SENTENCES.sort(() => Math.random() - 0.5)[0];

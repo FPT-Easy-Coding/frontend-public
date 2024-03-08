@@ -64,6 +64,7 @@ export async function fetchUserCreatedStudySetsData(userId: number) {
 }
 function FolderPage() {
   const { id } = useParams();
+
   return <Folder folderId={Number(id)} />;
 }
 

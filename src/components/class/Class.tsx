@@ -52,9 +52,8 @@ import {
   addQuizToClassApi,
   removeQuizFromClassApi,
 } from "../../pages/class/ClassPage";
-import { Link } from "react-router-dom";
-const iconStyle = { width: rem(12), height: rem(12) };
-function Class({ classId }: { classId: number }) {
+import { Link, useNavigate } from "react-router-dom";
+function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
   const iconSearch = <IconSearch style={{ width: rem(16), height: rem(16) }} />;
   const [inviteModalOpened, setInviteModalOpened] = useState(false);
   const [addSetsModalOpened, setAddSetsModalOpened] = useState(false);
@@ -71,12 +70,12 @@ function Class({ classId }: { classId: number }) {
   const uid = Number(localStorage.getItem("uid"));
   // Find common quiz IDs between studySets and studyUserCreatedSets
   const [commonQuizIds, setCommonQuizIds] = useState<number[]>([]);
+  const navigate = useNavigate();
 
   const inviteMembers = () => {
-    // Logic to create a folder
     console.log("invite", jsonContent);
-    // You can put your logic here to create the folder
   };
+
   useEffect(() => {
     fetchStudySets(classId);
     fetchClassEntityData(classId);
@@ -375,25 +374,27 @@ function Class({ classId }: { classId: number }) {
           <Grid.Col span={8}>
             <Stack gap={"lg"}>
               <Group>
-                <Text c={"dimmed"}>0 sets</Text>
+                <Text c={"dimmed"}>{`${classData?.numberOfQuizSet} sets`}</Text>
                 <Divider orientation="vertical" />
-                <Text>created by</Text>
-                <Group gap={0}>
-                  <Avatar size={"sm"} />
-                  <Text>{classData?.teacherName}</Text>
+                <Group gap={"md"}>
+                  <Text c={"dimmed"}>created by</Text>
+                  <Group gap={"xs"}>
+                    <Avatar size={"sm"} />
+                    <Text>{classData?.teacherName}</Text>
+                  </Group>
                 </Group>
               </Group>
               <Group className="justify-between">
                 <Group>
                   <IconUsers size={35} color="blue" />
-                  <Text className="font-bold text-3xl uppercase">
+                  <Text className="font-bold text-3xl">
                     {classData?.className}
                   </Text>
                 </Group>
 
                 <Menu shadow="md" width={200}>
                   <Menu.Target>
-                    <Button variant="light" color="gray" className="w-[50px]">
+                    <Button variant="light" color="gray">
                       <IconDots />
                     </Button>
                   </Menu.Target>
@@ -495,7 +496,11 @@ function Class({ classId }: { classId: number }) {
                   </Menu.Dropdown>
                 </Menu>
               </Group>
-              <Tabs color="indigo" defaultValue="gallery">
+              <Tabs
+                color="indigo"
+                value={tab}
+                onChange={(value) => navigate(`/class/${classId}/${value}`)}
+              >
                 <Tabs.List>
                   <Tabs.Tab value="sets">Sets</Tabs.Tab>
                   <Tabs.Tab value="members">Members</Tabs.Tab>
@@ -573,7 +578,7 @@ function Class({ classId }: { classId: number }) {
 
                 <Tabs.Panel value="members">
                   {isLoading ? (
-                    <LoadingOverlay visible={true} zIndex={1000} />
+                    <LoadingOverlay visible={true} />
                   ) : (
                     <Stack gap={"sm"} className="mt-5">
                       <Paper
@@ -581,7 +586,7 @@ function Class({ classId }: { classId: number }) {
                         shadow="lg"
                         radius="md"
                         withBorder
-                        p="xl"
+                        p="md"
                       >
                         <Group>
                           <Avatar
@@ -610,7 +615,7 @@ function Class({ classId }: { classId: number }) {
                           shadow="lg"
                           radius="md"
                           withBorder
-                          p="xl"
+                          p="lg"
                         >
                           <Group>
                             <Avatar

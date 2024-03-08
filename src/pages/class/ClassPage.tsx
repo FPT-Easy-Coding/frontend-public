@@ -112,8 +112,8 @@ export const removeQuizFromClassApi = async (
 };
 
 function ClassPage() {
-  const { id } = useParams();
-  return <Class classId={Number(id)} />;
+  const { id, tab } = useParams();
+  return <Class classId={Number(id)} tab={tab} />;
 }
 
 export default ClassPage;

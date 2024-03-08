@@ -1,9 +1,11 @@
 import { Container, Title, Text, Stack } from "@mantine/core";
+import DocumentTitle from "../../document-title/DocumentTitle";
 
 function Sent({ forgotEmail }: { forgotEmail: string }) {
   const encryptedEmail = `${forgotEmail.charAt(0)}***${forgotEmail.slice(
     forgotEmail.indexOf("@")
   )}`;
+  DocumentTitle("QuizToast | Forgot Password");
   return (
     <>
       <Container size="xs">

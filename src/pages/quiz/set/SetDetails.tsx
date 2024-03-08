@@ -9,7 +9,6 @@ import {
   Group,
   Paper,
   Progress,
-  Rating,
   Stack,
   Text,
   Title,
@@ -19,12 +18,25 @@ import axios from "axios";
 import {
   IconPlayerPause,
   IconPlayerPlay,
+  IconStar,
   IconUsers,
 } from "@tabler/icons-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import classes from "./SetDetails.module.css";
 import Autoplay from "embla-carousel-autoplay";
 import { toast } from "react-toastify";
+import RatingModal from "../../../components/modal/set-details/RatingModal";
+import { useDisclosure } from "@mantine/hooks";
+import DocumentTitle from "../../../components/document-title/DocumentTitle";
+import { UserCredentialsContext } from "../../../store/user-credentials-context";
+
+export interface UserRating {
+  userId: number;
+  quizId: number;
+  rate: number;
+  createAt: Date | null;
+  isRated: boolean;
+}
 
 export interface SetDetails {
   userId: number | null;
@@ -56,18 +68,39 @@ export interface SetDetails {
     | null;
 }
 function SetDetails() {
+  const { info } = useContext(UserCredentialsContext);
   const loaderData = useLoaderData() as SetDetails;
+  DocumentTitle(`${loaderData?.quizName}`);
   const questionsData = loaderData?.questions;
+  const [opened, { open, close }] = useDisclosure();
   const [isQuestion, setIsQuestion] = useState(true);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [embla, setEmbla] = useState<Embla | null>(null);
   const autoplay = useRef(Autoplay({ delay: 5000 }));
   const [isAutoPlaying, setIsAutoPlaying] = useState(false);
+  const [userRating, setUserRating] = useState<UserRating | null>();
+  const [currentRating, setCurrentRating] = useState(0);
 
   if (!isAutoPlaying) {
     autoplay.current.stop();
   } else {
     autoplay.current.reset();
+  }
+
+  useEffect(() => {
+    checkRating(info?.userId, loaderData?.quizId);
+  }, []);
+
+  async function checkRating(uid: number | undefined, qid: number | null) {
+    const res = await axios.get(
+      `http://localhost:8080/api/v1/quiz/get-rating?user-id=${uid}&quiz-id=${qid}`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("AT")}`,
+        },
+      }
+    );
+    setUserRating(res.data);
   }
 
   const handleScroll = useCallback(() => {
@@ -76,16 +109,16 @@ function SetDetails() {
     setScrollProgress(progress * 100);
   }, [embla, setScrollProgress]);
 
+  function handleFlashcardClick() {
+    setIsQuestion(!isQuestion);
+  }
+
   useEffect(() => {
     if (embla) {
       embla.on("scroll", handleScroll);
       handleScroll();
     }
   }, [embla]);
-
-  function handleFlashcardClick() {
-    setIsQuestion(!isQuestion);
-  }
 
   useEffect(() => {
     isAutoPlaying
@@ -112,7 +145,7 @@ function SetDetails() {
   ));
 
   const flashcards = questionsData?.map((question, index) => (
-    <Carousel.Slide>
+    <Carousel.Slide key={index}>
       {isQuestion ? (
         <Paper
           shadow="md"
@@ -121,7 +154,6 @@ function SetDetails() {
           withBorder
           h={"100%"}
           className="flex flex-col items-center justify-center"
-          key={index}
           onClick={() => handleFlashcardClick()}
         >
           <Text className="text-3xl text-justify" fw={600}>
@@ -151,6 +183,16 @@ function SetDetails() {
 
   return (
     <>
+      <RatingModal
+        opened={opened}
+        close={close}
+        isRated={userRating?.isRated}
+        userId={info?.userId as number}
+        quizId={loaderData?.quizId as number}
+        setUserRating={
+          setUserRating as React.Dispatch<React.SetStateAction<UserRating>>
+        }
+      />
       <Container>
         {/* infomation section */}
         <Stack>
@@ -159,13 +201,21 @@ function SetDetails() {
           </Text>
           <Title order={1}>{loaderData?.quizName}</Title>
           <Group>
-            <Badge leftSection={<IconUsers size={14} />}>999 learners</Badge>
-            <Rating
-              size={"sm"}
-              value={loaderData?.rate}
-              fractions={2}
-              readOnly
-            />
+            <Badge
+              leftSection={<IconUsers size={14} />}
+            >{`${loaderData?.view} views`}</Badge>
+            <Group gap={"xs"}>
+              <Text className="text-sm">{loaderData?.rate}</Text>
+              <IconStar size={14} color="yellow" />
+            </Group>
+
+            {userRating?.isRated && (
+              <Badge color="orange">{`Your rating: ${userRating?.rate}`}</Badge>
+            )}
+
+            <Button variant="subtle" size="compact-sm" onClick={() => open()}>
+              Leave your rating
+            </Button>
           </Group>
         </Stack>
         {/* Button section */}
@@ -257,13 +307,66 @@ export async function loader({ params }: { params: Readonly<Params> }) {
       .catch(() => {
         throw new Error("Error while fetching data");
       });
-    console.log(res.data);
     return res.data;
   } catch (error) {
     if (error instanceof Error) {
       return {
         error: true,
         message: error.message,
+      };
+    }
+  }
+}
+
+export async function action({ request }: { request: Request }) {
+  try {
+    let res;
+    const data = Object.fromEntries(await request.formData());
+    const AT = "Bearer " + localStorage.getItem("AT");
+    const action = data.action;
+    const payload = {
+      quizId: Number(data.quizId),
+      userId: Number(data.userId),
+      rate: Number(data.rate),
+    };
+
+    switch (action) {
+      case "create-rating":
+        res = await axios
+          .post(`http://localhost:8080/api/v1/quiz/create-rating`, payload, {
+            headers: {
+              Authorization: AT,
+            },
+          })
+          .catch(() => {
+            throw new Error("Cannot creating rating");
+          });
+        return {
+          success: true,
+          msg: "Success",
+        };
+      case "update-rating":
+        res = await axios
+          .put(`http://localhost:8080/api/v1/quiz/update-rating`, payload, {
+            headers: {
+              Authorization: AT,
+            },
+          })
+          .catch(() => {
+            throw new Error("Cannot update rating");
+          });
+        return {
+          success: true,
+          msg: "Updated",
+        };
+      default:
+        throw new Error("Invalid action");
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      return {
+        success: false,
+        error: error.message,
       };
     }
   }

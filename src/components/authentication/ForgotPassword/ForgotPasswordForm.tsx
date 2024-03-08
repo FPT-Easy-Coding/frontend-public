@@ -7,12 +7,14 @@ import {
   useNavigation,
   useSubmit,
 } from "react-router-dom";
+import DocumentTitle from "../../document-title/DocumentTitle";
 
 function ForgotPasswordForm({
   setForgotEmail,
 }: {
   setForgotEmail: Dispatch<SetStateAction<string>>;
 }) {
+  DocumentTitle("QuizToast | Forgot Password");
   const submit = useSubmit();
   const actionData = useActionData() as { hasEmail: boolean };
   const navigation = useNavigation();
