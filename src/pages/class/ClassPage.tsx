@@ -113,7 +113,9 @@ export const removeQuizFromClassApi = async (
 
 function ClassPage() {
   const { id, tab } = useParams();
-  return <Class classId={Number(id)} tab={tab} />;
+  const validTabs = ["sets", "members"];
+  const checkedTab = validTabs.includes(tab as string) ? tab : "sets";
+  return <Class classId={Number(id)} tab={checkedTab} />;
 }
 
 export default ClassPage;

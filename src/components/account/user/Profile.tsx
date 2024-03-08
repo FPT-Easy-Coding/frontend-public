@@ -257,7 +257,7 @@ export default function Profile({
           {isLoading
             ? loadingIndicator
             : classes.map((classItem, index) => (
-                <Link to={`/class/${classItem.classId}`} key={index}>
+                <Link to={`/class/${classItem.classId}/sets`} key={index}>
                   <Paper
                     key={index}
                     className="mt-3"
