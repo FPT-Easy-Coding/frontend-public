@@ -18,6 +18,16 @@ export interface ClassData {
   teacherName: string;
   slugCode: string;
 }
+export interface Questions {
+  classQuestionId: number;
+  title: string;
+  content: string;
+  createAt: Date;
+  userName: string;
+  answered: boolean;
+  userFirstName: string;
+  userLastName: string;
+}
 
 export interface UserCreatedStudySet {
   userId: number;
@@ -79,7 +89,16 @@ export async function fetchMembersData(classId: number) {
     throw new Error("Error fetching class members");
   }
 }
-
+export async function fetchQuestionsData(classId: number) {
+  try {
+    const response = await axios.get(
+      `http://localhost:8080/api/v1/classroom/get-classroom-questions/class-id=${classId}`
+    );
+    return response.data.entityResponses;
+  } catch (error) {
+    throw new Error("Error fetching class questions");
+  }
+}
 export async function addQuizToClassApi(classId: number, quizId: number) {
   try {
     const response = await axios.post(

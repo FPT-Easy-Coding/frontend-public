@@ -1,4 +1,5 @@
 import {
+  ActionIcon,
   Avatar,
   Button,
   Container,
@@ -34,6 +35,7 @@ import {
   IconMinus,
   IconPlus,
   IconSearch,
+  IconSend,
   IconSettings,
   IconShare2,
   IconUserPlus,
@@ -51,9 +53,14 @@ import {
   fetchUserCreatedStudySetsData,
   addQuizToClassApi,
   removeQuizFromClassApi,
+  Questions,
+  fetchQuestionsData,
 } from "../../pages/class/ClassPage";
-import { Link, useNavigate } from "react-router-dom";
-function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
+import { format } from "date-fns";
+import { Link } from "react-router-dom";
+
+const iconStyle = { width: rem(12), height: rem(12) };
+function Class({ classId }: { classId: number }) {
   const iconSearch = <IconSearch style={{ width: rem(16), height: rem(16) }} />;
   const [inviteModalOpened, setInviteModalOpened] = useState(false);
   const [addSetsModalOpened, setAddSetsModalOpened] = useState(false);
@@ -62,13 +69,13 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
   const [studyUserCreatedSets, setUserCreatedSets] = useState<StudySet[]>([]);
   const [classData, setClassData] = useState<ClassData | null>(null);
   const [members, setMembers] = useState<Member[]>([]);
+  const [questions, setQuestions] = useState<Questions[]>([]);
   const [isLoading, setLoading] = useState<boolean>(true);
   const [filterOption, setFilterOption] = useState<string>("Latest");
   const [deleteModalOpened, setDeleteModalOpened] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const clipboard = useClipboard();
   const uid = Number(localStorage.getItem("uid"));
-  // Find common quiz IDs between studySets and studyUserCreatedSets
   const [commonQuizIds, setCommonQuizIds] = useState<number[]>([]);
   const navigate = useNavigate();
 
@@ -80,6 +87,7 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
     fetchStudySets(classId);
     fetchClassEntityData(classId);
     fetchMembers(classId);
+    fetchQuestions(classId);
   }, [classId]);
 
   useEffect(() => {
@@ -88,18 +96,13 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
     }
   }, [classData]);
   useEffect(() => {
-    // Check if uid exists
     if (uid) {
-      // Fetch quiz sets associated with the user ID
       fetchUserCreatedStudySets(uid);
     }
   }, [uid]);
   useEffect(() => {
-    // Logic to fetch commonQuizIds or initialize it based on your requirements
-    // This useEffect hook will run whenever studySets or studyUserCreatedSets change
     const updatedCommonQuizIds = studySets
       .filter((set) => {
-        // Check if the quiz ID from studySets exists in studyUserCreatedSets
         return studyUserCreatedSets.some(
           (userSet) => userSet.quizId === set.quizId
         );
@@ -116,6 +119,18 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
       setStudySets(sets);
     } catch (error) {
       console.error("Error fetching study sets:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+  async function fetchQuestions(classId: number) {
+    setLoading(true);
+    try {
+      const questionsData = await fetchQuestionsData(classId);
+      console.log("questions data from server: ", questionsData);
+      setQuestions(questionsData); // Ensure questionsData is an array
+    } catch (error) {
+      console.error("Error fetching questions:", error);
     } finally {
       setLoading(false);
     }
@@ -391,110 +406,110 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
                     {classData?.className}
                   </Text>
                 </Group>
+                <Group className="flex items-center">
+                  <ActionIcon variant="filled" aria-label="Settings">
+                    <IconBellFilled
+                      style={{ width: "70%", height: "70%" }}
+                      stroke={1.5}
+                    />
+                  </ActionIcon>
+                  <Menu shadow="md" width={200}>
+                    <Menu.Target>
+                      <Button variant="light" color="gray" className="w-[50px]">
+                        <IconDots />
+                      </Button>
+                    </Menu.Target>
 
-                <Menu shadow="md" width={200}>
-                  <Menu.Target>
-                    <Button variant="light" color="gray">
-                      <IconDots />
-                    </Button>
-                  </Menu.Target>
+                    <Menu.Dropdown>
+                      <Menu.Label>Actions</Menu.Label>
+                      <Menu.Item
+                        leftSection={
+                          <IconBook
+                            style={{ width: rem(14), height: rem(14) }}
+                          />
+                        }
+                        color="blue"
+                      >
+                        Study
+                      </Menu.Item>
+                      <Menu.Item
+                        leftSection={
+                          <IconShare2
+                            style={{ width: rem(14), height: rem(14) }}
+                          />
+                        }
+                      >
+                        Share
+                      </Menu.Item>
+                      <Menu.Item
+                        leftSection={
+                          <IconAlertTriangleFilled
+                            style={{ width: rem(14), height: rem(14) }}
+                          />
+                        }
+                        color="red"
+                      >
+                        Report
+                      </Menu.Item>
 
-                  <Menu.Dropdown>
-                    <Menu.Label>Actions</Menu.Label>
-                    <Menu.Item
-                      leftSection={
-                        <IconBook style={{ width: rem(14), height: rem(14) }} />
-                      }
-                      color="blue"
-                    >
-                      Study
-                    </Menu.Item>
-                    <Menu.Item
-                      leftSection={
-                        <IconBellFilled
-                          style={{ width: rem(14), height: rem(14) }}
-                        />
-                      }
-                    >
-                      Notification
-                    </Menu.Item>
-                    <Menu.Item
-                      leftSection={
-                        <IconShare2
-                          style={{ width: rem(14), height: rem(14) }}
-                        />
-                      }
-                    >
-                      Share
-                    </Menu.Item>
-                    <Menu.Item
-                      leftSection={
-                        <IconAlertTriangleFilled
-                          style={{ width: rem(14), height: rem(14) }}
-                        />
-                      }
-                      color="red"
-                    >
-                      Report
-                    </Menu.Item>
-
-                    <Menu.Divider />
-                    <Menu.Item>
-                      <Menu trigger="hover" position="right">
-                        <Menu.Target>
-                          <Group className="ml-[2px]">
-                            <IconSettings
-                              style={{ width: rem(14), height: rem(14) }}
-                            />{" "}
-                            Settings
-                          </Group>
-                        </Menu.Target>
-                        <Menu.Dropdown className="ml-2">
-                          <Menu.Item
-                            leftSection={
-                              <IconCirclePlus
+                      <Menu.Divider />
+                      <Menu.Item>
+                        <Menu trigger="hover" position="right">
+                          <Menu.Target>
+                            <Group className="ml-[2px]">
+                              <IconSettings
                                 style={{ width: rem(14), height: rem(14) }}
-                              />
-                            }
-                            onClick={() => setAddSetsModalOpened(true)}
-                          >
-                            Add sets
-                          </Menu.Item>
-                          <Menu.Item
-                            leftSection={
-                              <IconUserPlus
-                                style={{ width: rem(14), height: rem(14) }}
-                              />
-                            }
-                            onClick={() => setInviteModalOpened(true)}
-                          >
-                            Invite members
-                          </Menu.Item>
-                          <Menu.Item
-                            leftSection={
-                              <IconEdit
-                                style={{ width: rem(14), height: rem(14) }}
-                              />
-                            }
-                          >
-                            Edit
-                          </Menu.Item>
-                          <Menu.Item
-                            color="red"
-                            leftSection={
-                              <IconEraser
-                                style={{ width: rem(14), height: rem(14) }}
-                              />
-                            }
-                            onClick={() => setDeleteModalOpened(true)}
-                          >
-                            Delete
-                          </Menu.Item>
-                        </Menu.Dropdown>
-                      </Menu>
-                    </Menu.Item>
-                  </Menu.Dropdown>
-                </Menu>
+                              />{" "}
+                              Settings
+                            </Group>
+                          </Menu.Target>
+                          <Menu.Dropdown className="ml-2">
+                            <Menu.Item
+                              leftSection={
+                                <IconCirclePlus
+                                  style={{ width: rem(14), height: rem(14) }}
+                                />
+                              }
+                              onClick={() => setAddSetsModalOpened(true)}
+                            >
+                              Add sets
+                            </Menu.Item>
+                            <Menu.Item
+                              leftSection={
+                                <IconUserPlus
+                                  style={{ width: rem(14), height: rem(14) }}
+                                />
+                              }
+                              onClick={() => setInviteModalOpened(true)}
+                            >
+                              Invite members
+                            </Menu.Item>
+                            <Menu.Item
+                              leftSection={
+                                <IconEdit
+                                  style={{ width: rem(14), height: rem(14) }}
+                                />
+                              }
+                            >
+                              Edit
+                            </Menu.Item>
+                            <Menu.Item
+                              color="red"
+                              leftSection={
+                                <IconEraser
+                                  style={{ width: rem(14), height: rem(14) }}
+                                />
+                              }
+                              onClick={() => setDeleteModalOpened(true)}
+                            >
+                              Delete
+                            </Menu.Item>
+                          </Menu.Dropdown>
+                        </Menu>
+                      </Menu.Item>
+                    </Menu.Dropdown>
+                  </Menu>
+                </Group>
               </Group>
               <Tabs
                 color="indigo"
@@ -504,6 +519,7 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
                 <Tabs.List>
                   <Tabs.Tab value="sets">Sets</Tabs.Tab>
                   <Tabs.Tab value="members">Members</Tabs.Tab>
+                  <Tabs.Tab value="discussion">Discussion</Tabs.Tab>
                 </Tabs.List>
 
                 <Tabs.Panel value="sets">
@@ -638,6 +654,68 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
                           </Text>
                         </Paper>
                       ))}
+                    </Stack>
+                  )}
+                </Tabs.Panel>
+                <Tabs.Panel value="discussion">
+                  {isLoading ? (
+                    <LoadingOverlay visible={true} zIndex={1000} />
+                  ) : (
+                    <Stack gap={"sm"} className="mt-5">
+                      {Array.isArray(questions) &&
+                        questions.map((question, index) => (
+                          <Paper
+                            key={index}
+                            className="mt-3"
+                            shadow="lg"
+                            radius="md"
+                            withBorder
+                            p="xl"
+                          >
+                            <Group>
+                              <Avatar
+                                src={null}
+                                alt={`Avatar of ${question.userFirstName} ${question.userLastName}`}
+                                size={"lg"}
+                              >
+                                {`${question.userFirstName
+                                  .charAt(0)
+                                  .toUpperCase()}${question.userLastName
+                                  .charAt(0)
+                                  .toUpperCase()}`}
+                              </Avatar>
+                              <Stack gap={0}>
+                                <Text className="font-semibold text-md">
+                                  {`${question.userFirstName} ${question.userLastName}`}
+                                </Text>
+                                <Text className="text-xs">
+                                  {format(question.createAt, "MM/dd/yyyy")}
+                                </Text>
+                              </Stack>
+                            </Group>
+                            <Stack className="my-5">
+                              <Text className="font-bold text-xl">
+                                {question.title}
+                              </Text>
+                              <Text className="font-normal text-sm">
+                                {question.content}
+                              </Text>
+                            </Stack>
+                            <Group>
+                              <Input
+                                radius="xl"
+                                placeholder="Comment"
+                                className="w-[90%]"
+                              />
+                              <Button variant="white">
+                                <IconSend
+                                  style={{ width: rem(20), height: rem(20) }}
+                                  stroke={1.5}
+                                />
+                              </Button>
+                            </Group>
+                          </Paper>
+                        ))}
                     </Stack>
                   )}
                 </Tabs.Panel>
