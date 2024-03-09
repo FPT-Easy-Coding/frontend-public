@@ -28,7 +28,20 @@ export interface Questions {
   userFirstName: string;
   userLastName: string;
 }
+export interface RepliesComment {
+  userName: string;
+  content: string;
+  replyCommentId: number;
+  commentId: number;
+}
 
+export interface Comments {
+  commentId: number;
+  questionId: number;
+  userName: string;
+  content: string;
+  replyComments: RepliesComment[];
+}
 export interface UserCreatedStudySet {
   userId: number;
   quizId: number;
@@ -99,6 +112,17 @@ export async function fetchQuestionsData(classId: number) {
     throw new Error("Error fetching class questions");
   }
 }
+
+export async function fetchCommentsData(questionId: number) {
+  try {
+    const response = await axios.get(
+      `http://localhost:8080/api/v1/classroom/get-comments/question-id=${questionId}`
+    );
+    return response.data.entityResponses;
+  } catch (error) {
+    throw new Error("Error fetching questions comments");
+  }
+}
 export async function addQuizToClassApi(classId: number, quizId: number) {
   try {
     const response = await axios.post(
@@ -132,7 +156,7 @@ export const removeQuizFromClassApi = async (
 
 function ClassPage() {
   const { id, tab } = useParams();
-  const validTabs = ["sets", "members"];
+  const validTabs = ["sets", "members", "discussion"];
   const checkedTab = validTabs.includes(tab as string) ? tab : "sets";
   return <Class classId={Number(id)} tab={checkedTab} />;
 }
