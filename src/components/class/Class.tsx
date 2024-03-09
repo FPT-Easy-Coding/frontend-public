@@ -57,10 +57,10 @@ import {
   fetchQuestionsData,
 } from "../../pages/class/ClassPage";
 import { format } from "date-fns";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const iconStyle = { width: rem(12), height: rem(12) };
-function Class({ classId }: { classId: number }) {
+function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
   const iconSearch = <IconSearch style={{ width: rem(16), height: rem(16) }} />;
   const [inviteModalOpened, setInviteModalOpened] = useState(false);
   const [addSetsModalOpened, setAddSetsModalOpened] = useState(false);
