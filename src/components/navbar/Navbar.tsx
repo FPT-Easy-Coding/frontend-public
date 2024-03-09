@@ -37,6 +37,8 @@ import ClassModal from "../modal/navbar/create/ClassModal";
 import { toast } from "react-toastify";
 
 const userBtn = (data: LoaderData, submit: any, handleLogout: () => void) => {
+  const userCredentialsContext = useContext(UserCredentialsContext);
+  const cleanBase64Image = userCredentialsContext.info?.avatar.replace(/^"(.*)"$/, '$1');
   return (
     <>
       <Menu shadow="md" width={200}>
@@ -47,6 +49,7 @@ const userBtn = (data: LoaderData, submit: any, handleLogout: () => void) => {
               radius="xl"
               color="grape"
               className="cursor-pointer"
+              src={cleanBase64Image}
             />
             <Text className="text-sm font-semibold">
               {data ? data.firstName + " " + data.lastName : "Guest"}
@@ -65,15 +68,16 @@ const userBtn = (data: LoaderData, submit: any, handleLogout: () => void) => {
               Profile
             </Menu.Item>
           </NavLink>
+          <NavLink to={"/user/settings"}>
+            <Menu.Item
 
-          <Menu.Item
-            leftSection={
-              <IconSettings style={{ width: rem(14), height: rem(14) }} />
-            }
-          >
-            Settings
-          </Menu.Item>
-
+              leftSection={
+                <IconSettings style={{ width: rem(14), height: rem(14) }} />
+              }
+            >
+              Settings
+            </Menu.Item>
+          </NavLink>
           <Menu.Item
             leftSection={
               <IconPremiumRights style={{ width: rem(14), height: rem(14) }} />
@@ -185,7 +189,7 @@ function Navbar() {
       : userBtn(data, submit, clearUserCredentials);
   const whichHomepage = data?.error || !data ? "/" : "/home";
 
-  useEffect(() => {});
+  useEffect(() => { });
   return (
     <>
       <header className="w-full h-16 flex items-center justify-between sticky top-0 z-20 shadow-sm bg-[--mantine-color-body]">
