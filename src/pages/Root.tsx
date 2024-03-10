@@ -30,7 +30,7 @@ export async function action({ request }: { request: Request }) {
     const action = data.action;
     const payload = {
       folderName: data.folderTitle,
-      userId: localStorage.getItem("uid"),
+      userId: Number(localStorage.getItem("uid")),
     };
 
     if (action === "create-folder") {

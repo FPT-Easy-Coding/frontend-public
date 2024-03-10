@@ -33,6 +33,7 @@ import { action as NavbarAction } from "./pages/Root";
 import { lazy, Suspense } from "react";
 import { Box, LoadingOverlay } from "@mantine/core";
 import LearnPage from "./pages/study-mode/learn/LearnPage";
+import { createQuizAction } from "./pages/quiz/create_form/CreateQuizPage";
 
 const AuthPage = lazy(() => import("./pages/authentication/authpage/AuthPage"));
 const ForgotPassword = lazy(
@@ -160,9 +161,11 @@ const router = createBrowserRouter([
       },
       {
         path: "create-quiz",
+        loader: checkAuth,
         children: [
           {
             index: true,
+            action: createQuizAction,
             element: (
               <Suspense fallback={loadingIndicator}>
                 <CreateQuizPage />
