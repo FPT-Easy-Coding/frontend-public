@@ -18,7 +18,7 @@ import axios from "axios";
 import {
   IconPlayerPause,
   IconPlayerPlay,
-  IconStar,
+  IconStarFilled,
   IconUsers,
 } from "@tabler/icons-react";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
@@ -79,6 +79,7 @@ function SetDetails() {
   const autoplay = useRef(Autoplay({ delay: 5000 }));
   const [isAutoPlaying, setIsAutoPlaying] = useState(false);
   const [userRating, setUserRating] = useState<UserRating | null>();
+  const [averageRate, setAverageRate] = useState(0);
 
   if (!isAutoPlaying) {
     autoplay.current.stop();
@@ -88,7 +89,8 @@ function SetDetails() {
 
   useEffect(() => {
     checkRating(info?.userId, loaderData?.quizId);
-  }, []);
+    getAverageRate(loaderData?.quizId);
+  }, [opened]);
 
   async function checkRating(uid: number | undefined, qid: number | null) {
     const res = await axios.get(
@@ -100,6 +102,18 @@ function SetDetails() {
       }
     );
     setUserRating(res.data);
+  }
+
+  async function getAverageRate(qid: number | null) {
+    const res = await axios.get(
+      `http://localhost:8080/api/v1/quiz/get-average-rate-quiz?id=${qid}`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("AT")}`,
+        },
+      }
+    );
+    setAverageRate(res.data);
   }
 
   const handleScroll = useCallback(() => {
@@ -205,8 +219,8 @@ function SetDetails() {
             >{`${loaderData?.view} views`}</Badge>
 
             <Badge
-              leftSection={<IconStar size={14} color="yellow" />}
-            >{`${loaderData?.rate}`}</Badge>
+              leftSection={<IconStarFilled size={14} color="yellow" />}
+            >{`${averageRate}`}</Badge>
 
             {userRating?.isRated && (
               <Badge color="orange">{`Your rating: ${userRating?.rate}`}</Badge>
