@@ -205,8 +205,32 @@ const QuizCreateForm: React.FC = () => {
       return;
     }
 
-    // Proceed with form submission
-    console.log("Form data submitted:", quiz);
+    try {
+      const response = await fetch(
+        "http://localhost:8080/api/v1/quiz/create-quiz-set",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: quiz.userId,
+            title: quiz.title,
+            description: quiz.description,
+            questions: quiz.questions,
+          }),
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to create quiz set");
+      }
+
+      const data = await response.json();
+      console.log("Quiz set created:", data);
+    } catch (error: any) {
+      console.error("Error creating quiz set:", error.message);
+      alert("Error creating quiz set. Please try again.");
+    }
   };
 
   const handleAddAnswer = (index: number) => {
