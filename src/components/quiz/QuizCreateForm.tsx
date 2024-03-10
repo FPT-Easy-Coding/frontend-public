@@ -11,7 +11,6 @@ import {
   Checkbox,
 } from "@mantine/core";
 import {
-  IconCodeMinus,
   IconMinus,
   IconPlaylistAdd,
   IconPlus,
@@ -19,9 +18,34 @@ import {
 } from "@tabler/icons-react";
 import _debounce from "lodash/debounce";
 import _throttle from "lodash/throttle";
-import axios from "axios";
+import { Form } from "react-router-dom";
 
-const QuestionBox = ({
+interface Answer {
+  content: string;
+  isCorrect: boolean;
+}
+
+interface Question {
+  question: string;
+  answers: Answer[];
+}
+
+interface QuestionBoxProps {
+  question: Question;
+  index: number;
+  onDelete: (index: number) => void;
+  onChange: (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index: number,
+    field: string,
+    answerIndex?: number
+  ) => void;
+  onAddAnswer: (index: number) => void;
+  onRemoveAnswer: (index: number, answerIndex: number) => void;
+  onSelectCorrectAnswer: (index: number, answerIndex: number) => void;
+}
+
+const QuestionBox: React.FC<QuestionBoxProps> = ({
   question,
   index,
   onDelete,
@@ -34,26 +58,12 @@ const QuestionBox = ({
     onAddAnswer(index);
   };
 
-  const handleRemoveAnswer = (answerIndex) => {
+  const handleRemoveAnswer = (answerIndex: number) => {
     onRemoveAnswer(index, answerIndex);
   };
 
-  const handleSelectCorrectAnswer = (index, answerIndex) => {
-    const updatedQuestions = [...quiz.questions];
-    const correctAnswers = updatedQuestions[index].correctAnswers || []; // Get current correct answers or initialize an empty array
-
-    // Toggle the selection of the answer index
-    const answerIndexPosition = correctAnswers.indexOf(answerIndex);
-    if (answerIndexPosition === -1) {
-      // If answerIndex is not already in correctAnswers, add it
-      correctAnswers.push(answerIndex);
-    } else {
-      // If answerIndex is already in correctAnswers, remove it
-      correctAnswers.splice(answerIndexPosition, 1);
-    }
-
-    updatedQuestions[index].correctAnswers = correctAnswers; // Update correctAnswers array
-    setQuiz({ ...quiz, questions: updatedQuestions });
+  const handleSelectCorrectAnswer = (answerIndex: number) => {
+    onSelectCorrectAnswer(index, answerIndex);
   };
 
   return (
@@ -87,11 +97,8 @@ const QuestionBox = ({
               <Group key={answerIndex}>
                 <Checkbox
                   id={`correct-${index}-${answerIndex}`}
-                  checked={
-                    question.correctAnswers &&
-                    question.correctAnswers.includes(answerIndex)
-                  }
-                  onChange={() => handleSelectCorrectAnswer(index, answerIndex)}
+                  checked={answer.isCorrect}
+                  onChange={() => handleSelectCorrectAnswer(answerIndex)}
                 />
                 <TextInput
                   className=""
@@ -100,7 +107,7 @@ const QuestionBox = ({
                   label={`Option ${answerIndex + 1}`}
                   type="text"
                   name={`answer-${answerIndex}`}
-                  value={answer}
+                  value={answer.content}
                   onChange={(e) => onChange(e, index, "answer", answerIndex)}
                 />
 
@@ -130,21 +137,33 @@ const QuestionBox = ({
   );
 };
 
-const QuizCreateForm = () => {
+const QuizCreateForm: React.FC = () => {
   const DEBOUNCE_DELAY = 100; // Adjust as needed
   const THROTTLE_DELAY = 100; // Adjust as needed
-  const [quiz, setQuiz] = useState({
+  const [quiz, setQuiz] = useState<{
+    userId: number;
+    title: string;
+    description: string;
+    questions: Question[];
+  }>({
+    userId: localStorage.uid,
     title: "",
-    questions: [{ question: "", answers: [""] }],
+    description: "",
+    questions: [{ question: "", answers: [{ content: "", isCorrect: false }] }],
   });
 
-  const handleChange = (e, index, field, answerIndex) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index: number,
+    field: string,
+    answerIndex?: number
+  ) => {
     const { name, value } = e.target;
     const updatedQuestions = [...quiz.questions];
     if (field === "question") {
       updatedQuestions[index].question = value;
     } else if (field === "answer") {
-      updatedQuestions[index].answers[answerIndex] = value;
+      updatedQuestions[index].answers[answerIndex!].content = value;
     }
     setQuiz({ ...quiz, questions: updatedQuestions });
   };
@@ -152,41 +171,61 @@ const QuizCreateForm = () => {
   const handleAddQuestion = () => {
     setQuiz({
       ...quiz,
-      questions: [...quiz.questions, { question: "", answers: [""] }],
+      questions: [
+        ...quiz.questions,
+        { question: "", answers: [{ content: "", isCorrect: false }] },
+      ],
     });
   };
 
-  const handleDeleteQuestion = (index) => {
+  const handleDeleteQuestion = (index: number) => {
     const updatedQuestions = [...quiz.questions];
     updatedQuestions.splice(index, 1);
     setQuiz({ ...quiz, questions: updatedQuestions });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    try {
-      const response = await axios.post("your-api-endpoint", quiz);
-      console.log(response.data);
-    } catch (error) {
-      console.error("Error submitting quiz:", error);
+
+    // Check if the title is empty
+    if (!quiz.title.trim()) {
+      alert("Please enter a title");
+      return;
     }
+
+    // Check if any question is empty
+    if (quiz.questions.some((q) => !q.question.trim())) {
+      alert("Please fill in all questions");
+      return;
+    }
+
+    // Check if any answer is empty
+    if (quiz.questions.some((q) => q.answers.some((a) => !a.content.trim()))) {
+      alert("Please fill in all answers");
+      return;
+    }
+
+    // Proceed with form submission
+    console.log("Form data submitted:", quiz);
   };
 
-  const handleAddAnswer = (index) => {
+  const handleAddAnswer = (index: number) => {
     const updatedQuestions = [...quiz.questions];
-    updatedQuestions[index].answers.push("");
+    updatedQuestions[index].answers.push({ content: "", isCorrect: false });
     setQuiz({ ...quiz, questions: updatedQuestions });
   };
 
-  const handleRemoveAnswer = (index, answerIndex) => {
+  const handleRemoveAnswer = (index: number, answerIndex: number) => {
     const updatedQuestions = [...quiz.questions];
     updatedQuestions[index].answers.splice(answerIndex, 1);
     setQuiz({ ...quiz, questions: updatedQuestions });
   };
 
-  const handleSelectCorrectAnswer = (index, answerIndex) => {
+  const handleSelectCorrectAnswer = (index: number, answerIndex: number) => {
     const updatedQuestions = [...quiz.questions];
-    updatedQuestions[index].correctAnswer = answerIndex;
+    const currentStatus =
+      updatedQuestions[index].answers[answerIndex].isCorrect;
+    updatedQuestions[index].answers[answerIndex].isCorrect = !currentStatus;
     setQuiz({ ...quiz, questions: updatedQuestions });
   };
 
@@ -206,7 +245,7 @@ const QuizCreateForm = () => {
   return (
     <Container>
       <Text className="font-bold text-3xl my-5">Create a new study set</Text>
-      <form onSubmit={handleSubmit}>
+      <Form onSubmit={handleSubmit}>
         <TextInput
           className="my-5
           w-full border-b-2 border-transparent focus-within:border-blue-400"
@@ -262,7 +301,6 @@ const QuizCreateForm = () => {
             )}
           </Droppable>
         </DragDropContext>
-
         <Button
           type="button"
           onClick={handleAddQuestion}
@@ -276,7 +314,7 @@ const QuizCreateForm = () => {
         <Group className="justify-end mt-5">
           <Button type="submit">Create Quiz</Button>
         </Group>
-      </form>
+      </Form>
     </Container>
   );
 };
