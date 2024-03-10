@@ -33,6 +33,7 @@ import { action as NavbarAction } from "./pages/Root";
 import { lazy, Suspense } from "react";
 import { Box, LoadingOverlay } from "@mantine/core";
 import LearnPage from "./pages/study-mode/learn/LearnPage";
+import ClassQuestionPage from "./pages/class/ClassQuestionPage";
 
 const AuthPage = lazy(() => import("./pages/authentication/authpage/AuthPage"));
 const ForgotPassword = lazy(
@@ -146,13 +147,21 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: "class/:id/:tab",
+        path: "class/:id/",
         children: [
           {
-            index: true,
+            path: ":tab",
             element: (
               <Suspense fallback={loadingIndicator}>
                 <ClassPage />
+              </Suspense>
+            ),
+          },
+          {
+            path: "discussion/question/:questionId",
+            element: (
+              <Suspense fallback={loadingIndicator}>
+                <ClassQuestionPage />
               </Suspense>
             ),
           },
