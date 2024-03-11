@@ -60,7 +60,7 @@ export default function PrivacySettings() {
                 });
             }
         } else {
-            toast.error("Can't change your password", {
+            toast.error("The confirm password are not same", {
                 position: "bottom-right",
                 autoClose: 1000,
                 hideProgressBar: false,

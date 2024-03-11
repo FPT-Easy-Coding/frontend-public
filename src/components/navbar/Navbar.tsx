@@ -38,7 +38,7 @@ import { toast } from "react-toastify";
 
 const userBtn = (data: LoaderData, submit: any, handleLogout: () => void) => {
   const userCredentialsContext = useContext(UserCredentialsContext);
-  const cleanBase64Image = userCredentialsContext.info?.avatar.replace(/^"(.*)"$/, '$1');
+  console.log(userCredentialsContext)
   return (
     <>
       <Menu shadow="md" width={200}>
@@ -49,14 +49,13 @@ const userBtn = (data: LoaderData, submit: any, handleLogout: () => void) => {
               radius="xl"
               color="grape"
               className="cursor-pointer"
-              src={cleanBase64Image}
+              src={userCredentialsContext.info?.avatar}
             />
             <Text className="text-sm font-semibold">
               {data ? data.firstName + " " + data.lastName : "Guest"}
             </Text>
           </Group>
         </Menu.Target>
-
         <Menu.Dropdown>
           <Menu.Label>Menu</Menu.Label>
           <NavLink to={"/user/profile/sets"}>

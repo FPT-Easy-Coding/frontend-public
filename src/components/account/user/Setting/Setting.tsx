@@ -1,7 +1,7 @@
 import { Paper, Text, Button, Avatar, Select } from "@mantine/core";
-import { useState, useContext } from "react";
+import { useContext } from "react";
 import { MdAccountCircle } from "react-icons/md";
-import { IoMdAirplane, IoIosAddCircleOutline } from "react-icons/io";
+import { IoMdAirplane } from "react-icons/io";
 import { UserCredentialsContext } from "../../../../store/user-credentials-context";
 import FormUpdate from "./FormUpdateProfile";
 import AvatarSetings from "./AvatarSetings";
@@ -50,7 +50,7 @@ export default function Setting() {
                     <FormUpdate />
                 </div>
             </div>
-            <div style={{ display: 'flex', marginTop: "30px" }}>
+            {/* <div style={{ display: 'flex', marginTop: "30px" }}>
                 <div style={{ flex: 1, marginRight: '16px' }}>
                     <AiOutlineGlobal size={100} style={{ marginLeft: '200px' }} />
                     <Text style={{ fontWeight: 'bold', marginBottom: '8px', marginLeft: '210px' }}>
@@ -76,7 +76,7 @@ export default function Setting() {
                         />
                     </Paper>
                 </div>
-            </div>
+            </div> */}
             <div style={{ display: 'flex', paddingTop: '30px' }}>
                 <PrivacySettings />
             </div>

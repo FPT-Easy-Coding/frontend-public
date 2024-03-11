@@ -102,9 +102,9 @@ function RecentQuiz() {
                       <Avatar
                         variant="filled"
                         radius="xl"
-                        size="xl"
+                        size="sm"
                         color="violet"
-                        src={quiz.avatar ? quiz.avatar.replace(/^"(.*)"$/, '$1') : ''}
+                        src={quiz.avatar ? quiz.avatar : ''}
                       />
                       <Text size="sm">{quiz.userName}</Text>
                     </Group>

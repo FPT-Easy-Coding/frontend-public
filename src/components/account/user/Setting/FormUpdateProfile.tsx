@@ -4,9 +4,7 @@ import { Button, Group, TextInput, Box, Portal, Overlay, Radio } from '@mantine/
 import { Paper, Text } from "@mantine/core";
 import { UserCredentialsContext } from "../../../../store/user-credentials-context";
 import axios from 'axios';
-import { isNumber } from 'lodash';
 import { useNavigate } from 'react-router-dom';
-import { Bounce, toast } from 'react-toastify';
 
 export default function FormUpdate() {
     const userCredentialsContext = useContext(UserCredentialsContext);
@@ -23,8 +21,11 @@ export default function FormUpdate() {
             firstName: hasLength({ min: 2, max: 50 }, 'First Name must be between 2 and 50 characters'),
             lastName: hasLength({ min: 2, max: 50 }, 'Last Name must be between 2 and 50 characters'),
             email: isEmail('Invalid email'),
-            telephone: hasLength({ min: 9, max: 11 }, 'Telephone must have exactly 10 number'),
-
+            telephone: (value) => {
+                if (!/^\d{9}$/.test(value)) {
+                    return 'Telephone must have exactly 10 numeric characters';
+                }
+            },
         },
     });
 
@@ -37,6 +38,7 @@ export default function FormUpdate() {
         email: userCredentialsContext.info?.email || '',
     });
     const handleInputChange = (field: string, value: string) => {
+
         setFormData({
             ...formData,
             [field]: value,
@@ -229,7 +231,5 @@ export default function FormUpdate() {
         </Box>
     );
 }
-function combine(arg0: (value: unknown) => string | number | true | import("react").ReactElement<any, string | import("react").JSXElementConstructor<any>> | Iterable<import("react").ReactNode> | null, arg1: boolean): ((value: string, values: { firstName: string; lastName: string; email: string; telephone: string; accountType: string; }, path: string) => import("react").ReactNode) | undefined {
-    throw new Error('Function not implemented.');
-}
+
 

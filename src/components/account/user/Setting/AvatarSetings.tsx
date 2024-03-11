@@ -14,13 +14,11 @@ export default function AvatarSettings() {
     const [selectedAvatar, setSelectedAvatar] = useState<string>("");
     const [customImage, setCustomImage] = useState<string | null>(null);
     const userCredentialsContext = useContext(UserCredentialsContext);
-    const cleanBase64Image = userCredentialsContext.info?.avatar.replace(/^"(.*)"$/, '$1');
     const navigate = useNavigate();
     const handleAvatarSelection = (avatarSrc: string | React.ReactNode) => {
         if (typeof avatarSrc === "string") {
             setSelectedAvatar(avatarSrc);
             setCustomImage(null);
-            console.log(avatarSrc);
             if (avatarSrc.startsWith("data:")) {
                 console.log("Image is already in base64 format");
             } else {
@@ -40,6 +38,7 @@ export default function AvatarSettings() {
                                         },
                                     }
                                 );
+                                console.log(base64Image)
                                 navigate("/user/settings")
                             } catch (error) {
                                 console.error('Error uploading image:', error);
@@ -55,8 +54,6 @@ export default function AvatarSettings() {
             console.error("Invalid avatar source:", avatarSrc);
         }
     };
-
-
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         console.log("file:", file);
@@ -101,7 +98,7 @@ export default function AvatarSettings() {
                     radius="xl"
                     color="grape"
                     className="cursor-pointer"
-                    src={cleanBase64Image}
+                    src={userCredentialsContext.info?.avatar}
                 />
                 <Text style={{ fontWeight: "bold", marginBottom: "8px", marginLeft: "230px" }}>
                     Avatar

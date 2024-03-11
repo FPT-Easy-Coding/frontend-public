@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { Carousel } from "@mantine/carousel";
 import {
@@ -21,7 +21,7 @@ interface User {
   numberOfQuizSet: number;
   classes: number;
   avatar: string;
-  // Add other properties as needed
+  accountType: string;
 }
 function PopularAuthor() {
 
@@ -73,14 +73,14 @@ function PopularAuthor() {
                       radius="xl"
                       size="xl"
                       color="violet"
-                      src={user.avatar ? user.avatar.replace(/^"(.*)"$/, '$1') : ''}
+                      src={user.avatar ? user.avatar : ''}
                     />
                   </Card.Section>
                   <Card.Section>
                     <Stack gap={6}>
                       <Group gap={8}>
                         <Title order={3}>{user.userName}</Title>
-                        <Badge color="orange">{user.role}</Badge>
+                        <Badge color="orange">{user.accountType}</Badge>
                       </Group>
                       <Group gap={"xs"}>
                         <Badge color="blue" autoContrast leftSection={quizSetsIcon}>
