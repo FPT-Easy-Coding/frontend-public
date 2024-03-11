@@ -35,6 +35,7 @@ import {
   IconMinus,
   IconPlus,
   IconSearch,
+  IconSend,
   IconSettings,
   IconShare2,
   IconUserPlus,
@@ -54,24 +55,24 @@ import {
   removeQuizFromClassApi,
   Questions,
   fetchQuestionsData,
+  fetchCommentsData,
+  Comments,
 } from "../../pages/class/ClassPage";
 import { format } from "date-fns";
-import { Link, useActionData, useNavigate } from "react-router-dom";
-import QuizQuestionModal from "./QuizQuestionModal";
+import { Link, useNavigate } from "react-router-dom";
 
 const iconStyle = { width: rem(12), height: rem(12) };
 function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
-  const actionData = useActionData();
   const iconSearch = <IconSearch style={{ width: rem(16), height: rem(16) }} />;
   const [inviteModalOpened, setInviteModalOpened] = useState(false);
   const [addSetsModalOpened, setAddSetsModalOpened] = useState(false);
-  const [addQuestionModalOpened, setAddQuestionModalOpened] = useState(false);
   const [jsonContent, setJsonContent] = useState("");
   const [studySets, setStudySets] = useState<StudySet[]>([]);
   const [studyUserCreatedSets, setUserCreatedSets] = useState<StudySet[]>([]);
   const [classData, setClassData] = useState<ClassData | null>(null);
   const [members, setMembers] = useState<Member[]>([]);
   const [questions, setQuestions] = useState<Questions[]>([]);
+  const [comments, setComments] = useState<Comments[]>([]);
   const [isLoading, setLoading] = useState<boolean>(true);
   const [filterOption, setFilterOption] = useState<string>("Latest");
   const [deleteModalOpened, setDeleteModalOpened] = useState(false);
@@ -90,7 +91,7 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
     fetchClassEntityData(classId);
     fetchMembers(classId);
     fetchQuestions(classId);
-  }, [classId, actionData]);
+  }, [classId]);
 
   useEffect(() => {
     if (classData) {
@@ -114,6 +115,25 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
     setCommonQuizIds(updatedCommonQuizIds);
   }, [studySets, studyUserCreatedSets]);
 
+  async function fetchComments(questionId: number) {
+    console.log(`Fetching comments for question ID: ${questionId}`);
+    setLoading(true);
+    try {
+      const commentsData = await fetchCommentsData(questionId);
+      console.log("Comments data from server: ", commentsData);
+      // Check if commentsData is defined and not empty
+      if (commentsData && commentsData.length > 0) {
+        setComments((prevComments) => [...prevComments, ...commentsData]);
+      } else {
+        console.log("Comments not found for question ID:", questionId);
+      }
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function fetchStudySets(classId: number) {
     setLoading(true);
     try {
@@ -130,7 +150,12 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
     try {
       const questionsData = await fetchQuestionsData(classId);
       console.log("questions data from server: ", questionsData);
-      setQuestions(questionsData);
+      setQuestions(questionsData); // Ensure questionsData is an array
+
+      // Fetch comments for each question
+      for (const question of questionsData) {
+        await fetchComments(question.classQuestionId);
+      }
     } catch (error) {
       console.error("Error fetching questions:", error);
     } finally {
@@ -246,17 +271,12 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
     fetchFilteredStudySets(classId);
   }, [classId, filterOption]);
 
+  // Event handler for when the filter option changes
+  // Event handler for when the filter option changes
   const handleFilterChange = (value: string | null) => {
     if (value !== null) {
       setFilterOption(value);
     }
-  };
-  const handleAddQuestionClose = () => {
-    setAddQuestionModalOpened(false);
-  };
-
-  const handleAddQuestionOpen = () => {
-    setAddQuestionModalOpened(true);
   };
 
   return (
@@ -605,22 +625,6 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
                     <LoadingOverlay visible={true} />
                   ) : (
                     <Stack gap={"sm"} className="mt-5">
-                      <Group className="justify-between">
-                        <Select
-                          checkIconPosition="right"
-                          data={["Latest", "Alphabetical"]}
-                          defaultValue={"Latest"}
-                          allowDeselect={false}
-                        />
-                        <TextInput
-                          variant="filled"
-                          radius="xl"
-                          placeholder="Filter by name"
-                          rightSectionPointerEvents="none"
-                          rightSection={iconSearch}
-                          className="w-[375px]"
-                        />
-                      </Group>
                       <Paper
                         className="mt-3"
                         shadow="lg"
@@ -686,50 +690,10 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
                     <LoadingOverlay visible={true} zIndex={1000} />
                   ) : (
                     <Stack gap={"sm"} className="mt-5">
-                      <Group className="justify-between">
-                        <Select
-                          checkIconPosition="right"
-                          data={["Latest", "Alphabetical"]}
-                          defaultValue={"Latest"}
-                          allowDeselect={false}
-                        />
-
-                        <TextInput
-                          variant="filled"
-                          radius="xl"
-                          placeholder="Filter by title"
-                          rightSectionPointerEvents="none"
-                          rightSection={iconSearch}
-                          className="w-[375px]"
-                        />
-                      </Group>
-                      <Group className="justify-center">
-                        <Button
-                          className="w-[100%]"
-                          variant="outline"
-                          onClick={handleAddQuestionOpen}
-                          leftSection={<IconPlus size={14} />}
-                        >
-                          Add new question
-                        </Button>
-                      </Group>
-                      <QuizQuestionModal
-                        opened={addQuestionModalOpened}
-                        close={handleAddQuestionClose}
-                        classId={classId}
-                      />
                       {Array.isArray(questions) &&
                         questions.map((question, index) => (
-                          <Link
-                            to={`./question/${question.classQuestionId}`}
-                            key={index}
-                          >
-                            <Paper
-                              withBorder
-                              p="xl"
-                              shadow="md"
-                              className="mb-5"
-                            >
+                          <div key={index} className="mb-8">
+                            <Paper className="shadow-lg rounded-md border p-6">
                               <Group>
                                 <Avatar
                                   src={null}
@@ -749,14 +713,58 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
                                   </Text>
                                 </Stack>
                               </Group>
-                              <Stack gap={"sm"} className="mt-3">
-                                <Title order={4}>{question.title}</Title>
+                              <Stack className="my-5">
+                                <Text className="font-bold text-xl">
+                                  {question.title}
+                                </Text>
                                 <Text className="font-normal text-sm">
                                   {question.content}
                                 </Text>
                               </Stack>
+
+                              {/* Render comments for this question */}
+                              {comments
+                                .filter(
+                                  (comment) =>
+                                    comment.questionId ===
+                                    question.classQuestionId
+                                )
+                                .map((comment) => (
+                                  <div key={comment.commentId} className="mb-4">
+                                    <div className="bg-gray-100 rounded-lg p-4">
+                                      <p className="text-gray-800">
+                                        {comment.content}
+                                      </p>
+                                    </div>
+                                    {/* Render reply comments if necessary */}
+                                    {comment.replyComments.map((reply) => (
+                                      <div
+                                        key={reply.replyCommentId}
+                                        className="bg-gray-200 rounded-lg p-3 ml-8"
+                                      >
+                                        <p className="text-gray-700">
+                                          {reply.content}
+                                        </p>
+                                      </div>
+                                    ))}
+                                  </div>
+                                ))}
+
+                              <Group>
+                                <Input
+                                  radius="xl"
+                                  placeholder="Comment"
+                                  className="w-[90%]"
+                                />
+                                <Button variant="white">
+                                  <IconSend
+                                    style={{ width: rem(20), height: rem(20) }}
+                                    stroke={1.5}
+                                  />
+                                </Button>
+                              </Group>
                             </Paper>
-                          </Link>
+                          </div>
                         ))}
                     </Stack>
                   )}
@@ -765,13 +773,7 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
             </Stack>
           </Grid.Col>
           <Grid.Col span={4} className="flex justify-end">
-            <Paper
-              className="w-4/5 max-h-80"
-              shadow="lg"
-              radius="md"
-              withBorder
-              p="xl"
-            >
+            <Paper className="w-4/5" shadow="lg" radius="md" withBorder p="xl">
               <Stack>
                 <Stack gap="xs">
                   <Title order={5} className="uppercase font-medium">

@@ -176,14 +176,6 @@ const router = createBrowserRouter([
               </Suspense>
             ),
           },
-          {
-            path: "discussion/question/:questionId",
-            element: (
-              <Suspense fallback={loadingIndicator}>
-                <ClassQuestionPage />
-              </Suspense>
-            ),
-          },
         ],
       },
       {
