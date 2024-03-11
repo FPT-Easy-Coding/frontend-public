@@ -36,6 +36,7 @@ import LearnPage from "./pages/study-mode/learn/LearnPage";
 import { createQuizAction } from "./pages/quiz/create_form/CreateQuizPage";
 import ClassQuestionPage from "./pages/class/ClassQuestionPage";
 import { classAction } from "./pages/class/ClassPage";
+import SettingPage from "./pages/account/user/SettingPage";
 
 const AuthPage = lazy(() => import("./pages/authentication/authpage/AuthPage"));
 const ForgotPassword = lazy(
@@ -150,6 +151,21 @@ const router = createBrowserRouter([
       },
       {
         path: "class/:id/",
+        path: "user/settings",
+        loader: getAuthCredentials,
+        children: [
+          {
+            index: true,
+            element: (
+              <Suspense fallback={loadingIndicator}>
+                <SettingPage />
+              </Suspense>
+            ),
+          },
+        ],
+      },
+      {
+        path: "class/:id",
         children: [
           {
             path: ":tab",

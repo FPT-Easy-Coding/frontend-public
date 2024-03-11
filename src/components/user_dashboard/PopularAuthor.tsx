@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { Carousel } from "@mantine/carousel";
 import {
@@ -13,8 +13,6 @@ import {
 import classes from "./Carousel.module.css";
 import '@tabler/icons-react';
 import { IconLibrary, IconSchool } from "@tabler/icons-react";
-
-
 const quizSetsIcon = <IconLibrary size={18} />;
 const classIcon = <IconSchool size={18} />;
 interface User {
@@ -22,11 +20,10 @@ interface User {
   role: string;
   numberOfQuizSet: number;
   classes: number;
+  avatar: string;
   // Add other properties as needed
 }
-
 function PopularAuthor() {
-
 
   const [popularAuthor, setpopularAuthor] = useState<User[]>([]);
 
@@ -35,6 +32,7 @@ function PopularAuthor() {
       .then(res => {
         // Sort the users by the 'view' property
         const sortedAuthors = res.data.sort((a: { view: number; }, b: { view: number; }) => b.view - a.view);
+        // const cleanBase64Image = userCredentialsContext.info?.avatar.replace(/^"(.*)"$/, '$1');
         setpopularAuthor(sortedAuthors);
       })
   }, [])
@@ -70,7 +68,13 @@ function PopularAuthor() {
                     document.body.style.cursor = "auto";
                   }}>
                   <Card.Section>
-                    <Avatar variant="filled" radius="xl" size="xl" color="violet" />
+                    <Avatar
+                      variant="filled"
+                      radius="xl"
+                      size="xl"
+                      color="violet"
+                      src={user.avatar ? user.avatar.replace(/^"(.*)"$/, '$1') : ''}
+                    />
                   </Card.Section>
                   <Card.Section>
                     <Stack gap={6}>

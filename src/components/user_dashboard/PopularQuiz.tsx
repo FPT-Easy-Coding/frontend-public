@@ -19,7 +19,9 @@ interface Quiz {
   numberOfQuestions: number;
   userName: string;
   view: number;
-  timeRecentViewQuiz: string; // Change the type to string
+  timeRecentViewQuiz: string;
+  avatar: string;
+  accountType: string;
   // Add other properties as needed
 }
 
@@ -101,7 +103,13 @@ function PopularQuiz() {
                   </Card.Section>
                   <Card.Section>
                     <Group gap={"xs"}>
-                      <Avatar variant="filled" radius="xl" size="sm" />
+                      <Avatar
+                        variant="filled"
+                        radius="xl"
+                        size="xl"
+                        color="violet"
+                        src={quiz.avatar ? quiz.avatar.replace(/^"(.*)"$/, '$1') : ''}
+                      />
                       <Text size="sm">{quiz.userName}</Text>
                     </Group>
                   </Card.Section>
