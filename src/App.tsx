@@ -34,6 +34,7 @@ import { lazy, Suspense } from "react";
 import { Box, LoadingOverlay } from "@mantine/core";
 import LearnPage from "./pages/study-mode/learn/LearnPage";
 import ClassQuestionPage from "./pages/class/ClassQuestionPage";
+import { classAction } from "./pages/class/ClassPage";
 
 const AuthPage = lazy(() => import("./pages/authentication/authpage/AuthPage"));
 const ForgotPassword = lazy(
@@ -151,6 +152,7 @@ const router = createBrowserRouter([
         children: [
           {
             path: ":tab",
+            action: classAction,
             element: (
               <Suspense fallback={loadingIndicator}>
                 <ClassPage />

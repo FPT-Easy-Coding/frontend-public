@@ -6,6 +6,7 @@ import {
   Comments,
 } from "../../pages/class/ClassQuestionPage";
 import {
+  ActionIcon,
   Avatar,
   Button,
   Container,
@@ -16,9 +17,11 @@ import {
   Paper,
   Stack,
   Text,
+  TextInput,
+  Title,
   rem,
 } from "@mantine/core";
-import { IconPencil, IconSend, IconTrash } from "@tabler/icons-react";
+import { IconDots, IconPencil, IconSend, IconTrash } from "@tabler/icons-react";
 import { format } from "date-fns";
 import CommentSection from "./CommentSection";
 
@@ -66,19 +69,10 @@ function ClassQuestionDetail({ questionId }: { questionId: number }) {
   }
 
   return (
-    <Container className="flex justify-center">
-      <div className="mb-8" style={{ width: "90%" }}>
-        <Paper
-          className="shadow-lg rounded-md border p-6"
-          style={{ display: "flex", flexDirection: "column" }}
-        >
-          <Group
-            style={{
-              display: "flex",
-              alignItems: "center",
-              marginBottom: "0.5rem",
-            }}
-          >
+    <Container className="container">
+      <Paper withBorder radius="md" p={"xl"} shadow="md">
+        <Group className="justify-between">
+          <Group gap={"xs"}>
             <Avatar
               src={null}
               alt={`Avatar of ${question.userFirstName} ${question.userLastName}`}
@@ -90,31 +84,23 @@ function ClassQuestionDetail({ questionId }: { questionId: number }) {
                 .charAt(0)
                 .toUpperCase()}`}
             </Avatar>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                flex: 1,
-                marginLeft: "1rem",
-              }}
-            >
+            <Stack gap={0}>
               <Text className="font-semibold text-md">{`${question.userFirstName} ${question.userLastName}`}</Text>
-              <Text className="text-xs">
+              <Text className="text-xs" c={"dimmed"}>
                 {format(question.createAt, "MM/dd/yyyy")}
               </Text>
-            </div>
-            <Text className="text-xs justify-end">
+            </Stack>
+          </Group>
+          <Group>
+            <Text className="text-xs justify-end" c={"yellow"}>
               {question.answered ? "Answered" : "Unanswered"}
             </Text>
             {question.userId == currentUserId && (
               <Menu shadow="md" width={200}>
                 <Menu.Target>
-                  <Button
-                    variant="white"
-                    className=" text-black text-md justify-end"
-                  >
-                    ...
-                  </Button>
+                  <ActionIcon variant="light" color="orange">
+                    <IconDots size={14} />
+                  </ActionIcon>
                 </Menu.Target>
 
                 <Menu.Dropdown>
@@ -137,69 +123,65 @@ function ClassQuestionDetail({ questionId }: { questionId: number }) {
               </Menu>
             )}
           </Group>
-          <Divider size="xs" />
-          <Stack className="my-5" style={{ marginBottom: "1rem" }}>
-            <Text className="font-bold text-xl">{question.title}</Text>
-            <Text className="font-normal text-sm">{question.content}</Text>
-          </Stack>
+        </Group>
+        <Divider size="xs" className="mt-5" />
+        <Stack className="my-5">
+          <Title order={4}>{question.title}</Title>
+          <Text className="font-normal text-sm">{question.content}</Text>
+        </Stack>
 
-          {/* Render answer section */}
-          {question.answered && (
-            <div className="bg-blue-100 p-4 rounded-md mb-4 flex justify-between items-center">
-              <div>
-                <Text className="font-semibold text-lg">Answer:</Text>
-                <Text className="font-normal text-md">
-                  {question.classroomAnswerResponse?.content}
-                </Text>
-              </div>
-              {question.classroomAnswerResponse?.userId == currentUserId && (
-                <Menu shadow="md" width={200}>
-                  <Menu.Target>
-                    <Button variant="light" className="bg-blue-100 text-black">
-                      ...
-                    </Button>
-                  </Menu.Target>
-
-                  <Menu.Dropdown>
-                    <Menu.Item
-                      leftSection={
-                        <IconPencil
-                          style={{ width: rem(14), height: rem(14) }}
-                        />
-                      }
-                    >
-                      Edit
-                    </Menu.Item>
-                    <Menu.Item
-                      color="red"
-                      leftSection={
-                        <IconTrash
-                          style={{ width: rem(14), height: rem(14) }}
-                        />
-                      }
-                    >
-                      Delete
-                    </Menu.Item>
-                  </Menu.Dropdown>
-                </Menu>
-              )}
+        {/* Render answer section */}
+        {question.answered && (
+          <div className="bg-blue-100 p-4 rounded-md mb-4 flex justify-between items-center">
+            <div>
+              <Text className="font-semibold text-lg">Answer:</Text>
+              <Text className="font-normal text-md">
+                {question.classroomAnswerResponse?.content}
+              </Text>
             </div>
-          )}
-          <Divider my="md" />
-          {/* Render comments for this question */}
-          <CommentSection comments={comments} question={question} />
+            {question.classroomAnswerResponse?.userId == currentUserId && (
+              <Menu shadow="md" width={200}>
+                <Menu.Target>
+                  <Button variant="light" className="bg-blue-100 text-black">
+                    ...
+                  </Button>
+                </Menu.Target>
 
-          <Group style={{ marginTop: "auto" }}>
-            <Input radius="xl" placeholder="Comment" className="w-[90%]" />
-            <Button variant="white">
-              <IconSend
-                style={{ width: rem(20), height: rem(20) }}
-                stroke={1.5}
-              />
-            </Button>
-          </Group>
-        </Paper>
-      </div>
+                <Menu.Dropdown>
+                  <Menu.Item
+                    leftSection={
+                      <IconPencil size={14} />
+                    }
+                  >
+                    Edit
+                  </Menu.Item>
+                  <Menu.Item
+                    color="red"
+                    leftSection={
+                      <IconTrash size={14} />
+                    }
+                  >
+                    Delete
+                  </Menu.Item>
+                </Menu.Dropdown>
+              </Menu>
+            )}
+          </div>
+        )}
+        <Divider my="md" />
+        {/* Render comments for this question */}
+        <CommentSection comments={comments} question={question} />
+
+        <Group className="mt-5">
+          <TextInput
+            placeholder="Comment about this question"
+            className="grow"
+          />
+          <ActionIcon variant="subtle">
+            <IconSend size={20} />
+          </ActionIcon>
+        </Group>
+      </Paper>
     </Container>
   );
 }

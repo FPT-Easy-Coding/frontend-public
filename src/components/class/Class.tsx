@@ -56,11 +56,12 @@ import {
   fetchQuestionsData,
 } from "../../pages/class/ClassPage";
 import { format } from "date-fns";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useActionData, useNavigate } from "react-router-dom";
 import QuizQuestionModal from "./QuizQuestionModal";
 
 const iconStyle = { width: rem(12), height: rem(12) };
 function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
+  const actionData = useActionData();
   const iconSearch = <IconSearch style={{ width: rem(16), height: rem(16) }} />;
   const [inviteModalOpened, setInviteModalOpened] = useState(false);
   const [addSetsModalOpened, setAddSetsModalOpened] = useState(false);
@@ -89,7 +90,7 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
     fetchClassEntityData(classId);
     fetchMembers(classId);
     fetchQuestions(classId);
-  }, [classId]);
+  }, [classId, actionData]);
 
   useEffect(() => {
     if (classData) {
@@ -707,52 +708,55 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
                           className="w-[100%]"
                           variant="outline"
                           onClick={handleAddQuestionOpen}
+                          leftSection={<IconPlus size={14} />}
                         >
-                          + Add new question
+                          Add new question
                         </Button>
                       </Group>
                       <QuizQuestionModal
                         opened={addQuestionModalOpened}
                         close={handleAddQuestionClose}
+                        classId={classId}
                       />
                       {Array.isArray(questions) &&
                         questions.map((question, index) => (
-                          <div key={index} className="mb-8">
-                            <Link
-                              to={`./question/${question.classQuestionId}`}
-                              key={index}
+                          <Link
+                            to={`./question/${question.classQuestionId}`}
+                            key={index}
+                          >
+                            <Paper
+                              withBorder
+                              p="xl"
+                              shadow="md"
+                              className="mb-5"
                             >
-                              <Paper className="shadow-lg rounded-md border p-6">
-                                <Group>
-                                  <Avatar
-                                    src={null}
-                                    alt={`Avatar of ${question.userFirstName} ${question.userLastName}`}
-                                    size="lg"
-                                  >
-                                    {`${question.userFirstName
-                                      .charAt(0)
-                                      .toUpperCase()}${question.userLastName
-                                      .charAt(0)
-                                      .toUpperCase()}`}
-                                  </Avatar>
-                                  <Stack gap={0}>
-                                    <Text className="font-semibold text-md">{`${question.userFirstName} ${question.userLastName}`}</Text>
-                                    <Text className="text-xs">
-                                      {format(question.createAt, "MM/dd/yyyy")}
-                                    </Text>
-                                  </Stack>
-                                </Group>
-                                <Stack className="my-5">
-                                  <Text className="font-bold text-xl">
-                                    {question.title}
-                                  </Text>
-                                  <Text className="font-normal text-sm">
-                                    {question.content}
+                              <Group>
+                                <Avatar
+                                  src={null}
+                                  alt={`Avatar of ${question.userFirstName} ${question.userLastName}`}
+                                  size="lg"
+                                >
+                                  {`${question.userFirstName
+                                    .charAt(0)
+                                    .toUpperCase()}${question.userLastName
+                                    .charAt(0)
+                                    .toUpperCase()}`}
+                                </Avatar>
+                                <Stack gap={0}>
+                                  <Text className="font-semibold text-md">{`${question.userFirstName} ${question.userLastName}`}</Text>
+                                  <Text className="text-xs">
+                                    {format(question.createAt, "MM/dd/yyyy")}
                                   </Text>
                                 </Stack>
-                              </Paper>
-                            </Link>
-                          </div>
+                              </Group>
+                              <Stack gap={"sm"} className="mt-3">
+                                <Title order={4}>{question.title}</Title>
+                                <Text className="font-normal text-sm">
+                                  {question.content}
+                                </Text>
+                              </Stack>
+                            </Paper>
+                          </Link>
                         ))}
                     </Stack>
                   )}
@@ -761,7 +765,13 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
             </Stack>
           </Grid.Col>
           <Grid.Col span={4} className="flex justify-end">
-            <Paper className="w-4/5" shadow="lg" radius="md" withBorder p="xl">
+            <Paper
+              className="w-4/5 max-h-80"
+              shadow="lg"
+              radius="md"
+              withBorder
+              p="xl"
+            >
               <Stack>
                 <Stack gap="xs">
                   <Title order={5} className="uppercase font-medium">

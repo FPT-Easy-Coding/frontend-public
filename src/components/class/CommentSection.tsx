@@ -1,30 +1,30 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import {
   Question,
   Comments,
   RepliesComment,
 } from "../../pages/class/ClassQuestionPage";
 import {
+  ActionIcon,
+  Avatar,
   Button,
-  Container,
   Group,
-  Input,
   Menu,
+  Paper,
+  Stack,
   Text,
+  TextInput,
   rem,
 } from "@mantine/core";
 import {
-  IconArrowBack,
-  IconArrowForward,
-  IconArrowsLeftRight,
-  IconMessageCircle,
+  IconChevronDown,
+  IconChevronUp,
+  IconDots,
   IconPencil,
-  IconPhoto,
-  IconSearch,
   IconSend,
-  IconSettings,
   IconTrash,
 } from "@tabler/icons-react";
+import { UserCredentialsContext } from "../../store/user-credentials-context";
 
 interface Props {
   comments: Comments[];
@@ -32,8 +32,8 @@ interface Props {
 }
 
 function CommentSection({ comments, question }: Props) {
-  const currentUserId = localStorage.uid;
-  const [menuOpened, setMenuOpened] = useState(false);
+  const { info } = useContext(UserCredentialsContext);
+  const currentUserId = info?.userId;
   const [showReplies, setShowReplies] = useState<{ [key: number]: boolean }>(
     {}
   );
@@ -54,119 +54,101 @@ function CommentSection({ comments, question }: Props) {
       [commentId]: !prevInputs[commentId],
     }));
   };
-  const handleUpdate = () => {
-    // Implement your update logic here
-    console.log("Updating comment or reply");
-  };
 
-  // Function to handle deleting comment/reply
-  const handleDelete = () => {
-    // Implement your delete logic here
-    console.log("Deleting comment or reply");
-  };
-  return (
-    <div className="flex-1 mb-4">
-      {comments
-        .filter((comment) => comment.questionId === question.classQuestionId)
-        .map((comment) => (
-          <div key={comment.commentId} className="mb-4">
-            <div className="bg-gray-100 rounded-lg p-4">
-              <Group className="flex justify-between items-center">
-                <p className="text-gray-800">{comment.content}</p>
-                {comment.userId == currentUserId && (
-                  <Menu shadow="md" width={200}>
-                    <Menu.Target>
-                      <Button variant="light" className="bg-gray-100">
-                        ...
-                      </Button>
-                    </Menu.Target>
-
-                    <Menu.Dropdown>
-                      <Menu.Item
-                        leftSection={
-                          <IconPencil
-                            style={{ width: rem(14), height: rem(14) }}
-                          />
-                        }
-                      >
-                        Edit
-                      </Menu.Item>
-                      <Menu.Item
-                        color="red"
-                        leftSection={
-                          <IconTrash
-                            style={{ width: rem(14), height: rem(14) }}
-                          />
-                        }
-                      >
-                        Delete
-                      </Menu.Item>
-                    </Menu.Dropdown>
-                  </Menu>
-                )}
-              </Group>
-            </div>
+  const commentsList = comments
+    .filter((comment) => comment.questionId === question.classQuestionId)
+    .map((comment) => (
+      <>
+        <Paper withBorder key={comment.commentId} p="md" shadow="lg">
+          <Group className="justify-between">
             <Group>
-              {/* <Button
-                variant="white"
-                size="xs"
-                radius="md"
-                onClick={() => toggleReplyInput(comment.commentId)}
-              >
-                Reply
-              </Button> */}
-              {/* Render reply comments if necessary */}
-
+              <Group>
+                <Avatar size={"sm"} src={null} color="orange" />
+                <Text c={"dimmed"} className="text-sm">
+                  {comment.userName}
+                  {": "}
+                </Text>
+              </Group>
+              <Text fz={"sm"}>{comment.content}</Text>
+            </Group>
+            <Group>
               {comment.replyComments.length > 0 && (
-                <div>
-                  <Button
-                    variant="white"
-                    size="xs"
-                    radius="md"
-                    onClick={() => {
-                      toggleReplies(comment.commentId);
-                      toggleReplyInput(comment.commentId);
-                    }}
-                    style={{ display: "flex", alignItems: "center" }}
-                  >
-                    {showReplies[comment.commentId] ? (
-                      <>
-                        <IconArrowBack
-                          style={{ width: rem(20), height: rem(20) }}
-                          stroke={1.5}
-                        />
-                        <span>Hide all replies</span>
-                      </>
+                <Button
+                  size="compact-xs"
+                  variant="subtle"
+                  radius="md"
+                  onClick={() => {
+                    toggleReplies(comment.commentId);
+                    toggleReplyInput(comment.commentId);
+                  }}
+                  leftSection={
+                    showReplies[comment.commentId] ? (
+                      <IconChevronUp size={14} />
                     ) : (
-                      <>
-                        <IconArrowForward
-                          style={{ width: rem(20), height: rem(20) }}
-                          stroke={1.5}
+                      <IconChevronDown size={14} />
+                    )
+                  }
+                  className="my-3"
+                >
+                  {showReplies[comment.commentId]
+                    ? "Hide replies"
+                    : "Show replies"}
+                </Button>
+              )}
+              {comment.userId == currentUserId && (
+                <Menu shadow="md" width={200}>
+                  <Menu.Target>
+                    <ActionIcon variant="subtle">
+                      <IconDots size={14} />
+                    </ActionIcon>
+                  </Menu.Target>
+
+                  <Menu.Dropdown>
+                    <Menu.Item
+                      leftSection={
+                        <IconPencil
+                          style={{ width: rem(14), height: rem(14) }}
                         />
-                        <span>View all replies</span>
-                      </>
-                    )}
-                  </Button>
-                </div>
+                      }
+                    >
+                      Edit
+                    </Menu.Item>
+                    <Menu.Item
+                      color="red"
+                      leftSection={
+                        <IconTrash
+                          style={{ width: rem(14), height: rem(14) }}
+                        />
+                      }
+                    >
+                      Delete
+                    </Menu.Item>
+                  </Menu.Dropdown>
+                </Menu>
               )}
             </Group>
-            {showReplies[comment.commentId] &&
-              comment.replyComments.map((reply: RepliesComment) => (
-                <Container
-                  key={reply.replyCommentId}
-                  className="bg-gray-200 rounded-lg p-3 mb-2 mx-8 flex justify-between items-center"
-                >
-                  <Text className="text-gray-700">{reply.content}</Text>
+          </Group>
+
+          {showReplies[comment.commentId] &&
+            comment.replyComments.map((reply: RepliesComment) => (
+              <Paper key={reply.replyCommentId} withBorder p="md" shadow="lg">
+                <Group className="justify-between">
+                  <Group>
+                    <Group>
+                      <Avatar size={"xs"} src={null} color="orange" />
+                      <Text c={"dimmed"} className="text-xs">
+                        {reply.userName}
+                        {": "}
+                      </Text>
+                    </Group>
+                    <Text className="text-xs">{reply.content}</Text>
+                  </Group>
                   {reply.userId == currentUserId && (
                     <Menu shadow="md" width={200}>
                       <Menu.Target>
-                        <Button
-                          variant="light"
-                          size="xs"
-                          className="bg-gray-200 text-black"
-                        >
-                          ...
-                        </Button>
+                        <ActionIcon variant="subtle">
+                          <IconDots size={14} />
+                        </ActionIcon>
                       </Menu.Target>
 
                       <Menu.Dropdown>
@@ -192,24 +174,22 @@ function CommentSection({ comments, question }: Props) {
                       </Menu.Dropdown>
                     </Menu>
                   )}
-                </Container>
-              ))}
-            {/* Render reply input field if necessary */}
-            {replyInputs[comment.commentId] && (
-              <Group style={{ marginTop: "auto" }}>
-                <Input radius="xl" placeholder="Reply" className="w-[90%]" />
-                <Button variant="white">
-                  <IconSend
-                    style={{ width: rem(20), height: rem(20) }}
-                    stroke={1.5}
-                  />
-                </Button>
-              </Group>
-            )}
-          </div>
-        ))}
-    </div>
-  );
+                </Group>
+              </Paper>
+            ))}
+          {replyInputs[comment.commentId] && (
+            <Group className="mt-3">
+              <TextInput placeholder="Reply to comment" className="grow" />
+              <ActionIcon variant="subtle">
+                <IconSend size={20} />
+              </ActionIcon>
+            </Group>
+          )}
+        </Paper>
+      </>
+    ));
+
+  return <Stack>{commentsList}</Stack>;
 }
 
 export default CommentSection;

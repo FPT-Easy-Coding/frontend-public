@@ -8,7 +8,7 @@ export interface Question {
   userId: number;
   title: string;
   content: string;
-  createdAt: Date;
+  createAt: Date;
   userName: string;
   answered: boolean;
   userFirstName: string;
@@ -63,9 +63,9 @@ export async function fetchCommentsData(questionId: number) {
 function ClassQuestionPage() {
   const { questionId } = useParams();
   return (
-    <div>
+    <>
       <ClassQuestionDetail questionId={Number(questionId)} />
-    </div>
+    </>
   );
 }
 

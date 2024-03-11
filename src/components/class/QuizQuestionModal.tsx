@@ -1,24 +1,54 @@
 import { Button, Modal, Stack, TextInput } from "@mantine/core";
-import { isNotEmpty, useForm } from "@mantine/form";
-import { Form } from "react-router-dom";
-
+import { TransformedValues, isNotEmpty, useForm } from "@mantine/form";
+import { useContext } from "react";
+import { Form, useNavigation, useSubmit } from "react-router-dom";
+import { UserCredentialsContext } from "../../store/user-credentials-context";
+interface SubmitFields {
+  title: string;
+  content: string;
+}
 function QuizQuestionModal({
   opened,
   close,
+  classId,
 }: {
   opened: boolean;
   close: () => void;
+  classId: number;
 }) {
-  const form = useForm({
+  const { info } = useContext(UserCredentialsContext);
+  const submit = useSubmit();
+  const navigation = useNavigation();
+  const isSubmitting = navigation.state === "submitting";
+  const form = useForm<SubmitFields>({
     initialValues: {
       title: "",
       content: "",
-      allowInvites: false,
     },
     validate: {
       title: isNotEmpty("Question title is required"),
+      content: isNotEmpty("Question description is required"),
     },
+    transformValues: (values) => ({
+      ...values,
+      userId: info?.userId,
+      classId: classId,
+      actionType: "create-class-discussion-question",
+    }),
   });
+
+  type Transformed = TransformedValues<typeof form>;
+
+  const handleSubmit = (values: Transformed) => {
+    submit(
+      {
+        ...values,
+      },
+      {
+        method: "post",
+      }
+    );
+  };
   return (
     <>
       <Modal
@@ -27,25 +57,28 @@ function QuizQuestionModal({
         onClose={close}
         centered
         size="xl"
-        title="Create a new class"
+        title="Create new question"
       >
-        <Form onSubmit={form.onSubmit(() => {})}>
+        <Form onSubmit={form.onSubmit(handleSubmit)}>
           <Stack>
             <TextInput
               placeholder="Enter question title"
               variant="filled"
-              name="title"
-              radius={"lg"}
               {...form.getInputProps("title")}
             />
             <TextInput
               placeholder="Enter a description (optional)"
               variant="filled"
               name="content"
-              radius={"lg"}
               {...form.getInputProps("content")}
             />
-            <Button className="self-end" variant="filled" type="submit">
+            <Button
+              className="self-end"
+              variant="filled"
+              type="submit"
+              disabled={isSubmitting}
+              loading={isSubmitting}
+            >
               Create question
             </Button>
           </Stack>

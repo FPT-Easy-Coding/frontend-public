@@ -1,6 +1,8 @@
-import { useParams } from "react-router-dom";
+import { useActionData, useParams } from "react-router-dom";
 import Class from "../../components/class/Class";
 import axios from "axios";
+import { useEffect } from "react";
+import { toast } from "react-toastify";
 export interface StudySet {
   quizId: number;
   numberOfQuestion: number;
@@ -61,6 +63,28 @@ export interface Member {
   userFirstName: string;
   userLastName: string;
 }
+
+interface KeysFields {
+  actionType: string;
+  userId: number;
+  classId?: number;
+  questionId?: number;
+  commentId?: number;
+  replyId?: number;
+}
+interface CreateDiscussionQuestion extends KeysFields {
+  title: string;
+  content: string;
+}
+
+interface Comment extends KeysFields {
+  content: string;
+}
+
+interface ReplyComment extends KeysFields {
+  content: string;
+}
+
 export async function fetchClassData(classId: number) {
   try {
     const response = await axios.get(
@@ -155,10 +179,121 @@ export const removeQuizFromClassApi = async (
 };
 
 function ClassPage() {
+  const actionData = useActionData() as { error: boolean; msg: string };
+  useEffect(() => {
+    if (actionData?.error) {
+      toast.error(actionData.msg);
+    }
+    if (!actionData?.error) {
+      toast.success(actionData?.msg);
+    }
+  }, [actionData]);
   const { id, tab } = useParams();
   const validTabs = ["sets", "members", "discussion"];
   const checkedTab = validTabs.includes(tab as string) ? tab : "sets";
   return <Class classId={Number(id)} tab={checkedTab} />;
 }
+async function action({ request }: { request: Request }) {
+  try {
+    const { method } = request;
+    const data = Object.fromEntries(await request.formData()) as unknown as
+      | CreateDiscussionQuestion
+      | Comment
+      | ReplyComment;
 
+    const actionType = data.actionType;
+
+    const url = {
+      POST: {
+        "create-class-discussion-question": `http://localhost:8080/api/v1/classroom/add-question`,
+      },
+      PUT: {},
+      DELETE: {},
+    };
+
+    const payload = {
+      POST: {
+        "create-class-discussion-question": {
+          classroomId: data.classId,
+          userId: data.userId,
+          title: (data as CreateDiscussionQuestion).title,
+          content: (data as CreateDiscussionQuestion).content,
+        },
+      },
+      PUT: {},
+      DELETE: {},
+    };
+
+    const errorMsg = {
+      POST: {
+        "create-class-discussion-question": "Failed to create discussion",
+      },
+      PUT: {},
+      DELETE: {},
+    };
+
+    const successMsg = {
+      POST: {
+        "create-class-discussion-question": "Discussion created successfully",
+      },
+      PUT: {},
+      DELETE: {},
+    };
+
+    let res;
+
+    if (method !== "DELETE") {
+      console.log(
+        payload[method as keyof typeof payload] as Record<string, string>
+      );
+      res = await axios.request({
+        method,
+        url: (url[method as keyof typeof url] as Record<string, string>)[
+          actionType
+        ],
+        data: (
+          payload[method as keyof typeof payload] as Record<string, string>
+        )[actionType],
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("AT")}`,
+        },
+      });
+    } else if (method === "DELETE") {
+      res = await axios.delete(
+        (url[method as keyof typeof url] as Record<string, string>)[actionType],
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("AT")}`,
+          },
+        }
+      );
+    }
+
+    if (res?.status !== 200) {
+      return {
+        error: true,
+        msg: (
+          errorMsg[method as keyof typeof errorMsg] as Record<string, string>
+        )[actionType],
+      };
+    } else {
+      return {
+        error: false,
+        msg: (
+          successMsg[method as keyof typeof successMsg] as Record<
+            string,
+            string
+          >
+        )[actionType],
+      };
+    }
+  } catch (error) {
+    return {
+      error: true,
+      msg: "Server error",
+    };
+  }
+}
+
+export { action as classAction };
 export default ClassPage;
