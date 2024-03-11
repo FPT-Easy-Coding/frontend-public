@@ -220,7 +220,7 @@ function SetDetails() {
 
             <Badge
               leftSection={<IconStarFilled size={14} color="yellow" />}
-            >{`${averageRate}`}</Badge>
+            >{`${averageRate ? averageRate : 0}`}</Badge>
 
             {userRating?.isRated && (
               <Badge color="orange">{`Your rating: ${userRating?.rate}`}</Badge>
