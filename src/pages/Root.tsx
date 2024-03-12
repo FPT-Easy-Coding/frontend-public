@@ -1,15 +1,19 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigation } from "react-router-dom";
+import axios from "axios";
+import { nprogress } from "@mantine/nprogress";
 import Navbar from "../components/navbar/Navbar";
 import Footer from "../components/footer/Footer";
-import axios from "axios";
+import { useEffect } from "react";
 
 function Root() {
-  // useEffect(() => {
-  //   if (!(data) || (data as { error?: string }).error) {
-  //     submit(null, { action: "/logout", method: "post" });
-  //     return;
-  //   }
-  // }, [data, submit]);
+  const navigation = useNavigation();
+  useEffect(() => {
+    if (navigation.state === "loading") {
+      nprogress.start();
+    } else {
+      nprogress.complete();
+    }
+  }, [navigation.state]);
   return (
     <>
       <Navbar />

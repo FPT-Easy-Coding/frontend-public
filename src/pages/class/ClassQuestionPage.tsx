@@ -1,8 +1,6 @@
-import { useParams } from "react-router-dom";
+import { Params } from "react-router-dom";
 import axios from "axios";
 import ClassQuestionDetail from "../../components/class/ClassQuestionDetail";
-
-// Interface for a question
 export interface Question {
   classQuestionId: number;
   userId: number;
@@ -36,37 +34,169 @@ export interface Comments {
   replyComments: RepliesComment[];
 }
 
-export async function fetchQuestionData(questionId: number) {
-  try {
-    const response = await axios.get(
-      `http://localhost:8080/api/v1/classroom/get-classroom-question/question-id=${questionId}`
-    );
-    console.log("questions data from server: ", response.data);
-    return response.data;
-  } catch (error) {
-    throw new Error("Error fetching class question");
-  }
-}
-
-export async function fetchCommentsData(questionId: number) {
-  try {
-    const response = await axios.get(
-      `http://localhost:8080/api/v1/classroom/get-comments/question-id=${questionId}`
-    );
-    console.log("comments data from server: ", response.data.entityResponses);
-    return response.data.entityResponses;
-  } catch (error) {
-    throw new Error("Error fetching questions comments");
-  }
+interface ActionRequest {
+  requestField: "comment" | "reply" | "answer";
+  userId: string;
+  questionId?: string;
+  commentId?: string;
+  replyCommentId?: string;
+  answerId?: string;
+  content: string;
 }
 
 function ClassQuestionPage() {
-  const { questionId } = useParams();
   return (
     <>
-      <ClassQuestionDetail questionId={Number(questionId)} />
+      <ClassQuestionDetail />
     </>
   );
 }
 
+async function loader({ params }: { params: Readonly<Params> }) {
+  try {
+    const { questionId } = params;
+    const url = {
+      fetchQuestions: `http://localhost:8080/api/v1/classroom/get-classroom-question/question-id=${questionId}`,
+      fetchComments: `http://localhost:8080/api/v1/classroom/get-comments/question-id=${questionId}`,
+    };
+    const responses = await Promise.all([
+      axios.get(url.fetchQuestions),
+      axios.get(url.fetchComments),
+    ]);
+    console.log(responses);
+    return {
+      questionsData: responses[0]?.data,
+      commentsData: responses[1]?.data.entityResponses,
+    };
+  } catch (error) {
+    return { error: true, message: "Server error" };
+  }
+}
+
+async function action({ request }: { request: Request }) {
+  try {
+    const { method } = request;
+    const data = Object.fromEntries(
+      await request.formData()
+    ) as unknown as ActionRequest;
+    const { requestField } = data;
+
+    const url: { [key: string]: { [key: string]: string } } = {
+      comment: {
+        POST: `http://localhost:8080/api/v1/classroom/add-comment`,
+        PUT: `http://localhost:8080/api/v1/classroom/update-comment/${data.commentId}`,
+        DELETE: `http://localhost:8080/api/v1/classroom/delete-comment/${data.commentId}`,
+      },
+      reply: {
+        POST: `http://localhost:8080/api/v1/classroom/add-reply`,
+        PUT: `http://localhost:8080/api/v1/classroom/update-reply/${data.replyCommentId}`,
+        DELETE: `http://localhost:8080/api/v1/classroom/delete-reply/${data.replyCommentId}`,
+      },
+      answer: {
+        POST: `http://localhost:8080/api/v1/classroom/add-answer`,
+        PUT: `http://localhost:8080/api/v1/classroom/update-answer/${data.answerId}`,
+        DELETE: `http://localhost:8080/api/v1/classroom/delete-answer/${data.answerId}`,
+      },
+    };
+
+    const payload: { [key: string]: { [key: string]: any } } = {
+      comment: {
+        POST: {
+          content: data.content,
+          questionId: Number(data.questionId),
+          userId: Number(data.userId),
+        },
+        PUT: {
+          content: data.content,
+        },
+      },
+      reply: {
+        POST: {
+          content: data.content,
+          commentId: Number(data.commentId),
+          userId: Number(data.userId),
+        },
+        PUT: {
+          content: data.content,
+        },
+      },
+      answer: {
+        POST: {
+          content: data.content,
+          questionId: Number(data.questionId),
+          userId: Number(data.userId),
+        },
+        PUT: {
+          content: data.content,
+        },
+      },
+    };
+
+    const successMsg: { [key: string]: { [key: string]: string } } = {
+      comment: {
+        POST: "Comment created",
+        PUT: "Comment updated",
+        DELETE: "Comment deleted",
+      },
+      reply: {
+        POST: "Reply created",
+        PUT: "Reply updated",
+        DELETE: "Reply deleted",
+      },
+      answer: {
+        POST: "Answer created",
+        PUT: "Answer updated",
+        DELETE: "Answer deleted",
+      },
+    };
+
+    const errorMsg: { [key: string]: { [key: string]: string } } = {
+      comment: {
+        POST: "Cannot create comment",
+        PUT: "Cannot update comment",
+        DELETE: "Cannot delete comment",
+      },
+      reply: {
+        POST: "Cannot create reply",
+        PUT: "Cannot update reply",
+        DELETE: "Cannot delete reply",
+      },
+      answer: {
+        POST: "Cannot create answer",
+        PUT: "Cannot update answer",
+        DELETE: "Cannot delete answer",
+      },
+    };
+
+    let res;
+
+    if (method !== "DELETE") {
+      res = await axios.request({
+        url: url[requestField][method],
+        method,
+        data: payload[requestField][method],
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("AT")}`,
+        },
+      });
+    } else {
+      res = await axios.delete(url[requestField][method]);
+    }
+
+    if (res.status !== 200) {
+      return {
+        error: true,
+        msg: errorMsg[requestField][method],
+      };
+    } else {
+      return {
+        error: false,
+        msg: successMsg[requestField][method],
+      };
+    }
+  } catch (error) {
+    return { error: true, msg: "Server error" };
+  }
+}
+export { loader as classQuestionPageLoader, action as classQuestionPageAction };
 export default ClassQuestionPage;

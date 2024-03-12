@@ -34,7 +34,10 @@ import { lazy, Suspense } from "react";
 import { Box, LoadingOverlay } from "@mantine/core";
 import LearnPage from "./pages/study-mode/learn/LearnPage";
 import { createQuizAction } from "./pages/quiz/create_form/CreateQuizPage";
-import ClassQuestionPage from "./pages/class/ClassQuestionPage";
+import ClassQuestionPage, {
+  classQuestionPageAction,
+  classQuestionPageLoader,
+} from "./pages/class/ClassQuestionPage";
 import { classAction } from "./pages/class/ClassPage";
 
 const AuthPage = lazy(() => import("./pages/authentication/authpage/AuthPage"));
@@ -66,7 +69,7 @@ const SetDetails = lazy(() => import("./pages/quiz/set/SetDetails"));
 const FlashcardMode = lazy(
   () => import("./pages/study-mode/flashcard/FlashcardPage")
 );
-const loadingIndicator = (
+export const loadingIndicator = (
   <Box pos={"relative"} h={"100vh"} w={"100vw"}>
     <LoadingOverlay
       visible
@@ -162,6 +165,8 @@ const router = createBrowserRouter([
           },
           {
             path: "discussion/question/:questionId",
+            loader: classQuestionPageLoader,
+            action: classQuestionPageAction,
             element: (
               <Suspense fallback={loadingIndicator}>
                 <ClassQuestionPage />

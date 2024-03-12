@@ -1,10 +1,5 @@
-import { useEffect, useState } from "react";
-import {
-  Question,
-  fetchQuestionData,
-  fetchCommentsData,
-  Comments,
-} from "../../pages/class/ClassQuestionPage";
+import { useContext, useEffect, useState } from "react";
+import { Question, Comments } from "../../pages/class/ClassQuestionPage";
 import {
   ActionIcon,
   Avatar,
@@ -12,61 +7,80 @@ import {
   Container,
   Divider,
   Group,
-  Input,
   Menu,
   Paper,
   Stack,
   Text,
   TextInput,
   Title,
-  rem,
 } from "@mantine/core";
 import { IconDots, IconPencil, IconSend, IconTrash } from "@tabler/icons-react";
 import { format } from "date-fns";
 import CommentSection from "./CommentSection";
+import { z } from "zod";
+import { useForm, zodResolver } from "@mantine/form";
+import {
+  useSubmit,
+  useNavigation,
+  useActionData,
+  useLoaderData,
+  Form,
+} from "react-router-dom";
+import { UserCredentialsContext } from "../../store/user-credentials-context";
+import { toast } from "react-toastify";
 
-function ClassQuestionDetail({ questionId }: { questionId: number }) {
-  const [question, setQuestion] = useState<Question | null>(null); // Changed to single object, not an array
-  const [comments, setComments] = useState<Comments[]>([]);
-  const currentUserId = localStorage.uid;
+export interface FormValues {
+  comment: string;
+  reply: string;
+  editComment: string;
+  editReply: string;
+}
+const formValidationSchema = z.object({
+  comment: z.string().max(2000, "Comment must be less than 2000 characters"),
+  reply: z.string().max(2000, "Reply must be less than 2000 characters"),
+});
+function ClassQuestionDetail() {
+  const { info } = useContext(UserCredentialsContext);
+  const currentUserId = info?.userId;
+  const loaderData = useLoaderData() as {
+    questionsData: Question | null;
+    commentsData: Comments[] | null;
+  };
+  const actionData = useActionData() as { error: boolean; msg: string };
+  const submit = useSubmit();
+  const navigation = useNavigation();
+  const isSubmitting = navigation.state === "submitting";
+  const question: Question | null = loaderData?.questionsData;
+  const comments: Comments[] | null = loaderData?.commentsData;
+
   useEffect(() => {
-    fetchQuestion(questionId);
-    fetchComments(questionId);
-  }, [questionId]);
-
-  async function fetchQuestion(questionId: number) {
-    try {
-      const questionData = await fetchQuestionData(questionId);
-      console.log("questions data from server: ", questionData);
-      setQuestion(questionData); // Ensure questionData is an array
-
-      // Fetch comments for each question
-    } catch (error) {
-      console.error("Error fetching questions:", error);
+    if (actionData?.error) {
+      toast.error(actionData.msg);
     }
-  }
-
-  async function fetchComments(questionId: number) {
-    console.log(`Fetching comments for question ID: ${questionId}`);
-
-    try {
-      const commentsData = await fetchCommentsData(questionId);
-      console.log("Comments data from server: ", commentsData);
-      // Check if commentsData is defined and not empty
-      if (commentsData && commentsData.length > 0) {
-        setComments((prevComments) => [...prevComments, ...commentsData]);
-      } else {
-        console.log("Comments not found for question ID:", questionId);
-      }
-    } catch (error) {
-      console.error("Error fetching comments:", error);
+    if (!actionData?.error) {
+      toast.success(actionData?.msg);
     }
-  }
+  }, [actionData]);
 
-  // Check if question exists before rendering
-  if (!question) {
-    return <div>Loading...</div>; // Or some loading indicator
-  }
+  const form = useForm<FormValues>({
+    initialValues: {
+      comment: "",
+      reply: "",
+      editComment: "",
+      editReply: "",
+    },
+    validate: zodResolver(formValidationSchema),
+  });
+
+  const handleSubmit = (values: FormValues) => {
+    const payload = {
+      requestField: "comment",
+      content: values.comment,
+      questionId: question?.classQuestionId ?? 0,
+      userId: currentUserId ?? 0,
+    };
+    submit(payload, { method: "post" });
+  };
 
   return (
     <Container className="container">
@@ -75,27 +89,27 @@ function ClassQuestionDetail({ questionId }: { questionId: number }) {
           <Group gap={"xs"}>
             <Avatar
               src={null}
-              alt={`Avatar of ${question.userFirstName} ${question.userLastName}`}
+              alt={`Avatar of ${question?.userFirstName} ${question?.userLastName}`}
               size="lg"
             >
-              {`${question.userFirstName
+              {`${question?.userFirstName
                 .charAt(0)
-                .toUpperCase()}${question.userLastName
+                .toUpperCase()}${question?.userLastName
                 .charAt(0)
                 .toUpperCase()}`}
             </Avatar>
             <Stack gap={0}>
-              <Text className="font-semibold text-md">{`${question.userFirstName} ${question.userLastName}`}</Text>
+              <Text className="font-semibold text-md">{`${question?.userFirstName} ${question?.userLastName}`}</Text>
               <Text className="text-xs" c={"dimmed"}>
-                {format(question.createAt, "MM/dd/yyyy")}
+                {format(question!.createAt, "MM/dd/yyyy")}
               </Text>
             </Stack>
           </Group>
           <Group>
             <Text className="text-xs justify-end" c={"yellow"}>
-              {question.answered ? "Answered" : "Unanswered"}
+              {question?.answered ? "Answered" : "Unanswered"}
             </Text>
-            {question.userId == currentUserId && (
+            {question?.userId == currentUserId && (
               <Menu shadow="md" width={200}>
                 <Menu.Target>
                   <ActionIcon variant="light" color="orange">
@@ -104,19 +118,10 @@ function ClassQuestionDetail({ questionId }: { questionId: number }) {
                 </Menu.Target>
 
                 <Menu.Dropdown>
-                  <Menu.Item
-                    leftSection={
-                      <IconPencil style={{ width: rem(14), height: rem(14) }} />
-                    }
-                  >
+                  <Menu.Item leftSection={<IconPencil size={14} />}>
                     Edit
                   </Menu.Item>
-                  <Menu.Item
-                    color="red"
-                    leftSection={
-                      <IconTrash style={{ width: rem(14), height: rem(14) }} />
-                    }
-                  >
+                  <Menu.Item color="red" leftSection={<IconTrash size={14} />}>
                     Delete
                   </Menu.Item>
                 </Menu.Dropdown>
@@ -126,12 +131,12 @@ function ClassQuestionDetail({ questionId }: { questionId: number }) {
         </Group>
         <Divider size="xs" className="mt-5" />
         <Stack className="my-5">
-          <Title order={4}>{question.title}</Title>
-          <Text className="font-normal text-sm">{question.content}</Text>
+          <Title order={4}>{question?.title}</Title>
+          <Text className="font-normal text-sm">{question?.content}</Text>
         </Stack>
 
         {/* Render answer section */}
-        {question.answered && (
+        {question?.answered && (
           <div className="bg-blue-100 p-4 rounded-md mb-4 flex justify-between items-center">
             <div>
               <Text className="font-semibold text-lg">Answer:</Text>
@@ -142,25 +147,16 @@ function ClassQuestionDetail({ questionId }: { questionId: number }) {
             {question.classroomAnswerResponse?.userId == currentUserId && (
               <Menu shadow="md" width={200}>
                 <Menu.Target>
-                  <Button variant="light" className="bg-blue-100 text-black">
-                    ...
-                  </Button>
+                  <ActionIcon variant="light" color="orange">
+                    <IconDots size={14} />
+                  </ActionIcon>
                 </Menu.Target>
 
                 <Menu.Dropdown>
-                  <Menu.Item
-                    leftSection={
-                      <IconPencil size={14} />
-                    }
-                  >
+                  <Menu.Item leftSection={<IconPencil size={14} />}>
                     Edit
                   </Menu.Item>
-                  <Menu.Item
-                    color="red"
-                    leftSection={
-                      <IconTrash size={14} />
-                    }
-                  >
+                  <Menu.Item color="red" leftSection={<IconTrash size={14} />}>
                     Delete
                   </Menu.Item>
                 </Menu.Dropdown>
@@ -169,18 +165,33 @@ function ClassQuestionDetail({ questionId }: { questionId: number }) {
           </div>
         )}
         <Divider my="md" />
-        {/* Render comments for this question */}
-        <CommentSection comments={comments} question={question} />
-
-        <Group className="mt-5">
-          <TextInput
-            placeholder="Comment about this question"
-            className="grow"
+        {/* render comment section */}
+        {question && (
+          <CommentSection
+            comments={comments}
+            question={question}
+            form={form}
+            submit={submit}
           />
-          <ActionIcon variant="subtle">
-            <IconSend size={20} />
-          </ActionIcon>
-        </Group>
+        )}
+        {/* render comment form */}
+        <Form onSubmit={form.onSubmit(handleSubmit)}>
+          <Group className="mt-5">
+            <TextInput
+              placeholder="Comment about this question"
+              className="grow"
+              {...form.getInputProps("comment")}
+            />
+            <ActionIcon
+              variant="subtle"
+              type="submit"
+              disabled={isSubmitting}
+              loading={isSubmitting}
+            >
+              <IconSend size={20} />
+            </ActionIcon>
+          </Group>
+        </Form>
       </Paper>
     </Container>
   );
