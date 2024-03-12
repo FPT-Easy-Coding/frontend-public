@@ -1,8 +1,25 @@
 import { Button, Checkbox, Modal, Stack, TextInput } from "@mantine/core";
-import { isNotEmpty, useForm } from "@mantine/form";
-import { Form } from "react-router-dom";
+import { TransformedValues, isNotEmpty, useForm } from "@mantine/form";
+import { useContext, useEffect } from "react";
+import { useFetcher } from "react-router-dom";
+import { toast } from "react-toastify";
+import { UserCredentialsContext } from "../../../../store/user-credentials-context";
 
 function ClassModal({ opened, close }: { opened: boolean; close: () => void }) {
+  const { info } = useContext(UserCredentialsContext);
+  const fetcher = useFetcher();
+  const { data, state, submit } = fetcher;
+  const isSubmitting = state === "submitting";
+
+  useEffect(() => {
+    if (data?.error) {
+      toast.error(data?.msg);
+    }
+    if (!data?.error) {
+      toast.success(data?.msg);
+    }
+  }, [data]);
+
   const form = useForm({
     initialValues: {
       className: "",
@@ -12,7 +29,18 @@ function ClassModal({ opened, close }: { opened: boolean; close: () => void }) {
     validate: {
       className: isNotEmpty("Class name is required"),
     },
+    transformValues: (values) => ({
+      actionType: "create-classroom",
+      userId: info?.userId as number,
+      classroomName: values.className,
+      classroomDescription: values.classDescription,
+      allowInvites: values.allowInvites,
+    }),
   });
+
+  const handleSubmit = (values: TransformedValues<typeof form>) => {
+    submit(values, { method: "post", action: "/class/1/sets" });
+  };
   return (
     <>
       <Modal
@@ -23,32 +51,39 @@ function ClassModal({ opened, close }: { opened: boolean; close: () => void }) {
         size="xl"
         title="Create a new class"
       >
-        <Form onSubmit={form.onSubmit(() => {})}>
-          <Stack>
-            <TextInput
-              placeholder="Enter class name (course, teacher, year, section etc.)"
-              variant="filled"
-              name="className"
-              radius={"lg"}
-              {...form.getInputProps("className")}
-            />
-            <TextInput
-              placeholder="Enter a description (optional)"
-              variant="filled"
-              name="classDescription"
-              radius={"lg"}
-              {...form.getInputProps("classDescription")}
-            />
-            <Checkbox
-              label="Allow class members to invite new members"
-              name="allowInvites"
-              {...form.getInputProps("allowInvites")}
-            />
-            <Button className="self-end" variant="filled" type="submit">
-              Create class
-            </Button>
-          </Stack>
-        </Form>
+        <Stack>
+          <TextInput
+            placeholder="Enter class name (course, teacher, year, section etc.)"
+            variant="filled"
+            name="className"
+            radius={"lg"}
+            {...form.getInputProps("className")}
+          />
+          <TextInput
+            placeholder="Enter a description (optional)"
+            variant="filled"
+            name="classDescription"
+            radius={"lg"}
+            {...form.getInputProps("classDescription")}
+          />
+          <Checkbox
+            label="Allow class members to invite new members"
+            name="allowInvites"
+            {...form.getInputProps("allowInvites")}
+          />
+          <Button
+            className="self-end"
+            variant="filled"
+            type="submit"
+            loading={isSubmitting}
+            disabled={isSubmitting}
+            onClick={() => {
+              form.onSubmit(handleSubmit)();
+            }}
+          >
+            Create class
+          </Button>
+        </Stack>
       </Modal>
     </>
   );

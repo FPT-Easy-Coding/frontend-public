@@ -1,6 +1,6 @@
 import { Params } from "react-router-dom";
 import axios from "axios";
-import ClassQuestionDetail from "../../components/class/ClassQuestionDetail";
+import ClassQuestionDetail from "../../components/class/question-details/ClassQuestionDetail";
 export interface Question {
   classQuestionId: number;
   userId: number;

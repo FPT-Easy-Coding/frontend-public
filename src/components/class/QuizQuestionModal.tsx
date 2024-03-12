@@ -32,7 +32,7 @@ function QuizQuestionModal({
     transformValues: (values) => ({
       ...values,
       userId: info?.userId,
-      classId: classId,
+      classroomId: classId,
       actionType: "create-class-discussion-question",
     }),
   });

@@ -67,22 +67,16 @@ export interface Member {
 interface KeysFields {
   actionType: string;
   userId: number;
-  classId?: number;
-  questionId?: number;
-  commentId?: number;
-  replyId?: number;
+  classroomId: number;
 }
-interface CreateDiscussionQuestion extends KeysFields {
+interface DiscussionQuestion extends KeysFields {
+  questionId: number;
   title: string;
   content: string;
 }
 
-interface Comment extends KeysFields {
-  content: string;
-}
-
-interface ReplyComment extends KeysFields {
-  content: string;
+interface Classroom extends KeysFields {
+  classroomName: string;
 }
 
 export async function fetchClassData(classId: number) {
@@ -197,15 +191,15 @@ async function action({ request }: { request: Request }) {
   try {
     const { method } = request;
     const data = Object.fromEntries(await request.formData()) as unknown as
-      | CreateDiscussionQuestion
-      | Comment
-      | ReplyComment;
-
-    const actionType = data.actionType;
+      | DiscussionQuestion
+      | Classroom;
+    const actionType = (data as KeysFields).actionType;
 
     const url = {
       POST: {
         "create-class-discussion-question": `http://localhost:8080/api/v1/classroom/add-question`,
+        "create-classroom":
+          "http://localhost:8080/api/v1/classroom/create-classroom",
       },
       PUT: {},
       DELETE: {},
@@ -214,10 +208,14 @@ async function action({ request }: { request: Request }) {
     const payload = {
       POST: {
         "create-class-discussion-question": {
-          classroomId: data.classId,
-          userId: data.userId,
-          title: (data as CreateDiscussionQuestion).title,
-          content: (data as CreateDiscussionQuestion).content,
+          classroomId: (data as DiscussionQuestion).classroomId,
+          userId: (data as DiscussionQuestion).userId,
+          title: (data as DiscussionQuestion).title,
+          content: (data as DiscussionQuestion).content,
+        },
+        "create-classroom": {
+          classroomName: (data as Classroom).classroomName,
+          userId: (data as Classroom).userId,
         },
       },
       PUT: {},
@@ -227,6 +225,7 @@ async function action({ request }: { request: Request }) {
     const errorMsg = {
       POST: {
         "create-class-discussion-question": "Failed to create discussion",
+        "create-classroom": "Failed to create classroom",
       },
       PUT: {},
       DELETE: {},
@@ -235,6 +234,7 @@ async function action({ request }: { request: Request }) {
     const successMsg = {
       POST: {
         "create-class-discussion-question": "Discussion created successfully",
+        "create-classroom": "Classroom created successfully",
       },
       PUT: {},
       DELETE: {},

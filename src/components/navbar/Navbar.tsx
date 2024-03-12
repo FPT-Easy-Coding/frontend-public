@@ -12,7 +12,6 @@ import {
 import logo from "../../assets/logo.svg";
 import {
   NavLink,
-  useActionData,
   useLoaderData,
   useSearchParams,
   useSubmit,
@@ -34,7 +33,6 @@ import { UserCredentialsContext } from "../../store/user-credentials-context";
 import { useDisclosure } from "@mantine/hooks";
 import FolderModal from "../modal/navbar/create/FolderModal";
 import ClassModal from "../modal/navbar/create/ClassModal";
-import { toast } from "react-toastify";
 
 const userBtn = (data: LoaderData, submit: any, handleLogout: () => void) => {
   return (

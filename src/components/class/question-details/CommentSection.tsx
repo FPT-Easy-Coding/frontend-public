@@ -3,7 +3,7 @@ import {
   Question,
   Comments,
   RepliesComment,
-} from "../../pages/class/ClassQuestionPage";
+} from "../../../pages/class/ClassQuestionPage";
 import {
   ActionIcon,
   Avatar,
@@ -16,7 +16,6 @@ import {
   Text,
   TextInput,
   Textarea,
-  rem,
 } from "@mantine/core";
 import {
   IconChevronDown,
@@ -28,18 +27,34 @@ import {
   IconTrash,
   IconX,
 } from "@tabler/icons-react";
-import { UserCredentialsContext } from "../../store/user-credentials-context";
-import { UseFormReturnType } from "@mantine/form";
-import { FormValues } from "./ClassQuestionDetail";
-import { Form, SubmitFunction } from "react-router-dom";
-
+import { UserCredentialsContext } from "../../../store/user-credentials-context";
+import { Form, useSubmit } from "react-router-dom";
+import { useForm, zodResolver } from "@mantine/form";
+import { z } from "zod";
+import EditCommentInput from "./edit/EditCommentInput";
+import EditInput from "./edit/EditInput";
 interface Props {
   comments: Comments[] | null;
   question: Question;
-  form: UseFormReturnType<FormValues>;
-  submit: SubmitFunction;
 }
-function CommentSection({ comments, question, form, submit }: Props) {
+const formValidationSchema = z.object({
+  reply: z
+    .string()
+    .max(2000, "Reply must be less than 2000 characters")
+    .min(1, "Reply is required"),
+  editComment: z
+    .string()
+    .max(2000, "Comment must be less than 2000 characters"),
+  editReply: z.string().max(2000, "Reply must be less than 2000 characters"),
+});
+function CommentSection({ comments, question }: Props) {
+  const submit = useSubmit();
+  const form = useForm({
+    initialValues: {
+      reply: "",
+    },
+    validate: zodResolver(formValidationSchema),
+  });
   const { info } = useContext(UserCredentialsContext);
   const currentUserId = info?.userId;
   const [showReplies, setShowReplies] = useState<{ [key: number]: boolean }>(
@@ -53,8 +68,9 @@ function CommentSection({ comments, question, form, submit }: Props) {
     {}
   );
   const [editReplyComment, setEditReplyComment] = useState<{
-    [key: number]: boolean;
+    [key: number]: { [key: number]: boolean };
   }>({});
+
   // togglers
   const toggleEditComment = (commentId: number, comment: Comments) => {
     setEditComment((prevState) => ({
@@ -67,7 +83,12 @@ function CommentSection({ comments, question, form, submit }: Props) {
   const toggleEditReply = (commentId: number, reply: RepliesComment) => {
     setEditReplyComment((prevState) => ({
       ...prevState,
-      [commentId]: !prevState[commentId],
+      [commentId]: {
+        ...(prevState[commentId] || {}),
+        [reply.replyCommentId]: !(
+          (prevState[commentId] || {})[reply.replyCommentId] || false
+        ),
+      },
     }));
     form.setFieldValue("editReply", reply.content);
   };
@@ -86,45 +107,16 @@ function CommentSection({ comments, question, form, submit }: Props) {
     }));
   };
   // handlers
-  const handleReplySubmit = (values: FormValues, commentId: number) => {
+  const handleReplySubmit = (values: typeof form.values, commentId: number) => {
     const payload = {
       requestField: "reply",
       content: values.reply,
       commentId: commentId,
       userId: currentUserId!,
     };
+    console.log(payload);
     submit(payload, { method: "post" });
     form.setFieldValue("reply", "");
-  };
-
-  const handleEditCommentSubmit = (values: FormValues, commentId: number) => {
-    const payload = {
-      requestField: "comment",
-      content: values.editComment,
-      commentId: commentId,
-    };
-    submit(payload, { method: "put" });
-    form.setFieldValue("editComment", "");
-    toggleEditComment(commentId, comments![commentId - 1]);
-  };
-
-  const handleEditReplySubmit = (
-    values: FormValues,
-    commentId: number,
-    replyCommentId: number
-  ) => {
-    const payload = {
-      requestField: "reply",
-      content: values.editReply,
-      commentId: commentId,
-      replyCommentId: replyCommentId,
-    };
-    submit(payload, { method: "put" });
-    form.setFieldValue("editReply", "");
-    toggleEditReply(
-      commentId,
-      comments![commentId - 1].replyComments![replyCommentId - 1]
-    );
   };
 
   const handleDeleteComment = (commentId: number) => {
@@ -158,34 +150,13 @@ function CommentSection({ comments, question, form, submit }: Props) {
               </Group>
               {/* edit comment input */}
               {editComment[comment.commentId] ? (
-                <Paper radius="md" p="xs" shadow="md" className="grow">
-                  <Group>
-                    <Textarea
-                      placeholder="Edit comment"
-                      {...form.getInputProps("editComment")}
-                      autoFocus
-                      autosize
-                      className="grow"
-                    />
-                    <ActionIcon
-                      variant="subtle"
-                      onClick={() => {
-                        handleEditCommentSubmit(form.values, comment.commentId);
-                      }}
-                    >
-                      <IconSend size={20} />
-                    </ActionIcon>
-                    <ActionIcon
-                      variant="subtle"
-                      c="red"
-                      onClick={() =>
-                        toggleEditComment(comment.commentId, comment)
-                      }
-                    >
-                      <IconX size={20} />
-                    </ActionIcon>
-                  </Group>
-                </Paper>
+                <EditInput
+                  requestField="comment"
+                  object={comment}
+                  toggler={() => {
+                    toggleEditComment(comment.commentId, comment);
+                  }}
+                />
               ) : (
                 <Text fz={"sm"}>{comment.content}</Text>
               )}
@@ -275,39 +246,19 @@ function CommentSection({ comments, question, form, submit }: Props) {
                         </Text>
                       </Group>
                       {/* edit reply input */}
-                      {editReplyComment[comment.commentId] ? (
-                        <Paper radius="md" p="xs" shadow="md" className="grow">
-                          <Group>
-                            <Textarea
-                              placeholder="Edit reply"
-                              {...form.getInputProps("editReply")}
-                              autoFocus
-                              autosize
-                              className="grow"
-                            />
-                            <ActionIcon
-                              variant="subtle"
-                              onClick={() => {
-                                handleEditReplySubmit(
-                                  form.values,
-                                  comment.commentId,
-                                  reply.replyCommentId
-                                );
-                              }}
-                            >
-                              <IconSend size={20} />
-                            </ActionIcon>
-                            <ActionIcon
-                              variant="subtle"
-                              c="red"
-                              onClick={() => {
-                                toggleEditReply(comment.commentId, reply);
-                              }}
-                            >
-                              <IconX size={20} />
-                            </ActionIcon>
-                          </Group>
-                        </Paper>
+                      {editReplyComment[comment.commentId][
+                        reply.replyCommentId
+                      ] ? (
+                        <EditInput
+                          requestField="reply"
+                          object={reply}
+                          toggler={() => {
+                            toggleEditReply(
+                              comment.commentId,
+                              reply as RepliesComment
+                            );
+                          }}
+                        />
                       ) : (
                         <Text fz={"sm"}>{reply.content}</Text>
                       )}
@@ -350,22 +301,23 @@ function CommentSection({ comments, question, form, submit }: Props) {
           {/* render reply form */}
           {replyInputs[comment.commentId] && (
             <FocusTrap active={replyInputs[comment.commentId]}>
-              <Group className="mt-3">
-                <TextInput
-                  placeholder="Reply to comment"
-                  className="grow"
-                  {...form.getInputProps("reply")}
-                  data-autofocus
-                />
-                <ActionIcon
-                  variant="subtle"
-                  onClick={() => {
-                    handleReplySubmit(form.values, comment.commentId);
-                  }}
-                >
-                  <IconSend size={20} color="orange" />
-                </ActionIcon>
-              </Group>
+              <Form
+                onSubmit={form.onSubmit((values) => {
+                  handleReplySubmit(values, comment.commentId);
+                })}
+              >
+                <Group className="mt-3">
+                  <TextInput
+                    placeholder="Reply to comment"
+                    className="grow"
+                    {...form.getInputProps("reply")}
+                    data-autofocus
+                  />
+                  <ActionIcon variant="subtle" type="submit">
+                    <IconSend size={20} color="orange" />
+                  </ActionIcon>
+                </Group>
+              </Form>
             </FocusTrap>
           )}
         </Paper>

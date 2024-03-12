@@ -4,6 +4,13 @@ import { nprogress } from "@mantine/nprogress";
 import Navbar from "../components/navbar/Navbar";
 import Footer from "../components/footer/Footer";
 import { useEffect } from "react";
+interface FolderRequest {
+  folderTitle: string;
+}
+interface ActionRequest extends FolderRequest {
+  action: string;
+  userId: number;
+}
 
 function Root() {
   const navigation = useNavigation();
@@ -29,7 +36,9 @@ export default Root;
 
 export async function action({ request }: { request: Request }) {
   try {
-    const data = Object.fromEntries(await request.formData());
+    const data = Object.fromEntries(
+      await request.formData()
+    ) as unknown as ActionRequest;
     const AT = "Bearer " + localStorage.getItem("AT");
     const action = data.action;
     const payload = {

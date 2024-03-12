@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Question, Comments } from "../../pages/class/ClassQuestionPage";
+import { Question, Comments } from "../../../pages/class/ClassQuestionPage";
 import {
   ActionIcon,
   Avatar,
@@ -18,7 +18,7 @@ import { IconDots, IconPencil, IconSend, IconTrash } from "@tabler/icons-react";
 import { format } from "date-fns";
 import CommentSection from "./CommentSection";
 import { z } from "zod";
-import { useForm, zodResolver } from "@mantine/form";
+import { isNotEmpty, useForm, zodResolver } from "@mantine/form";
 import {
   useSubmit,
   useNavigation,
@@ -26,18 +26,17 @@ import {
   useLoaderData,
   Form,
 } from "react-router-dom";
-import { UserCredentialsContext } from "../../store/user-credentials-context";
+import { UserCredentialsContext } from "../../../store/user-credentials-context";
 import { toast } from "react-toastify";
 
-export interface FormValues {
+interface FormValues {
   comment: string;
-  reply: string;
-  editComment: string;
-  editReply: string;
 }
 const formValidationSchema = z.object({
-  comment: z.string().max(2000, "Comment must be less than 2000 characters"),
-  reply: z.string().max(2000, "Reply must be less than 2000 characters"),
+  comment: z
+    .string()
+    .max(2000, "Comment must be less than 2000 characters")
+    .min(1, "Comment is required"),
 });
 function ClassQuestionDetail() {
   const { info } = useContext(UserCredentialsContext);
@@ -65,9 +64,6 @@ function ClassQuestionDetail() {
   const form = useForm<FormValues>({
     initialValues: {
       comment: "",
-      reply: "",
-      editComment: "",
-      editReply: "",
     },
     validate: zodResolver(formValidationSchema),
   });
@@ -166,14 +162,7 @@ function ClassQuestionDetail() {
         )}
         <Divider my="md" />
         {/* render comment section */}
-        {question && (
-          <CommentSection
-            comments={comments}
-            question={question}
-            form={form}
-            submit={submit}
-          />
-        )}
+        {question && <CommentSection comments={comments} question={question} />}
         {/* render comment form */}
         <Form onSubmit={form.onSubmit(handleSubmit)}>
           <Group className="mt-5">
