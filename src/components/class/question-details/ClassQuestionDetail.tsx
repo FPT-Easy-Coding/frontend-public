@@ -76,6 +76,7 @@ function ClassQuestionDetail() {
       userId: currentUserId ?? 0,
     };
     submit(payload, { method: "post" });
+    form.setFieldValue("comment", "");
   };
 
   return (
