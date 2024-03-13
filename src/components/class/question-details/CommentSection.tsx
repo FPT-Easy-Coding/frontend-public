@@ -15,7 +15,6 @@ import {
   Stack,
   Text,
   TextInput,
-  Textarea,
 } from "@mantine/core";
 import {
   IconChevronDown,
@@ -25,13 +24,11 @@ import {
   IconPencil,
   IconSend,
   IconTrash,
-  IconX,
 } from "@tabler/icons-react";
 import { UserCredentialsContext } from "../../../store/user-credentials-context";
 import { Form, useSubmit } from "react-router-dom";
 import { useForm, zodResolver } from "@mantine/form";
 import { z } from "zod";
-import EditCommentInput from "./edit/EditCommentInput";
 import EditInput from "./edit/EditInput";
 interface Props {
   comments: Comments[] | null;
@@ -42,10 +39,6 @@ const formValidationSchema = z.object({
     .string()
     .max(2000, "Reply must be less than 2000 characters")
     .min(1, "Reply is required"),
-  editComment: z
-    .string()
-    .max(2000, "Comment must be less than 2000 characters"),
-  editReply: z.string().max(2000, "Reply must be less than 2000 characters"),
 });
 function CommentSection({ comments, question }: Props) {
   const submit = useSubmit();
@@ -84,13 +77,12 @@ function CommentSection({ comments, question }: Props) {
     setEditReplyComment((prevState) => ({
       ...prevState,
       [commentId]: {
-        ...(prevState[commentId] || {}),
-        [reply.replyCommentId]: !(
-          (prevState[commentId] || {})[reply.replyCommentId] || false
-        ),
+        ...prevState[commentId],
+        [reply.replyCommentId]:
+          !prevState[commentId]?.[reply.replyCommentId] || false,
       },
     }));
-    form.setFieldValue("editReply", reply.content);
+    form.setFieldValue("reply", "");
   };
 
   const toggleShowReplies = (commentId: number) => {
@@ -114,7 +106,6 @@ function CommentSection({ comments, question }: Props) {
       commentId: commentId,
       userId: currentUserId!,
     };
-    console.log(payload);
     submit(payload, { method: "post" });
     form.setFieldValue("reply", "");
   };
@@ -246,17 +237,15 @@ function CommentSection({ comments, question }: Props) {
                         </Text>
                       </Group>
                       {/* edit reply input */}
-                      {editReplyComment[comment.commentId][
+                      {editReplyComment[comment.commentId] &&
+                      editReplyComment[comment.commentId][
                         reply.replyCommentId
                       ] ? (
                         <EditInput
                           requestField="reply"
                           object={reply}
                           toggler={() => {
-                            toggleEditReply(
-                              comment.commentId,
-                              reply as RepliesComment
-                            );
+                            toggleEditReply(comment.commentId, reply);
                           }}
                         />
                       ) : (

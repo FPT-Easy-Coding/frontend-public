@@ -68,7 +68,9 @@ function EditInput({ toggler, object, requestField }: Props) {
           <ActionIcon
             variant="subtle"
             c="red"
-            onClick={() => toggler(object.commentId, object)}
+            onClick={() => {
+              toggler(object.commentId, object);
+            }}
           >
             <IconX size={20} />
           </ActionIcon>
