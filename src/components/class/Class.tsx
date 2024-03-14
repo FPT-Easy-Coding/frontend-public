@@ -56,11 +56,12 @@ import {
   fetchQuestionsData,
 } from "../../pages/class/ClassPage";
 import { format } from "date-fns";
-import { Link, useActionData, useNavigate } from "react-router-dom";
+import { Link, useActionData, useNavigate, useSubmit } from "react-router-dom";
 import QuizQuestionModal from "./QuizQuestionModal";
+import deleteClassModal from "../modal/class/delete/DeleteClassModal";
 
-const iconStyle = { width: rem(12), height: rem(12) };
 function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
+  const submit = useSubmit();
   const actionData = useActionData();
   const iconSearch = <IconSearch style={{ width: rem(16), height: rem(16) }} />;
   const [inviteModalOpened, setInviteModalOpened] = useState(false);
@@ -80,10 +81,6 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
   const uid = Number(localStorage.getItem("uid"));
   const [commonQuizIds, setCommonQuizIds] = useState<number[]>([]);
   const navigate = useNavigate();
-
-  const inviteMembers = () => {
-    console.log("invite", jsonContent);
-  };
 
   useEffect(() => {
     fetchStudySets(classId);
@@ -261,45 +258,6 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
 
   return (
     <div>
-      <Modal.Root
-        opened={deleteModalOpened}
-        onClose={() => setDeleteModalOpened(false)}
-        centered
-      >
-        <Modal.Overlay />
-        <Modal.Content>
-          <div className="p-4">
-            <Modal.Header>
-              <Modal.Title className="font-bold text-size text-2xl">
-                Confirm Deletion
-              </Modal.Title>
-              <Modal.CloseButton />
-            </Modal.Header>
-            <Modal.Body>
-              <Text>Are you sure you want to delete this item?</Text>
-            </Modal.Body>
-            <Group className="flex justify-center">
-              {" "}
-              <Button
-                variant="light"
-                onClick={() => setDeleteModalOpened(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="filled"
-                color="red"
-                onClick={() => {
-                  setDeleteModalOpened(false);
-                }}
-              >
-                Delete
-              </Button>
-            </Group>
-          </div>
-        </Modal.Content>
-      </Modal.Root>
-
       {/* Add quiz sets modal */}
       <Modal.Root
         opened={addSetsModalOpened}
@@ -416,45 +374,28 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
                 </Group>
                 <Group className="flex items-center">
                   <ActionIcon variant="filled" aria-label="Settings">
-                    <IconBellFilled
-                      style={{ width: "70%", height: "70%" }}
-                      stroke={1.5}
-                    />
+                    <IconBellFilled size={20} />
                   </ActionIcon>
                   <Menu shadow="md" width={200}>
                     <Menu.Target>
-                      <Button variant="light" color="gray" className="w-[50px]">
-                        <IconDots />
+                      <Button variant="light" color="gray">
+                        <IconDots size={14} />
                       </Button>
                     </Menu.Target>
 
                     <Menu.Dropdown>
                       <Menu.Label>Actions</Menu.Label>
                       <Menu.Item
-                        leftSection={
-                          <IconBook
-                            style={{ width: rem(14), height: rem(14) }}
-                          />
-                        }
+                        leftSection={<IconBook size={14} />}
                         color="blue"
                       >
                         Study
                       </Menu.Item>
-                      <Menu.Item
-                        leftSection={
-                          <IconShare2
-                            style={{ width: rem(14), height: rem(14) }}
-                          />
-                        }
-                      >
+                      <Menu.Item leftSection={<IconShare2 size={14} />}>
                         Share
                       </Menu.Item>
                       <Menu.Item
-                        leftSection={
-                          <IconAlertTriangleFilled
-                            style={{ width: rem(14), height: rem(14) }}
-                          />
-                        }
+                        leftSection={<IconAlertTriangleFilled size={14} />}
                         color="red"
                       >
                         Report
@@ -464,51 +405,30 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
                       <Menu.Item>
                         <Menu trigger="hover" position="right">
                           <Menu.Target>
-                            <Group className="ml-[2px]">
-                              <IconSettings
-                                style={{ width: rem(14), height: rem(14) }}
-                              />{" "}
+                            <Menu.Item leftSection={<IconSettings size={14} />}>
                               Settings
-                            </Group>
+                            </Menu.Item>
                           </Menu.Target>
                           <Menu.Dropdown className="ml-2">
                             <Menu.Item
-                              leftSection={
-                                <IconCirclePlus
-                                  style={{ width: rem(14), height: rem(14) }}
-                                />
-                              }
+                              leftSection={<IconCirclePlus size={14} />}
                               onClick={() => setAddSetsModalOpened(true)}
                             >
                               Add sets
                             </Menu.Item>
                             <Menu.Item
-                              leftSection={
-                                <IconUserPlus
-                                  style={{ width: rem(14), height: rem(14) }}
-                                />
-                              }
+                              leftSection={<IconUserPlus size={14} />}
                               onClick={() => setInviteModalOpened(true)}
                             >
                               Invite members
                             </Menu.Item>
-                            <Menu.Item
-                              leftSection={
-                                <IconEdit
-                                  style={{ width: rem(14), height: rem(14) }}
-                                />
-                              }
-                            >
+                            <Menu.Item leftSection={<IconEdit size={14} />}>
                               Edit
                             </Menu.Item>
                             <Menu.Item
                               color="red"
-                              leftSection={
-                                <IconEraser
-                                  style={{ width: rem(14), height: rem(14) }}
-                                />
-                              }
-                              onClick={() => setDeleteModalOpened(true)}
+                              leftSection={<IconEraser size={14} />}
+                              onClick={() => deleteClassModal(classId, submit)}
                             >
                               Delete
                             </Menu.Item>

@@ -64,13 +64,15 @@ const userBtn = (data: LoaderData, submit: any, handleLogout: () => void) => {
             </Menu.Item>
           </NavLink>
 
-          <Menu.Item
-            leftSection={
-              <IconSettings style={{ width: rem(14), height: rem(14) }} />
-            }
-          >
-            Settings
-          </Menu.Item>
+          <NavLink to={"/settings"}>
+            <Menu.Item
+              leftSection={
+                <IconSettings style={{ width: rem(14), height: rem(14) }} />
+              }
+            >
+              Settings
+            </Menu.Item>
+          </NavLink>
 
           <Menu.Item
             leftSection={
@@ -183,7 +185,6 @@ function Navbar() {
       : userBtn(data, submit, clearUserCredentials);
   const whichHomepage = data?.error || !data ? "/" : "/home";
 
-  useEffect(() => {});
   return (
     <>
       <header className="w-full h-16 flex items-center justify-between sticky top-0 z-20 shadow-sm bg-[--mantine-color-body]">

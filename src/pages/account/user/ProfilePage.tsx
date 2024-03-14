@@ -1,6 +1,8 @@
 import axios from "axios";
 import Profile from "../../../components/account/user/Profile";
 import { useParams, useRouteLoaderData } from "react-router-dom";
+import { useContext } from "react";
+import { UserCredentialsContext } from "../../../store/user-credentials-context";
 export interface UserData {
   userId: number;
   userName: string;
@@ -86,4 +88,15 @@ function ProfilePage() {
   return <Profile userData={loaderData} tabPath={checkedTab} />;
 }
 
+async function loader() {
+  const uid = localStorage.getItem("uid");
+  try {
+    const url = {
+      folderData: `http://localhost:8080/api/v1/folder/created/user-id=${uid}`,
+      studySetData: `http://localhost:8080/api/v1/quiz/learned/user-id=${uid}`,
+      classData: `http://localhost:8080/api/v1/classroom/learned/user-id=${uid}`,
+    };
+  } catch (error) {}
+}
+export { loader as profileLoader };
 export default ProfilePage;

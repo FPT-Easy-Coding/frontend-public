@@ -7,6 +7,7 @@ import {
   Stack,
   Avatar,
   Flex,
+  Paper,
 } from "@mantine/core";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -24,42 +25,47 @@ interface Quiz {
 }
 
 function PopularQuiz() {
-
   const navigate = useNavigate();
 
   const [popularQuiz, setpopularQuiz] = useState<Quiz[]>([]);
 
   useEffect(() => {
-    axios.get('http://localhost:8080/api/v1/quiz/get-all-quiz')
-      .then(res => {
-        const sortedList = res && res.data ? res.data.sort((a: { view: number; }, b: { view: number; }) => b.view - a.view) : [];
+    axios
+      .get("http://localhost:8080/api/v1/quiz/get-all-quiz")
+      .then((res) => {
+        const sortedList =
+          res && res.data
+            ? res.data.sort(
+                (a: { view: number }, b: { view: number }) => b.view - a.view
+              )
+            : [];
         setpopularQuiz(sortedList);
       })
-      .catch(error => {
+      .catch((error) => {
         // Handle error here
-        console.log('Error fetching data:', error);
+        console.log("Error fetching data:", error);
         // You can set an error state or do other error handling if needed
       });
   }, []);
 
-
-
   const handleClickUpdateTime = async (quizId: any) => {
-    await axios.put(`http://localhost:8080/api/v1/quiz/update-time-quiz?id=${quizId}`);
+    await axios.put(
+      `http://localhost:8080/api/v1/quiz/update-time-quiz?id=${quizId}`
+    );
   };
-
 
   const handleClickIncreaseView = async (quizId: any) => {
-    await axios.put(`http://localhost:8080/api/v1/quiz/increase-view?quiz-id=${quizId}`);
+    await axios.put(
+      `http://localhost:8080/api/v1/quiz/increase-view?quiz-id=${quizId}`
+    );
   };
 
-
   return (
-    <div>
+    <>
       {popularQuiz.length > 0 ? (
         <Carousel
           slideSize={"33.333333%"}
-          height={"200px"}
+          height={"150px"}
           align={"start"}
           slideGap="lg"
           controlsOffset="xs"
@@ -71,52 +77,40 @@ function PopularQuiz() {
             <Carousel.Slide key={index}>
               <Card
                 shadow="sm"
-                padding="lg"
+                padding={"lg"}
                 radius="md"
                 withBorder
                 component="a"
                 className="h-full"
               >
-                <Flex
-                  className="flex-col px-5 h-full"
-                  justify="space-between"
+                <Stack
+                  className="h-full justify-between"
                   onClick={() => {
                     handleClickUpdateTime(quiz.quizId);
                     handleClickIncreaseView(quiz.quizId);
-                    // navigate(`/quiz/set/${quiz.quizId}/learn`),
-                    navigate(`/quiz/set/${quiz.quizId}`)
-                  }}
-                  onMouseEnter={() => {
-                    document.body.style.cursor = "pointer";
-                  }}
-                  onMouseLeave={() => {
-                    document.body.style.cursor = "auto";
+                    navigate(`/quiz/set/${quiz.quizId}`);
                   }}
                 >
-                  <Card.Section>
-                    <Stack className="gap-2">
-                      <Text fw={500}>{quiz.quizName}</Text>
-                      <Badge color="indigo">{quiz.numberOfQuestions} Question</Badge>
-                    </Stack>
-                  </Card.Section>
-                  <Card.Section>
-                    <Group gap={"xs"}>
-                      <Avatar variant="filled" radius="xl" size="sm" />
-                      <Text size="sm">{quiz.userName}</Text>
-                    </Group>
-                  </Card.Section>
-                </Flex>
+                  <Stack gap={3}>
+                    <Text fw={500}>{quiz.quizName}</Text>
+                    <Badge color="indigo">
+                      {quiz.numberOfQuestions} Question
+                    </Badge>
+                  </Stack>
+                  <Group gap={"xs"}>
+                    <Avatar variant="filled" radius="xl" size="sm" />
+                    <Text size="sm">{quiz.userName}</Text>
+                  </Group>
+                </Stack>
               </Card>
             </Carousel.Slide>
           ))}
         </Carousel>
       ) : (
-        <div className="no-data-message">
-          don't have any quiz
-        </div>
+        <div className="no-data-message">don't have any quiz</div>
       )}
-    </div>
+    </>
   );
-};
+}
 
 export default PopularQuiz;

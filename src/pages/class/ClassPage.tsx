@@ -1,4 +1,4 @@
-import { useActionData, useParams } from "react-router-dom";
+import { redirect, useActionData, useParams } from "react-router-dom";
 import Class from "../../components/class/Class";
 import axios from "axios";
 import { useEffect } from "react";
@@ -201,8 +201,12 @@ async function action({ request }: { request: Request }) {
         "create-classroom":
           "http://localhost:8080/api/v1/classroom/create-classroom",
       },
-      PUT: {},
-      DELETE: {},
+      PUT: {
+        "update-classroom": `http://localhost:8080/api/v1/classroom/update-classroom/classroom-id=${data.classroomId}`,
+      },
+      DELETE: {
+        "delete-classroom": `http://localhost:8080/api/v1/classroom/delete-classroom/class-id=${data.classroomId}`,
+      },
     };
 
     const payload = {
@@ -218,7 +222,12 @@ async function action({ request }: { request: Request }) {
           userId: (data as Classroom).userId,
         },
       },
-      PUT: {},
+      PUT: {
+        "update-classroom": {
+          classroomId: (data as Classroom).classroomId,
+          classroomName: (data as Classroom).classroomName,
+        },
+      },
       DELETE: {},
     };
 
@@ -227,8 +236,12 @@ async function action({ request }: { request: Request }) {
         "create-class-discussion-question": "Failed to create discussion",
         "create-classroom": "Failed to create classroom",
       },
-      PUT: {},
-      DELETE: {},
+      PUT: {
+        "update-classroom": "Failed to update classroom",
+      },
+      DELETE: {
+        "delete-classroom": "Failed to delete classroom",
+      },
     };
 
     const successMsg = {
@@ -236,16 +249,17 @@ async function action({ request }: { request: Request }) {
         "create-class-discussion-question": "Discussion created successfully",
         "create-classroom": "Classroom created successfully",
       },
-      PUT: {},
-      DELETE: {},
+      PUT: {
+        "update-classroom": "Classroom updated successfully",
+      },
+      DELETE: {
+        "delete-classroom": "Classroom deleted successfully",
+      },
     };
 
     let res;
 
     if (method !== "DELETE") {
-      console.log(
-        payload[method as keyof typeof payload] as Record<string, string>
-      );
       res = await axios.request({
         method,
         url: (url[method as keyof typeof url] as Record<string, string>)[
@@ -267,6 +281,9 @@ async function action({ request }: { request: Request }) {
           },
         }
       );
+      if (actionType === "delete-classroom") {
+        return redirect(`/home`);
+      }
     }
 
     if (res?.status !== 200) {

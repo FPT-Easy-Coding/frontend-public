@@ -69,6 +69,9 @@ const SetDetails = lazy(() => import("./pages/quiz/set/SetDetails"));
 const FlashcardMode = lazy(
   () => import("./pages/study-mode/flashcard/FlashcardPage")
 );
+
+const Settings = lazy(() => import("./pages/settings/SettingsPage"));
+
 export const loadingIndicator = (
   <Box pos={"relative"} h={"100vh"} w={"100vw"}>
     <LoadingOverlay
@@ -218,6 +221,14 @@ const router = createBrowserRouter([
             action: SetAction,
           },
         ],
+      },
+      {
+        path: "settings",
+        element: (
+          <Suspense fallback={loadingIndicator}>
+            <Settings />
+          </Suspense>
+        ),
       },
       { path: "logout", action: logout },
     ],
