@@ -1,6 +1,6 @@
 import { modals } from "@mantine/modals";
 import { Text } from "@mantine/core";
-import { SubmitFunction, redirect, useNavigate } from "react-router-dom";
+import { SubmitFunction } from "react-router-dom";
 const deleteClassModal = (classroomId: number, submit: SubmitFunction) => {
   modals.openConfirmModal({
     title: "Confirm class deletion",

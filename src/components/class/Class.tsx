@@ -257,7 +257,7 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
   };
 
   return (
-    <div>
+    <>
       {/* Add quiz sets modal */}
       <Modal.Root
         opened={addSetsModalOpened}
@@ -775,7 +775,7 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
           </Grid.Col>
         </Grid>
       </Container>
-    </div>
+    </>
   );
 }
 
