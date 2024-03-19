@@ -45,6 +45,7 @@ const userBtn = (data: LoaderData, submit: any, handleLogout: () => void) => {
               radius="xl"
               color="grape"
               className="cursor-pointer"
+              src={data?.avatar}
             />
             <Text className="text-sm font-semibold">
               {data ? data.firstName + " " + data.lastName : "Guest"}
@@ -142,6 +143,8 @@ interface LoaderData {
   role: string;
   premium: boolean;
   banned: boolean;
+  accountType: string;
+  avatar: string
 }
 
 function Navbar() {

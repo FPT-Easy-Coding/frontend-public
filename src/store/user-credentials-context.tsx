@@ -11,6 +11,8 @@ export interface UserCredentials {
     role: string;
     premium: boolean;
     banned: boolean;
+    accountType: string;
+    avatar: string
   } | null;
   loaded: boolean;
 }
@@ -26,6 +28,8 @@ interface UserCredentialsContextProps {
     role: string;
     premium: boolean;
     banned: boolean;
+    accountType: string;
+    avatar: string
   } | null;
   loaded: boolean;
   assignUserCredentials: (userCredentials: any) => void;
@@ -44,10 +48,12 @@ export const UserCredentialsContext =
       role: "",
       premium: false,
       banned: false,
+      accountType: "",
+      avatar: "",
     },
     loaded: false,
-    assignUserCredentials: () => {},
-    clearUserCredentials: () => {},
+    assignUserCredentials: () => { },
+    clearUserCredentials: () => { },
   });
 
 function userCredentialsReducer(state: UserCredentials, action: any) {

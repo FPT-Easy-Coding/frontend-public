@@ -21,6 +21,8 @@ interface Quiz {
   userName: string;
   view: number;
   timeRecentViewQuiz: string; // Change the type to string
+  avatar: string;
+  accountType: string;
   // Add other properties as needed
 }
 
@@ -36,8 +38,8 @@ function PopularQuiz() {
         const sortedList =
           res && res.data
             ? res.data.sort(
-                (a: { view: number }, b: { view: number }) => b.view - a.view
-              )
+              (a: { view: number }, b: { view: number }) => b.view - a.view
+            )
             : [];
         setpopularQuiz(sortedList);
       })
@@ -98,7 +100,7 @@ function PopularQuiz() {
                     </Badge>
                   </Stack>
                   <Group gap={"xs"}>
-                    <Avatar variant="filled" radius="xl" size="sm" />
+                    <Avatar variant="filled" radius="xl" size="sm" src={quiz.avatar ? quiz.avatar : ''} />
                     <Text size="sm">{quiz.userName}</Text>
                   </Group>
                 </Stack>

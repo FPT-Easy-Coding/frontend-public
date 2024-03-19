@@ -10,16 +10,20 @@ import {
 } from "@mantine/core";
 import { Dropzone, DropzoneProps } from "@mantine/dropzone";
 import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
+import AvatarSettings from "./AvatarSetings";
+import { MdAccountCircle } from "react-icons/md";
+import FormUpdate from "./FormUpdateProfile";
+import PrivacySettings from "./PrivacySettings";
 function Settings(props: Partial<DropzoneProps>) {
   return (
     <>
-      <Container size="md">
+      <Container size="xl">
         <Title order={4}>Personal infomation</Title>
         <Paper shadow="xs" withBorder p="xl">
-          <Group>
+          {/* <Group>
             <Group>
               <Avatar src={null} size={"xl"}></Avatar>
-              <Dropzone {...props} onDrop={() => {}} className="grow">
+              <Dropzone {...props} onDrop={() => { }} className="grow">
                 <Group>
                   <Dropzone.Accept>
                     <IconUpload size={32} />
@@ -40,9 +44,27 @@ function Settings(props: Partial<DropzoneProps>) {
                   </Stack>
                 </Group>
               </Dropzone>
+
             </Group>
             <Divider />
-          </Group>
+          </Group> */}
+          <div style={{ display: 'flex', paddingTop: "40px" }}>
+            <AvatarSettings />
+          </div>
+          <div style={{ display: 'flex', paddingTop: "40px" }}>
+            <div style={{ flex: 1 }}>
+              <MdAccountCircle style={{ marginBottom: '8px', width: '90px', height: '90px' }} />
+              <Text style={{ fontWeight: 'bold', marginBottom: '8px', paddingLeft: '10px' }}>
+                Account
+              </Text>
+            </div>
+            <div style={{ flex: 11 }}>
+              <FormUpdate />
+            </div>
+          </div>
+          <div style={{ display: 'flex', paddingTop: '30px' }}>
+            <PrivacySettings />
+          </div>
         </Paper>
       </Container>
     </>

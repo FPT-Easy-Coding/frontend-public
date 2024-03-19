@@ -19,6 +19,8 @@ function RecentQuiz() {
     userName: string;
     view: number;
     timeRecentViewQuiz: string; // Change the type to string
+    avatar: string;
+    accountType: string;
     // Add other properties as needed
   }
 
@@ -31,15 +33,15 @@ function RecentQuiz() {
         const sortedList =
           res && res.data
             ? res.data.sort(
-                (
-                  a: { timeRecentViewQuiz: string | number | Date },
-                  b: { timeRecentViewQuiz: string | number | Date }
-                ) => {
-                  const timeA = new Date(a.timeRecentViewQuiz).getTime();
-                  const timeB = new Date(b.timeRecentViewQuiz).getTime();
-                  return timeB - timeA; // Sort in descending order for most recent views first
-                }
-              )
+              (
+                a: { timeRecentViewQuiz: string | number | Date },
+                b: { timeRecentViewQuiz: string | number | Date }
+              ) => {
+                const timeA = new Date(a.timeRecentViewQuiz).getTime();
+                const timeB = new Date(b.timeRecentViewQuiz).getTime();
+                return timeB - timeA; // Sort in descending order for most recent views first
+              }
+            )
             : [];
         setrecentQuiz(sortedList);
       })
@@ -98,7 +100,7 @@ function RecentQuiz() {
                   </Badge>
                 </Stack>
                 <Group gap={"xs"}>
-                  <Avatar variant="filled" radius="xl" size="sm" />
+                  <Avatar variant="filled" radius="xl" size="sm" src={quiz.avatar ? quiz.avatar : ''} />
                   <Text size="sm">{quiz.userName}</Text>
                 </Group>
               </Stack>

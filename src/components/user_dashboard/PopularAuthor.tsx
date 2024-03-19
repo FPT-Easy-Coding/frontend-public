@@ -13,6 +13,8 @@ interface User {
   role: string;
   numberOfQuizSet: number;
   classes: number;
+  avatar: string;
+  accountType: string;
   // Add other properties as needed
 }
 
@@ -68,6 +70,7 @@ function PopularAuthor() {
                     radius="xl"
                     size="xl"
                     color="violet"
+                    src={user.avatar ? user.avatar : ''}
                   />
                   <Stack gap={6}>
                     <Group gap={8}>
