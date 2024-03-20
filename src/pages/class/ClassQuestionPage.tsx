@@ -59,14 +59,15 @@ async function loader({ params }: { params: Readonly<Params> }) {
       fetchQuestions: `http://localhost:8080/api/v1/classroom/get-classroom-question/question-id=${questionId}`,
       fetchComments: `http://localhost:8080/api/v1/classroom/get-comments/question-id=${questionId}`,
     };
+
     const responses = await Promise.all([
-      axios.get(url.fetchQuestions),
-      axios.get(url.fetchComments),
+      axios.get(url.fetchQuestions).catch(() => null),
+      axios.get(url.fetchComments).catch(() => null),
     ]);
-    console.log(responses);
+
     return {
       questionsData: responses[0]?.data,
-      commentsData: responses[1]?.data.entityResponses,
+      commentsData: responses[1]?.data.entityResponses ?? [],
     };
   } catch (error) {
     return { error: true, message: "Server error" };
