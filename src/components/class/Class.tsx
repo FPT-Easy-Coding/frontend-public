@@ -78,6 +78,10 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
   const [deleteModalOpened, setDeleteModalOpened] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const clipboard = useClipboard();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [memberSearchQuery, setMemberSearchQuery] = useState("");
+  const [discussionSearchQuery, setDiscussionSearchQuery] = useState("");
+
   const uid = Number(localStorage.getItem("uid"));
   const [commonQuizIds, setCommonQuizIds] = useState<number[]>([]);
   const navigate = useNavigate();
@@ -466,13 +470,20 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
                         rightSectionPointerEvents="none"
                         rightSection={iconSearch}
                         className="w-[375px]"
+                        value={searchQuery}
+                        onChange={(event) => setSearchQuery(event.target.value)}
                       />
                     </Group>
                     {isLoading ? (
                       <LoadingOverlay visible={true} zIndex={1000} />
                     ) : (
-                      fetchFilteredStudySetsData(classId, filterOption).map(
-                        (set, index) => (
+                      studySets
+                        .filter((set) =>
+                          set.quizName
+                            .toLowerCase()
+                            .includes(searchQuery.toLowerCase())
+                        )
+                        .map((set, index) => (
                           <Link to={`/quiz/set/${set.quizId}`} key={index}>
                             <Stack>
                               <Paper
@@ -514,8 +525,7 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
                               </Paper>
                             </Stack>
                           </Link>
-                        )
-                      )
+                        ))
                     )}
                   </Stack>
                 </Tabs.Panel>
@@ -539,6 +549,10 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
                           rightSectionPointerEvents="none"
                           rightSection={iconSearch}
                           className="w-[375px]"
+                          value={memberSearchQuery}
+                          onChange={(event) =>
+                            setMemberSearchQuery(event.target.value)
+                          }
                         />
                       </Group>
                       <Paper
@@ -613,7 +627,6 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
                           defaultValue={"Latest"}
                           allowDeselect={false}
                         />
-
                         <TextInput
                           variant="filled"
                           radius="xl"
@@ -621,6 +634,10 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
                           rightSectionPointerEvents="none"
                           rightSection={iconSearch}
                           className="w-[375px]"
+                          value={discussionSearchQuery}
+                          onChange={(event) =>
+                            setDiscussionSearchQuery(event.target.value)
+                          }
                         />
                       </Group>
                       <Group className="justify-center">
@@ -638,46 +655,53 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
                         close={handleAddQuestionClose}
                         classId={classId}
                       />
+
                       {Array.isArray(questions) &&
-                        questions.map((question, index) => (
-                          <Link
-                            to={`./question/${question.classQuestionId}`}
-                            key={index}
-                          >
-                            <Paper
-                              withBorder
-                              p="xl"
-                              shadow="md"
-                              className="mb-5"
+                        questions
+                          .filter((question) =>
+                            question.title
+                              .toLowerCase()
+                              .includes(discussionSearchQuery.toLowerCase())
+                          )
+                          .map((question, index) => (
+                            <Link
+                              to={`./question/${question.classQuestionId}`}
+                              key={index}
                             >
-                              <Group>
-                                <Avatar
-                                  src={null}
-                                  alt={`Avatar of ${question.userFirstName} ${question.userLastName}`}
-                                  size="lg"
-                                >
-                                  {`${question.userFirstName
-                                    .charAt(0)
-                                    .toUpperCase()}${question.userLastName
-                                    .charAt(0)
-                                    .toUpperCase()}`}
-                                </Avatar>
-                                <Stack gap={0}>
-                                  <Text className="font-semibold text-md">{`${question.userFirstName} ${question.userLastName}`}</Text>
-                                  <Text className="text-xs">
-                                    {format(question.createAt, "MM/dd/yyyy")}
+                              <Paper
+                                withBorder
+                                p="xl"
+                                shadow="md"
+                                className="mb-5"
+                              >
+                                <Group>
+                                  <Avatar
+                                    src={null}
+                                    alt={`Avatar of ${question.userFirstName} ${question.userLastName}`}
+                                    size="lg"
+                                  >
+                                    {`${question.userFirstName
+                                      .charAt(0)
+                                      .toUpperCase()}${question.userLastName
+                                      .charAt(0)
+                                      .toUpperCase()}`}
+                                  </Avatar>
+                                  <Stack gap={0}>
+                                    <Text className="font-semibold text-md">{`${question.userFirstName} ${question.userLastName}`}</Text>
+                                    <Text className="text-xs">
+                                      {format(question.createAt, "MM/dd/yyyy")}
+                                    </Text>
+                                  </Stack>
+                                </Group>
+                                <Stack gap={"sm"} className="mt-3">
+                                  <Title order={4}>{question.title}</Title>
+                                  <Text className="font-normal text-sm">
+                                    {question.content}
                                   </Text>
                                 </Stack>
-                              </Group>
-                              <Stack gap={"sm"} className="mt-3">
-                                <Title order={4}>{question.title}</Title>
-                                <Text className="font-normal text-sm">
-                                  {question.content}
-                                </Text>
-                              </Stack>
-                            </Paper>
-                          </Link>
-                        ))}
+                              </Paper>
+                            </Link>
+                          ))}
                     </Stack>
                   )}
                 </Tabs.Panel>
