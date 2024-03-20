@@ -20,7 +20,7 @@ import {
   Title,
   Tooltip,
 } from "@mantine/core";
-import { useClipboard } from "@mantine/hooks";
+import { useClipboard, useDisclosure } from "@mantine/hooks";
 import {
   IconAlertTriangleFilled,
   IconBellFilled,
@@ -59,6 +59,8 @@ import { format } from "date-fns";
 import { Link, useActionData, useNavigate, useSubmit } from "react-router-dom";
 import QuizQuestionModal from "./QuizQuestionModal";
 import deleteClassModal from "../modal/class/delete/DeleteClassModal";
+import UpdateClassModal from "../modal/class/update/UpdateClassModal";
+import { useForm, isNotEmpty } from "@mantine/form";
 
 function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
   const submit = useSubmit();
@@ -76,11 +78,21 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
   const [isLoading, setLoading] = useState<boolean>(true);
   const [filterOption, setFilterOption] = useState<string>("Latest");
   const [deleteModalOpened, setDeleteModalOpened] = useState(false);
+  const [opened, { open, close }] = useDisclosure(false);
   const [inputValue, setInputValue] = useState("");
   const clipboard = useClipboard();
   const uid = Number(localStorage.getItem("uid"));
   const [commonQuizIds, setCommonQuizIds] = useState<number[]>([]);
   const navigate = useNavigate();
+
+  const form = useForm<{ classroomName: string }>({
+    initialValues: {
+      classroomName: "",
+    },
+    validate: {
+      classroomName: isNotEmpty("Class name is required"),
+    },
+  });
 
   useEffect(() => {
     fetchStudySets(classId);
@@ -256,6 +268,11 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
     setAddQuestionModalOpened(true);
   };
 
+  const handleUpdateClass = () => {
+    form.setFieldValue("classroomName", classData!.className);
+    open();
+  };
+
   return (
     <>
       {/* Add quiz sets modal */}
@@ -350,6 +367,12 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
           </Modal.Body>
         </Modal.Content>
       </Modal.Root>
+      <UpdateClassModal
+        opened={opened}
+        close={close}
+        form={form}
+        classEntity={classData}
+      />
       <Container className="container">
         <Grid gutter={"lg"}>
           <Grid.Col span={8}>
@@ -422,7 +445,10 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
                             >
                               Invite members
                             </Menu.Item>
-                            <Menu.Item leftSection={<IconEdit size={14} />}>
+                            <Menu.Item
+                              leftSection={<IconEdit size={14} />}
+                              onClick={handleUpdateClass}
+                            >
                               Edit
                             </Menu.Item>
                             <Menu.Item

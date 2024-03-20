@@ -224,7 +224,6 @@ async function action({ request }: { request: Request }) {
       },
       PUT: {
         "update-classroom": {
-          classroomId: (data as Classroom).classroomId,
           classroomName: (data as Classroom).classroomName,
         },
       },
