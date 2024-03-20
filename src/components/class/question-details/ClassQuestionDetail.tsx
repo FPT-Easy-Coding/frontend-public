@@ -1,9 +1,8 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { Question, Comments } from "../../../pages/class/ClassQuestionPage";
 import {
   ActionIcon,
   Avatar,
-  Button,
   Container,
   Divider,
   Group,
@@ -18,7 +17,7 @@ import { IconDots, IconPencil, IconSend, IconTrash } from "@tabler/icons-react";
 import { format } from "date-fns";
 import CommentSection from "./CommentSection";
 import { z } from "zod";
-import { isNotEmpty, useForm, zodResolver } from "@mantine/form";
+import { useForm, zodResolver } from "@mantine/form";
 import {
   useSubmit,
   useNavigation,
