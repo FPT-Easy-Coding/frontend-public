@@ -11,23 +11,13 @@ export interface UserCredentials {
     role: string;
     premium: boolean;
     banned: boolean;
+    avatar: string;
+    accountType: string;
   } | null;
   loaded: boolean;
 }
 
-interface UserCredentialsContextProps {
-  info: {
-    userId: number;
-    userName: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    telephone: string;
-    role: string;
-    premium: boolean;
-    banned: boolean;
-  } | null;
-  loaded: boolean;
+interface UserCredentialsContextProps extends UserCredentials {
   assignUserCredentials: (userCredentials: any) => void;
   clearUserCredentials: () => void;
 }
@@ -44,6 +34,8 @@ export const UserCredentialsContext =
       role: "",
       premium: false,
       banned: false,
+      avatar: "",
+      accountType: "",
     },
     loaded: false,
     assignUserCredentials: () => {},

@@ -35,13 +35,15 @@ export interface Comments {
 }
 
 interface ActionRequest {
-  requestField: "comment" | "reply" | "answer";
+  requestField: "comment" | "reply" | "answer" | "question";
   userId: string;
   questionId?: string;
   commentId?: string;
   replyCommentId?: string;
   answerId?: string;
   content: string;
+  classroomId?: string;
+  title?: string;
 }
 
 function ClassQuestionPage() {
@@ -98,6 +100,10 @@ async function action({ request }: { request: Request }) {
         PUT: `http://localhost:8080/api/v1/classroom/update-answer/${data.answerId}`,
         DELETE: `http://localhost:8080/api/v1/classroom/delete-answer/${data.answerId}`,
       },
+      question: {
+        PUT: `http://localhost:8080/api/v1/classroom/update-question`,
+        DELETE: `http://localhost:8080/api/v1/classroom/delete-question/question-id=${data.questionId}&classroom-id=${data.classroomId}`,
+      },
     };
 
     const payload: { [key: string]: { [key: string]: any } } = {
@@ -131,6 +137,14 @@ async function action({ request }: { request: Request }) {
           content: data.content,
         },
       },
+      question: {
+        PUT: {
+          classroomId: Number(data.classroomId),
+          questionId: Number(data.questionId),
+          title: data.title,
+          content: data.content,
+        },
+      },
     };
 
     const successMsg: { [key: string]: { [key: string]: string } } = {
@@ -149,6 +163,10 @@ async function action({ request }: { request: Request }) {
         PUT: "Answer updated",
         DELETE: "Answer deleted",
       },
+      question: {
+        PUT: "Question updated",
+        DELETE: "Question deleted",
+      },
     };
 
     const errorMsg: { [key: string]: { [key: string]: string } } = {
@@ -166,6 +184,10 @@ async function action({ request }: { request: Request }) {
         POST: "Cannot create answer",
         PUT: "Cannot update answer",
         DELETE: "Cannot delete answer",
+      },
+      question: {
+        PUT: "Cannot update question",
+        DELETE: "Cannot delete question",
       },
     };
 

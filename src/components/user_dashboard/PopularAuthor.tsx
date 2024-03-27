@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Carousel } from "@mantine/carousel";
-import { Card, Badge, Group, Stack, Avatar, Flex, Title } from "@mantine/core";
+import { Card, Badge, Group, Stack, Avatar, Title } from "@mantine/core";
 import classes from "./Carousel.module.css";
 import "@tabler/icons-react";
 import { IconLibrary, IconSchool } from "@tabler/icons-react";

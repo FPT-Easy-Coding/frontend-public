@@ -45,6 +45,7 @@ const userBtn = (data: LoaderData, submit: any, handleLogout: () => void) => {
               radius="xl"
               color="grape"
               className="cursor-pointer"
+              src={data?.avatar}
             />
             <Text className="text-sm font-semibold">
               {data ? data.firstName + " " + data.lastName : "Guest"}
@@ -142,6 +143,8 @@ interface LoaderData {
   role: string;
   premium: boolean;
   banned: boolean;
+  accountType: string;
+  avatar: string;
 }
 
 function Navbar() {
@@ -154,7 +157,6 @@ function Navbar() {
   );
   const mode = useSearchParams()[0].get("mode");
   const data: LoaderData = useLoaderData() as LoaderData;
-  // const actionData = useActionData() as { success: boolean; msg: string };
   useEffect(() => {
     if (data !== null) {
       assignUserCredentials({
@@ -196,15 +198,16 @@ function Navbar() {
                 </Button>
               )}
             </NavLink>
-            <NavLink to="/about" className="no-underline">
-              <Button autoContrast color="indigo" variant="subtle">
-                Categories
-              </Button>
-            </NavLink>
-            <NavLink to="/contact" className="no-underline">
-              <Button autoContrast color="indigo" variant="subtle">
-                Classes
-              </Button>
+            <NavLink to="/user/profile/class" className="no-underline">
+              {({ isActive }) => (
+                <Button
+                  autoContrast
+                  color="indigo"
+                  variant={isActive ? "light" : "subtle"}
+                >
+                  Classes
+                </Button>
+              )}
             </NavLink>
           </div>
 

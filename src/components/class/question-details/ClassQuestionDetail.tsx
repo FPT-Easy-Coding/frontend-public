@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Question, Comments } from "../../../pages/class/ClassQuestionPage";
 import {
   ActionIcon,
@@ -24,9 +24,12 @@ import {
   useActionData,
   useLoaderData,
   Form,
+  useParams,
 } from "react-router-dom";
 import { UserCredentialsContext } from "../../../store/user-credentials-context";
 import { toast } from "react-toastify";
+import EditDiscussion from "./edit/EditDiscussion";
+import deleteClassQuestionModal from "../../modal/class/delete/DeleteClassQuestionModal";
 
 interface FormValues {
   comment: string;
@@ -39,6 +42,7 @@ const formValidationSchema = z.object({
 });
 function ClassQuestionDetail() {
   const { info } = useContext(UserCredentialsContext);
+  const { id: classId } = useParams();
   const currentUserId = info?.userId;
   const loaderData = useLoaderData() as {
     questionsData: Question | null;
@@ -50,6 +54,7 @@ function ClassQuestionDetail() {
   const isSubmitting = navigation.state === "submitting";
   const question: Question | null = loaderData?.questionsData;
   const comments: Comments[] | null = loaderData?.commentsData;
+  const [editDiscussion, setEditDiscussion] = useState(false);
 
   useEffect(() => {
     if (actionData?.error) {
@@ -114,10 +119,23 @@ function ClassQuestionDetail() {
                 </Menu.Target>
 
                 <Menu.Dropdown>
-                  <Menu.Item leftSection={<IconPencil size={14} />}>
+                  <Menu.Item
+                    leftSection={<IconPencil size={14} />}
+                    onClick={() => setEditDiscussion(true)}
+                  >
                     Edit
                   </Menu.Item>
-                  <Menu.Item color="red" leftSection={<IconTrash size={14} />}>
+                  <Menu.Item
+                    color="red"
+                    leftSection={<IconTrash size={14} />}
+                    onClick={() =>
+                      deleteClassQuestionModal(
+                        question as Question,
+                        submit,
+                        classId as string
+                      )
+                    }
+                  >
                     Delete
                   </Menu.Item>
                 </Menu.Dropdown>
@@ -127,8 +145,17 @@ function ClassQuestionDetail() {
         </Group>
         <Divider size="xs" className="mt-5" />
         <Stack className="my-5">
-          <Title order={4}>{question?.title}</Title>
-          <Text className="font-normal text-sm">{question?.content}</Text>
+          {!editDiscussion ? (
+            <>
+              <Title order={4}>{question?.title}</Title>
+              <Text className="font-normal text-sm">{question?.content}</Text>
+            </>
+          ) : (
+            <EditDiscussion
+              question={question}
+              setEditDiscussion={setEditDiscussion}
+            />
+          )}
         </Stack>
 
         {/* Render answer section */}

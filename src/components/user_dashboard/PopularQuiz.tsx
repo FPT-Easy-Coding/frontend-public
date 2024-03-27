@@ -6,8 +6,6 @@ import {
   Group,
   Stack,
   Avatar,
-  Flex,
-  Paper,
 } from "@mantine/core";
 import axios from "axios";
 import { useEffect, useState } from "react";

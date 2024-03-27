@@ -41,6 +41,7 @@ import ClassQuestionPage, {
 import { classAction } from "./pages/class/ClassPage";
 import { folderPageAction, folderPageLoader } from "./pages/folder/FolderPage";
 import { UpdateQuizSetLoader } from "./pages/quiz/update/UpdateQuizSet";
+import { settingsAction, settingsLoader } from "./pages/settings/SettingsPage";
 
 const AuthPage = lazy(() => import("./pages/authentication/authpage/AuthPage"));
 const ForgotPassword = lazy(
@@ -238,6 +239,7 @@ const router = createBrowserRouter([
       },
       {
         path: "settings",
+        action: settingsAction,
         element: (
           <Suspense fallback={loadingIndicator}>
             <Settings />
