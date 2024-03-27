@@ -302,71 +302,63 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
               <Button variant="subtle" size="sm" leftSection={<IconPlus />}>
                 <Link to="/create-quiz">Create new sets</Link>
               </Button>
-              <div>
-                <Select
-                  className="w-1/4"
-                  checkIconPosition="right"
-                  data={["Your sets", "Folder sets", "Study sets"]}
-                  defaultValue={"Your sets"}
-                  onChange={(value) => handleFilterChange(value)}
-                  allowDeselect={false}
-                />
-              </div>
-              {!isLoading ? (
-                studyUserCreatedSets.map((set) => (
-                  <Stack key={set.quizId}>
-                    <Paper
-                      shadow="lg"
-                      radius="md"
-                      withBorder
-                      p="xl"
-                      className="py-4"
-                    >
-                      <Group className="justify-between">
-                        <Text className="font-bold text-lg">
-                          {set.quizName}
-                        </Text>
-                        {commonQuizIds.includes(set.quizId) ? (
-                          // If the quiz ID exists, render the minus button
-                          <Button
-                            variant="default"
-                            size="sm"
-                            radius="md"
-                            onClick={() => {
-                              removeQuizFromClass(classId, set.quizId);
-                              const updatedCommonQuizIds = commonQuizIds.filter(
-                                (id) => id !== set.quizId
-                              );
-                              setCommonQuizIds(updatedCommonQuizIds);
-                            }}
-                          >
-                            <IconMinus size={12} />
-                          </Button>
-                        ) : (
-                          // If the quiz ID does not exist, render the plus button
-                          <Button
-                            variant="default"
-                            size="sm"
-                            radius="md"
-                            onClick={() => {
-                              addQuizToClass(classId, set.quizId);
-                              const updatedCommonQuizIds = [
-                                ...commonQuizIds,
-                                set.quizId,
-                              ];
-                              setCommonQuizIds(updatedCommonQuizIds);
-                            }}
-                          >
-                            <IconPlus size={12} />
-                          </Button>
-                        )}
-                      </Group>
-                    </Paper>
-                  </Stack>
-                ))
-              ) : (
-                <LoadingOverlay visible={true} zIndex={1000} />
-              )}
+              <Select
+                className="w-1/4"
+                checkIconPosition="right"
+                data={["Your sets", "Folder sets", "Study sets"]}
+                defaultValue={"Your sets"}
+                onChange={(value) => handleFilterChange(value)}
+                allowDeselect={false}
+              />
+              {studyUserCreatedSets?.map((set) => (
+                <Stack key={set.quizId}>
+                  <Paper
+                    shadow="lg"
+                    radius="md"
+                    withBorder
+                    p="xl"
+                    className="py-4"
+                  >
+                    <Group className="justify-between">
+                      <Text className="font-bold text-lg">{set.quizName}</Text>
+                      {commonQuizIds?.includes(set.quizId) ? (
+                        // If the quiz ID exists, render the minus button
+                        <Button
+                          variant="default"
+                          size="sm"
+                          radius="md"
+                          onClick={() => {
+                            removeQuizFromClass(classId, set.quizId);
+                            const updatedCommonQuizIds = commonQuizIds.filter(
+                              (id) => id !== set.quizId
+                            );
+                            setCommonQuizIds(updatedCommonQuizIds);
+                          }}
+                        >
+                          <IconMinus size={12} />
+                        </Button>
+                      ) : (
+                        // If the quiz ID does not exist, render the plus button
+                        <Button
+                          variant="default"
+                          size="sm"
+                          radius="md"
+                          onClick={() => {
+                            addQuizToClass(classId, set.quizId);
+                            const updatedCommonQuizIds = [
+                              ...commonQuizIds,
+                              set.quizId,
+                            ];
+                            setCommonQuizIds(updatedCommonQuizIds);
+                          }}
+                        >
+                          <IconPlus size={12} />
+                        </Button>
+                      )}
+                    </Group>
+                  </Paper>
+                </Stack>
+              ))}
             </Stack>
           </Modal.Body>
         </Modal.Content>
@@ -469,6 +461,7 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
                   </Menu>
                 </Group>
               </Group>
+
               <Tabs
                 color="indigo"
                 value={tab}
@@ -500,236 +493,222 @@ function Class({ classId, tab }: { classId: number; tab: string | undefined }) {
                         onChange={(event) => setSearchQuery(event.target.value)}
                       />
                     </Group>
-                    {isLoading ? (
-                      <LoadingOverlay visible={true} zIndex={1000} />
-                    ) : (
-                      studySets
-                        .filter((set) =>
-                          set.quizName
-                            .toLowerCase()
-                            .includes(searchQuery.toLowerCase())
-                        )
-                        .map((set, index) => (
-                          <Link to={`/quiz/set/${set.quizId}`} key={index}>
-                            <Stack>
-                              <Paper
-                                key={index}
-                                className="mt-3"
-                                shadow="lg"
-                                radius="md"
-                                withBorder
-                                p="xl"
-                              >
-                                <Group key={index}>
-                                  <Text className="font-semibold text-sm">
-                                    {set.numberOfQuestion}{" "}
-                                    {set.numberOfQuestion > 1
-                                      ? "terms"
-                                      : "term"}
-                                  </Text>
-                                  <Group className="pl-4 ">
-                                    <Avatar
-                                      src={null}
-                                      alt="no image here"
-                                      size={"sm"}
-                                    >
-                                      {set
-                                        ?.authorFirstName!.charAt(0)
-                                        .toUpperCase() +
-                                        set
-                                          ?.authorLastName!.charAt(0)
-                                          .toUpperCase()}
-                                    </Avatar>
-                                    <Text className="font-semibold text-sm">
-                                      {set.author}
-                                    </Text>
-                                  </Group>
-                                </Group>
-                                <Text className="font-bold text-xl pt-1">
-                                  {set.quizName}
+                    {studySets
+                      ?.filter((set) =>
+                        set.quizName
+                          .toLowerCase()
+                          .includes(searchQuery.toLowerCase())
+                      )
+                      ?.map((set, index) => (
+                        <Link to={`/quiz/set/${set.quizId}`} key={index}>
+                          <Stack>
+                            <Paper
+                              key={index}
+                              className="mt-3"
+                              shadow="lg"
+                              radius="md"
+                              withBorder
+                              p="xl"
+                            >
+                              <Group key={index}>
+                                <Text className="font-semibold text-sm">
+                                  {set.numberOfQuestion}{" "}
+                                  {set.numberOfQuestion > 1 ? "terms" : "term"}
                                 </Text>
-                              </Paper>
-                            </Stack>
-                          </Link>
-                        ))
-                    )}
+                                <Group className="pl-4 ">
+                                  <Avatar
+                                    src={null}
+                                    alt="no image here"
+                                    size={"sm"}
+                                  >
+                                    {set
+                                      ?.authorFirstName!.charAt(0)
+                                      .toUpperCase() +
+                                      set
+                                        ?.authorLastName!.charAt(0)
+                                        .toUpperCase()}
+                                  </Avatar>
+                                  <Text className="font-semibold text-sm">
+                                    {set.author}
+                                  </Text>
+                                </Group>
+                              </Group>
+                              <Text className="font-bold text-xl pt-1">
+                                {set.quizName}
+                              </Text>
+                            </Paper>
+                          </Stack>
+                        </Link>
+                      ))}
                   </Stack>
                 </Tabs.Panel>
 
                 <Tabs.Panel value="members">
-                  {isLoading ? (
-                    <LoadingOverlay visible={true} />
-                  ) : (
-                    <Stack gap={"sm"} className="mt-5">
-                      <Group className="justify-between">
-                        <Select
-                          checkIconPosition="right"
-                          data={["Latest", "Alphabetical"]}
-                          defaultValue={"Latest"}
-                          allowDeselect={false}
-                        />
-                        <TextInput
-                          variant="filled"
-                          radius="xl"
-                          placeholder="Filter by name"
-                          rightSectionPointerEvents="none"
-                          rightSection={iconSearch}
-                          className="w-[375px]"
-                          value={memberSearchQuery}
-                          onChange={(event) =>
-                            setMemberSearchQuery(event.target.value)
-                          }
-                        />
+                  <Stack gap={"sm"} className="mt-5">
+                    <Group className="justify-between">
+                      <Select
+                        checkIconPosition="right"
+                        data={["Latest", "Alphabetical"]}
+                        defaultValue={"Latest"}
+                        allowDeselect={false}
+                      />
+                      <TextInput
+                        variant="filled"
+                        radius="xl"
+                        placeholder="Filter by name"
+                        rightSectionPointerEvents="none"
+                        rightSection={iconSearch}
+                        className="w-[375px]"
+                        value={memberSearchQuery}
+                        onChange={(event) =>
+                          setMemberSearchQuery(event.target.value)
+                        }
+                      />
+                    </Group>
+                    <Paper
+                      className="mt-3"
+                      shadow="lg"
+                      radius="md"
+                      withBorder
+                      p="md"
+                    >
+                      <Group>
+                        <Avatar
+                          src={null} // Set the member's avatar source here
+                          alt={`Avatar of ${classData?.teacherName} ${classData?.teacherName}`}
+                          size={"sm"}
+                        >
+                          {`${classData?.teacherName
+                            .charAt(0)
+                            .toUpperCase()}${classData?.teacherName
+                            .charAt(0)
+                            .toUpperCase()}`}
+                        </Avatar>
+                        <Text className="font-semibold text-sm">
+                          {`${classData?.teacherName} Teacher`}
+                        </Text>
                       </Group>
+                      <Text className="font-normal text-sm">
+                        {classData?.teacherName}
+                      </Text>
+                    </Paper>
+                    {members?.map((member, index) => (
                       <Paper
+                        key={index}
                         className="mt-3"
                         shadow="lg"
                         radius="md"
                         withBorder
-                        p="md"
+                        p="lg"
                       >
                         <Group>
                           <Avatar
                             src={null} // Set the member's avatar source here
-                            alt={`Avatar of ${classData?.teacherName} ${classData?.teacherName}`}
+                            alt={`Avatar of ${member.userFirstName} ${member.userLastName}`}
                             size={"sm"}
                           >
-                            {`${classData?.teacherName
+                            {`${member.userFirstName
                               .charAt(0)
-                              .toUpperCase()}${classData?.teacherName
+                              .toUpperCase()}${member.userLastName
                               .charAt(0)
                               .toUpperCase()}`}
                           </Avatar>
                           <Text className="font-semibold text-sm">
-                            {`${classData?.teacherName} Teacher`}
+                            {`${member.userFirstName} ${member.userLastName}`}
                           </Text>
                         </Group>
                         <Text className="font-normal text-sm">
-                          {classData?.teacherName}
+                          {member.userName}
                         </Text>
                       </Paper>
-                      {members.map((member, index) => (
-                        <Paper
-                          key={index}
-                          className="mt-3"
-                          shadow="lg"
-                          radius="md"
-                          withBorder
-                          p="lg"
-                        >
-                          <Group>
-                            <Avatar
-                              src={null} // Set the member's avatar source here
-                              alt={`Avatar of ${member.userFirstName} ${member.userLastName}`}
-                              size={"sm"}
-                            >
-                              {`${member.userFirstName
-                                .charAt(0)
-                                .toUpperCase()}${member.userLastName
-                                .charAt(0)
-                                .toUpperCase()}`}
-                            </Avatar>
-                            <Text className="font-semibold text-sm">
-                              {`${member.userFirstName} ${member.userLastName}`}
-                            </Text>
-                          </Group>
-                          <Text className="font-normal text-sm">
-                            {member.userName}
-                          </Text>
-                        </Paper>
-                      ))}
-                    </Stack>
-                  )}
+                    ))}
+                  </Stack>
                 </Tabs.Panel>
-                <Tabs.Panel value="discussion">
-                  {isLoading ? (
-                    <LoadingOverlay visible={true} zIndex={1000} />
-                  ) : (
-                    <Stack gap={"sm"} className="mt-5">
-                      <Group className="justify-between">
-                        <Select
-                          checkIconPosition="right"
-                          data={["Latest", "Alphabetical"]}
-                          defaultValue={"Latest"}
-                          allowDeselect={false}
-                        />
-                        <TextInput
-                          variant="filled"
-                          radius="xl"
-                          placeholder="Filter by title"
-                          rightSectionPointerEvents="none"
-                          rightSection={iconSearch}
-                          className="w-[375px]"
-                          value={discussionSearchQuery}
-                          onChange={(event) =>
-                            setDiscussionSearchQuery(event.target.value)
-                          }
-                        />
-                      </Group>
-                      <Group className="justify-center">
-                        <Button
-                          className="w-[100%]"
-                          variant="outline"
-                          onClick={handleAddQuestionOpen}
-                          leftSection={<IconPlus size={14} />}
-                        >
-                          Add new question
-                        </Button>
-                      </Group>
-                      <QuizQuestionModal
-                        opened={addQuestionModalOpened}
-                        close={handleAddQuestionClose}
-                        classId={classId}
-                      />
 
-                      {Array.isArray(questions) &&
-                        questions
-                          .filter((question) =>
-                            question.title
-                              .toLowerCase()
-                              .includes(discussionSearchQuery.toLowerCase())
-                          )
-                          .map((question, index) => (
-                            <Link
-                              to={`./question/${question.classQuestionId}`}
-                              key={index}
+                <Tabs.Panel value="discussion">
+                  <Stack gap={"sm"} className="mt-5">
+                    <Group className="justify-between">
+                      <Select
+                        checkIconPosition="right"
+                        data={["Latest", "Alphabetical"]}
+                        defaultValue={"Latest"}
+                        allowDeselect={false}
+                      />
+                      <TextInput
+                        variant="filled"
+                        radius="xl"
+                        placeholder="Filter by title"
+                        rightSectionPointerEvents="none"
+                        rightSection={iconSearch}
+                        value={discussionSearchQuery}
+                        onChange={(event) =>
+                          setDiscussionSearchQuery(event.target.value)
+                        }
+                      />
+                    </Group>
+                    <Group className="justify-center">
+                      <Button
+                        className="w-[100%]"
+                        variant="outline"
+                        onClick={handleAddQuestionOpen}
+                        leftSection={<IconPlus size={14} />}
+                      >
+                        Add new question
+                      </Button>
+                    </Group>
+                    <QuizQuestionModal
+                      opened={addQuestionModalOpened}
+                      close={handleAddQuestionClose}
+                      classId={classId}
+                    />
+
+                    {Array.isArray(questions) &&
+                      questions
+                        ?.filter((question) =>
+                          question.title
+                            .toLowerCase()
+                            .includes(discussionSearchQuery.toLowerCase())
+                        )
+                        ?.map((question, index) => (
+                          <Link
+                            to={`./question/${question.classQuestionId}`}
+                            key={index}
+                          >
+                            <Paper
+                              withBorder
+                              p="xl"
+                              shadow="md"
+                              className="mb-5"
                             >
-                              <Paper
-                                withBorder
-                                p="xl"
-                                shadow="md"
-                                className="mb-5"
-                              >
-                                <Group>
-                                  <Avatar
-                                    src={null}
-                                    alt={`Avatar of ${question.userFirstName} ${question.userLastName}`}
-                                    size="lg"
-                                  >
-                                    {`${question.userFirstName
-                                      .charAt(0)
-                                      .toUpperCase()}${question.userLastName
-                                      .charAt(0)
-                                      .toUpperCase()}`}
-                                  </Avatar>
-                                  <Stack gap={0}>
-                                    <Text className="font-semibold text-md">{`${question.userFirstName} ${question.userLastName}`}</Text>
-                                    <Text className="text-xs">
-                                      {format(question.createAt, "MM/dd/yyyy")}
-                                    </Text>
-                                  </Stack>
-                                </Group>
-                                <Stack gap={"sm"} className="mt-3">
-                                  <Title order={4}>{question.title}</Title>
-                                  <Text className="font-normal text-sm">
-                                    {question.content}
+                              <Group>
+                                <Avatar
+                                  src={null}
+                                  alt={`Avatar of ${question.userFirstName} ${question.userLastName}`}
+                                  size="lg"
+                                >
+                                  {`${question.userFirstName
+                                    .charAt(0)
+                                    .toUpperCase()}${question.userLastName
+                                    .charAt(0)
+                                    .toUpperCase()}`}
+                                </Avatar>
+                                <Stack gap={0}>
+                                  <Text className="font-semibold text-md">{`${question.userFirstName} ${question.userLastName}`}</Text>
+                                  <Text className="text-xs">
+                                    {format(question.createAt, "MM/dd/yyyy")}
                                   </Text>
                                 </Stack>
-                              </Paper>
-                            </Link>
-                          ))}
-                    </Stack>
-                  )}
+                              </Group>
+                              <Stack gap={"sm"} className="mt-3">
+                                <Title order={4}>{question.title}</Title>
+                                <Text className="font-normal text-sm">
+                                  {question.content}
+                                </Text>
+                              </Stack>
+                            </Paper>
+                          </Link>
+                        ))}
+                  </Stack>
                 </Tabs.Panel>
               </Tabs>
             </Stack>

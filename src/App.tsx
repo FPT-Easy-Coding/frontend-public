@@ -39,6 +39,8 @@ import ClassQuestionPage, {
   classQuestionPageLoader,
 } from "./pages/class/ClassQuestionPage";
 import { classAction } from "./pages/class/ClassPage";
+import { folderPageAction, folderPageLoader } from "./pages/folder/FolderPage";
+import { UpdateQuizSetLoader } from "./pages/quiz/update/UpdateQuizSet";
 
 const AuthPage = lazy(() => import("./pages/authentication/authpage/AuthPage"));
 const ForgotPassword = lazy(
@@ -71,7 +73,7 @@ const FlashcardMode = lazy(
 );
 
 const Settings = lazy(() => import("./pages/settings/SettingsPage"));
-
+const UpdateQuizSet = lazy(() => import("./pages/quiz/update/UpdateQuizSet"));
 export const loadingIndicator = (
   <Box pos={"relative"} h={"100vh"} w={"100vw"}>
     <LoadingOverlay
@@ -198,6 +200,8 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
+            action: folderPageAction,
+            loader: folderPageLoader,
             element: (
               <Suspense fallback={loadingIndicator}>
                 <FolderPage />
@@ -217,8 +221,18 @@ const router = createBrowserRouter([
                 <SetDetails />
               </Suspense>
             ),
+            id: "set-details",
             loader: SetLoader,
             action: SetAction,
+          },
+          {
+            path: "edit",
+            element: (
+              <Suspense fallback={loadingIndicator}>
+                <UpdateQuizSet />
+              </Suspense>
+            ),
+            loader: UpdateQuizSetLoader,
           },
         ],
       },

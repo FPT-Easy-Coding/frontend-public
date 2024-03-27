@@ -4,21 +4,33 @@ import {
   Avatar,
   Badge,
   Button,
+  Center,
   Container,
   Divider,
   Group,
+  Menu,
   Paper,
   Progress,
   Stack,
   Text,
   Title,
+  Tooltip,
 } from "@mantine/core";
-import { Link, Params, useLoaderData } from "react-router-dom";
+import {
+  Link,
+  Params,
+  redirect,
+  useLoaderData,
+  useSubmit,
+} from "react-router-dom";
 import axios from "axios";
 import {
+  IconPencil,
   IconPlayerPause,
   IconPlayerPlay,
+  IconSettings,
   IconStarFilled,
+  IconTrash,
   IconUsers,
 } from "@tabler/icons-react";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
@@ -29,6 +41,7 @@ import RatingModal from "../../../components/modal/set-details/RatingModal";
 import { useDisclosure } from "@mantine/hooks";
 import DocumentTitle from "../../../components/document-title/DocumentTitle";
 import { UserCredentialsContext } from "../../../store/user-credentials-context";
+import DeleteModal from "../../../components/modal/set-details/DeleteModal";
 
 export interface UserRating {
   userId: number;
@@ -80,6 +93,7 @@ function SetDetails() {
   const [isAutoPlaying, setIsAutoPlaying] = useState(false);
   const [userRating, setUserRating] = useState<UserRating | null>();
   const [averageRate, setAverageRate] = useState(0);
+  const submit = useSubmit();
 
   if (!isAutoPlaying) {
     autoplay.current.stop();
@@ -194,6 +208,18 @@ function SetDetails() {
     </Carousel.Slide>
   ));
 
+  const handleDelete = () => {
+    submit(
+      {
+        quizId: loaderData?.quizId,
+        action: "delete-quiz",
+      },
+      {
+        method: "delete",
+      }
+    );
+  };
+
   return (
     <>
       <RatingModal
@@ -279,23 +305,54 @@ function SetDetails() {
         </Group>
 
         {/* Author section */}
-        <Group className="mt-10">
-          <Avatar
-            src={loaderData?.userImg ? loaderData?.userImg : ""}
-            size={"lg"}
-          >
-            {loaderData?.userFirstName!.charAt(0).toUpperCase() +
-              loaderData?.userLastName!.charAt(0).toUpperCase()}
-          </Avatar>
+        <Group className="justify-between mt-10">
+          <Group>
+            <Avatar
+              src={loaderData?.userImg ? loaderData?.userImg : ""}
+              size={"lg"}
+            >
+              {loaderData?.userFirstName!.charAt(0).toUpperCase() +
+                loaderData?.userLastName!.charAt(0).toUpperCase()}
+            </Avatar>
 
-          <Stack gap={0}>
-            <Text c={"dimmed"} size="sm">
-              Created by
-            </Text>
-            <Text className="capitalize">
-              {loaderData?.userFirstName + " " + loaderData?.userLastName}
-            </Text>
-          </Stack>
+            <Stack gap={0}>
+              <Text c={"dimmed"} size="sm">
+                Created by
+              </Text>
+              <Text className="capitalize">
+                {loaderData?.userFirstName + " " + loaderData?.userLastName}
+              </Text>
+            </Stack>
+          </Group>
+          {loaderData?.userId === info?.userId && (
+            <Center>
+              <Menu>
+                <Menu.Target>
+                  <Tooltip label="Settings for this set">
+                    <ActionIcon variant="subtle" size="xl" radius={"xl"}>
+                      <IconSettings stroke={1.5} />
+                    </ActionIcon>
+                  </Tooltip>
+                </Menu.Target>
+                <Menu.Dropdown>
+                  <Menu.Item
+                    leftSection={<IconPencil size={14} />}
+                    component={Link}
+                    to={`/quiz/set/${loaderData?.quizId}/edit`}
+                  >
+                    Edit
+                  </Menu.Item>
+                  <Menu.Item
+                    leftSection={<IconTrash size={14} />}
+                    color="red"
+                    onClick={() => DeleteModal({ handleDelete })}
+                  >
+                    Delete
+                  </Menu.Item>
+                </Menu.Dropdown>
+              </Menu>
+            </Center>
+          )}
         </Group>
 
         {/* Question details */}
@@ -372,6 +429,20 @@ export async function action({ request }: { request: Request }) {
           success: true,
           msg: "Updated",
         };
+      case "delete-quiz":
+        res = await axios
+          .delete(
+            `http://localhost:8080/api/v1/quiz/delete-quiz?id=${payload.quizId}`,
+            {
+              headers: {
+                Authorization: AT,
+              },
+            }
+          )
+          .catch(() => {
+            throw new Error("Cannot delete quiz");
+          });
+        return redirect("/");
       default:
         throw new Error("Invalid action");
     }

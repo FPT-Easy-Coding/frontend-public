@@ -13,6 +13,7 @@ import {
   Select,
 } from "@mantine/core";
 import {
+  IconDeviceFloppy,
   IconMinus,
   IconPlaylistAdd,
   IconPlus,
@@ -20,7 +21,14 @@ import {
 } from "@tabler/icons-react";
 import _debounce from "lodash/debounce";
 import _throttle from "lodash/throttle";
-import { Form, useNavigation, useSubmit } from "react-router-dom";
+import {
+  Form,
+  useLoaderData,
+  useNavigate,
+  useNavigation,
+  useRouteLoaderData,
+  useSubmit,
+} from "react-router-dom";
 import {
   TransformedValues,
   UseFormReturnType,
@@ -35,6 +43,8 @@ import {
 import { useContext, useEffect, useRef } from "react";
 import { UserCredentialsContext } from "../../store/user-credentials-context";
 import { toast } from "react-toastify";
+import { SetDetails } from "../../pages/quiz/set/SetDetails";
+import { loadingIndicator } from "../../App";
 
 interface QuestionBoxProps {
   question: Question;
@@ -115,12 +125,22 @@ const QuestionBox: React.FC<QuestionBoxProps> = ({ question, index, form }) => {
   );
 };
 
-const QuizCreateForm: React.FC = () => {
+const UpdateQuizForm: React.FC = () => {
   const { info } = useContext(UserCredentialsContext);
-  const categoriesData =
-    useRef<[{ categoryId: number; categoryName: string }]>();
+  const loaderData = useLoaderData() as {
+    quiz: SetDetails;
+    categories: { categoryId: number; categoryName: string }[];
+  };
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (info?.userId !== loaderData?.quiz.userId) {
+      navigate(`/quiz/set/${loaderData?.quiz.quizId}`);
+    }
+  }, []);
+
   const processedCategories: string[] = [];
-  categoriesData?.current?.forEach((category) => {
+  loaderData?.categories.forEach((category) => {
     processedCategories.push(category.categoryName);
   });
   const submit = useSubmit();
@@ -150,7 +170,7 @@ const QuizCreateForm: React.FC = () => {
       ...values,
       userId: info?.userId as number,
       categoryId: (() => {
-        const category = categoriesData.current?.find(
+        const category = loaderData?.categories.find(
           (category) => category.categoryName === values.categoryName
         );
         return category?.categoryId;
@@ -161,14 +181,19 @@ const QuizCreateForm: React.FC = () => {
   type Transformed = TransformedValues<typeof form>;
 
   useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  async function fetchCategories() {
-    const res: [{ categoryId: number; categoryName: string }] =
-      await getCategoriesList();
-    categoriesData.current = res;
-  }
+    form.initialize({
+      title: loaderData?.quiz?.quizName as string,
+      categoryName: loaderData?.quiz?.categoryName as string,
+      description: "",
+      questions: loaderData?.quiz?.questions?.map((question) => ({
+        question: question.questionContent as string,
+        answers: question.answers?.map((answer) => ({
+          content: answer.content,
+          isCorrect: answer.isCorrect,
+        })),
+      })) as Question[],
+    });
+  }, [loaderData]);
 
   const handleSubmit = (values: Transformed) => {
     const totalQuestions = values.questions.length;
@@ -215,13 +240,40 @@ const QuizCreateForm: React.FC = () => {
           method: "post",
         }
       );
-      form.reset();
     }
   };
+
+  if (navigation.state === "loading") {
+    return loadingIndicator;
+  }
+
   return (
     <Container>
-      <Text className="font-bold text-3xl my-5">Create a new study set</Text>
       <Form onSubmit={form.onSubmit(handleSubmit)}>
+        <Group className="justify-between">
+          <Text className="font-bold text-3xl my-5">Edit study set</Text>
+          <Button.Group>
+            <Button
+              type="submit"
+              variant="light"
+              leftSection={<IconDeviceFloppy size={14} />}
+              disabled={isSubmitting}
+              loading={isSubmitting}
+            >
+              Save
+            </Button>
+            <Button
+              disabled={isSubmitting}
+              leftSection={<IconTrash size={14} />}
+              loading={isSubmitting}
+              color="red"
+              variant="light"
+            >
+              Delete
+            </Button>
+          </Button.Group>
+        </Group>
+
         <Stack>
           <TextInput
             className="w-full border-b-2 border-transparent focus-within:border-blue-400"
@@ -304,7 +356,7 @@ const QuizCreateForm: React.FC = () => {
               disabled={isSubmitting}
               loading={isSubmitting}
             >
-              Create
+              Save
             </Button>
           </Group>
         </Stack>
@@ -313,4 +365,4 @@ const QuizCreateForm: React.FC = () => {
   );
 };
 
-export default QuizCreateForm;
+export default UpdateQuizForm;

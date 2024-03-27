@@ -1,5 +1,4 @@
 import {
-  Autocomplete,
   Button,
   Menu,
   rem,
@@ -33,6 +32,7 @@ import { UserCredentialsContext } from "../../store/user-credentials-context";
 import { useDisclosure } from "@mantine/hooks";
 import FolderModal from "../modal/navbar/create/FolderModal";
 import ClassModal from "../modal/navbar/create/ClassModal";
+import GeneralSearchBar from "./search/GeneralSearchBar";
 
 const userBtn = (data: LoaderData, submit: any, handleLogout: () => void) => {
   return (
@@ -162,15 +162,6 @@ function Navbar() {
       });
     }
   }, [data]);
-
-  // useEffect(() => {
-  //   if (actionData?.success) {
-  //     toast.success(actionData.msg);
-  //   }
-  //   if (!actionData?.success) {
-  //     toast.error(actionData?.msg);
-  //   }
-  // }, [actionData]);
   const submit = useSubmit();
   const { colorScheme, setColorScheme } = useMantineColorScheme({
     keepTransitions: true,
@@ -218,13 +209,7 @@ function Navbar() {
           </div>
 
           <div className="ml-5 grow">
-            <Autocomplete
-              placeholder="Search for quizzes, classes, etc."
-              data={["React", "Angular", "Vue", "Svelte"]}
-              size="md"
-              radius={"xl"}
-              className="w-full"
-            />
+            <GeneralSearchBar />
           </div>
 
           <Group className="mx-5">

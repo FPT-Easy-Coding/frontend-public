@@ -19,7 +19,6 @@ import {
   Paper,
   Progress,
   Text,
-  Transition,
 } from "@mantine/core";
 import classes from "../../quiz/set/SetDetails.module.css";
 import {
@@ -160,7 +159,7 @@ function FlashcardPage() {
         </Carousel.Slide>
       ));
     }
-  }, [settings.flashcard.isSorted, questionsData, isQuestion]);
+  }, [settings?.flashcard?.isSorted, questionsData, isQuestion]);
   return (
     <>
       {done ? (
